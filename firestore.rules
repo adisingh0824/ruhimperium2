@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Standard access rules for web clients (read settings, products, blogs; write orders, reviews)
+    // For sandbox preview, allow read/write on everything to let admins modify objects.
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

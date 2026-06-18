@@ -1,0 +1,157 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Site structural settings",
+      "type": "object",
+      "properties": {
+        "contactPhone": { "type": "string" },
+        "contactEmail": { "type": "string" },
+        "contactAddress": { "type": "string" },
+        "footerAbout": { "type": "string" },
+        "heroTagline": { "type": "string" },
+        "heroHeadline": { "type": "string" },
+        "heroDescription": { "type": "string" },
+        "whyChooseHeading": { "type": "string" },
+        "whyChooseSub": { "type": "string" },
+        "foundersHeading": { "type": "string" },
+        "foundersText": { "type": "string" },
+        "customLogoUrl": { "type": "string" },
+        "razorpayKeyId": { "type": "string" },
+        "razorpayKeySecret": { "type": "string" },
+        "razorpayEnabled": { "type": "boolean" },
+        "announcementText": { "type": "string" },
+        "announcementLink": { "type": "string" },
+        "activeAdBannerImg": { "type": "string" },
+        "activeAdBannerLink": { "type": "string" },
+        "activeAdBannerEnabled": { "type": "boolean" },
+        "distilleryVideoHeading": { "type": "string" },
+        "distilleryVideoText": { "type": "string" },
+        "distilleryVideoUrl": { "type": "string" },
+        "story01Title": { "type": "string" },
+        "story01Text": { "type": "string" },
+        "story01Image": { "type": "string" },
+        "story02Title": { "type": "string" },
+        "story02Text": { "type": "string" },
+        "story02Image": { "type": "string" },
+        "story03Title": { "type": "string" },
+        "story03Text": { "type": "string" },
+        "story03Image": { "type": "string" },
+        "sandalwoodStickTitle": { "type": "string" },
+        "sandalwoodStickText": { "type": "string" },
+        "sandalwoodStickPrice": { "type": "number" },
+        "sandalwoodStickImage": { "type": "string" },
+        "checkoutPolicyTitle": { "type": "string" },
+        "checkoutPolicyContent": { "type": "string" },
+        "checkoutPolicyEnabled": { "type": "boolean" }
+      }
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Perfume product detail schema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "tagline": { "type": "string" },
+        "price": { "type": "number" },
+        "salePrice": { "type": "number" },
+        "description": { "type": "string" },
+        "story": { "type": "string" },
+        "destination": { "type": "string" },
+        "destinationState": { "type": "string" },
+        "image": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
+        "size": { "type": "string" },
+        "longevity": { "type": "string" },
+        "projection": { "type": "string" },
+        "category": { "type": "string" }
+      }
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Product review",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "author": { "type": "string" },
+        "rating": { "type": "number" },
+        "text": { "type": "string" },
+        "date": { "type": "string" },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "pincode": { "type": "string" },
+        "paymentMode": { "type": "string" },
+        "total": { "type": "number" },
+        "date": { "type": "string" },
+        "status": { "type": "string" },
+        "trackingCode": { "type": "string" }
+      }
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "Discount coupon",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "discountPercent": { "type": "number" }
+      }
+    },
+    "BlogArticle": {
+      "title": "BlogArticle",
+      "description": "Blog article page details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "readTime": { "type": "string" },
+        "author": { "type": "string" },
+        "date": { "type": "string" },
+        "image": { "type": "string" },
+        "location": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "settings/site": {
+      "schema": "SiteSettings",
+      "description": "Site global Settings"
+    },
+    "products/{productId}": {
+      "schema": "Product",
+      "description": "Scent perfumes product items"
+    },
+    "reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Scent product ratings and reviews"
+    },
+    "orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer purchase invoice orders list"
+    },
+    "coupons/{couponId}": {
+      "schema": "Coupon",
+      "description": "Discount token coupons"
+    },
+    "blogArticles/{articleId}": {
+      "schema": "BlogArticle",
+      "description": "Fragrance travelogue blog posts"
+    }
+  }
+}

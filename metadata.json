@@ -1,0 +1,6 @@
+{
+  "name": "Ruh Imperium",
+  "description": "An exquisite luxury travel-inspired Indian fine fragrance house. Discover travel memories of ancient routes, high altitudes, and old markets distilled into bottled luxury.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
