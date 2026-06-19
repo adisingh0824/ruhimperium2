@@ -226,27 +226,43 @@ export default function AdminHub({
     }
   };
 
-  // Helper to upload selected file to Firebase Storage and return a persistent download URL
+  // Compress image before Base64 encoding to bypass Firebase Storage completely and stay well under Firestore 1MB limits
+  const compressAndEncodeBase64 = (file: File, callback: (base64: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        callback(canvas.toDataURL("image/jpeg", 0.6)); // High compression, very small string
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      const uploadToStorage = async () => {
-        try {
-          const timestamp = Date.now();
-          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-          const storageRef = ref(storage, `uploads/${timestamp}_${safeName}`);
-          await uploadBytes(storageRef, file);
-          const downloadUrl = await getDownloadURL(storageRef);
-          callback(downloadUrl);
-        } catch (err: any) {
-          console.error("Firebase Storage upload error:", err);
-          // Fallback: convert to base64 (may fail on large files due to Firestore limits)
-          const reader = new FileReader();
-          reader.onloadend = () => callback(reader.result as string);
-          reader.readAsDataURL(file);
-        }
-      };
-      uploadToStorage();
+      compressAndEncodeBase64(file, callback);
     }
   };
 
@@ -1032,32 +1048,13 @@ export default function AdminHub({
                                       onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                          const doUpload = async () => {
-                                            try {
-                                              const ts = Date.now();
-                                              const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-                                              const storageRef = ref(storage, `products/${ts}_${safeName}`);
-                                              await uploadBytes(storageRef, file);
-                                              const url = await getDownloadURL(storageRef);
-                                              setProdProductImages(prev => {
-                                                const updated = [...prev];
-                                                updated[idx] = url;
-                                                return updated;
-                                              });
-                                            } catch (err) {
-                                              console.error("Product image upload error:", err);
-                                              const reader = new FileReader();
-                                              reader.onloadend = () => {
-                                                setProdProductImages(prev => {
-                                                  const updated = [...prev];
-                                                  updated[idx] = reader.result as string;
-                                                  return updated;
-                                                });
-                                              };
-                                              reader.readAsDataURL(file);
-                                            }
-                                          };
-                                          doUpload();
+                                          compressAndEncodeBase64(file, (compressedBase64) => {
+                                            setProdProductImages(prev => {
+                                              const updated = [...prev];
+                                              updated[idx] = compressedBase64;
+                                              return updated;
+                                            });
+                                          });
                                         }
                                       }}
                                     />
@@ -1130,32 +1127,13 @@ export default function AdminHub({
                                         onChange={(e) => {
                                           const file = e.target.files?.[0];
                                           if (file) {
-                                            const doUpload = async () => {
-                                              try {
-                                                const ts = Date.now();
-                                                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-                                                const storageRef = ref(storage, `gallery/${ts}_${safeName}`);
-                                                await uploadBytes(storageRef, file);
-                                                const url = await getDownloadURL(storageRef);
-                                                setProdGalleryImages(prev => {
-                                                  const updated = [...prev];
-                                                  updated[idx] = url;
-                                                  return updated;
-                                                });
-                                              } catch (err) {
-                                                console.error("Gallery image upload error:", err);
-                                                const reader = new FileReader();
-                                                reader.onloadend = () => {
-                                                  setProdGalleryImages(prev => {
-                                                    const updated = [...prev];
-                                                    updated[idx] = reader.result as string;
-                                                    return updated;
-                                                  });
-                                                };
-                                                reader.readAsDataURL(file);
-                                              }
-                                            };
-                                            doUpload();
+                                            compressAndEncodeBase64(file, (compressedBase64) => {
+                                              setProdGalleryImages(prev => {
+                                                const updated = [...prev];
+                                                updated[idx] = compressedBase64;
+                                                return updated;
+                                              });
+                                            });
                                           }
                                         }}
                                       />
@@ -2945,23 +2923,14 @@ export default function AdminHub({
                                 id="new-col-img-upload-field"
                                 className="hidden"
                                 disabled={isUploadingNewColImg}
-                                onChange={async (e) => {
+                                onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
                                     setIsUploadingNewColImg(true);
-                                    try {
-                                      const ts = Date.now();
-                                      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-                                      const storageRef = ref(storage, `collections/${ts}_${safeName}`);
-                                      await uploadBytes(storageRef, file);
-                                      const url = await getDownloadURL(storageRef);
-                                      setNewColImageUrl(url);
-                                    } catch (err: any) {
-                                      console.error(err);
-                                      alert("Failed to upload collection image: " + err.message);
-                                    } finally {
+                                    compressAndEncodeBase64(file, (compressedBase64) => {
+                                      setNewColImageUrl(compressedBase64);
                                       setIsUploadingNewColImg(false);
-                                    }
+                                    });
                                   }
                                 }}
                               />
@@ -3066,23 +3035,14 @@ export default function AdminHub({
                                         id={`col-img-upload-${col.id}`}
                                         className="hidden"
                                         disabled={uploadingColId === col.id}
-                                        onChange={async (e) => {
+                                        onChange={(e) => {
                                           const file = e.target.files?.[0];
                                           if (file) {
                                             setUploadingColId(col.id);
-                                            try {
-                                              const ts = Date.now();
-                                              const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-                                              const storageRef = ref(storage, `collections/${ts}_${safeName}`);
-                                              await uploadBytes(storageRef, file);
-                                              const url = await getDownloadURL(storageRef);
-                                              setCollections(prev => prev.map(c => c.id === col.id ? { ...c, image: url } : c));
-                                            } catch (err: any) {
-                                              console.error(err);
-                                              alert("Failed to upload collection image: " + err.message);
-                                            } finally {
+                                            compressAndEncodeBase64(file, (compressedBase64) => {
+                                              setCollections(prev => prev.map(c => c.id === col.id ? { ...c, image: compressedBase64 } : c));
                                               setUploadingColId(null);
-                                            }
+                                            });
                                           }
                                         }}
                                       />
