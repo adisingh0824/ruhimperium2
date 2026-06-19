@@ -2446,10 +2446,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               {founders.map((fnd, idx) => (
                 <div 
                   key={fnd.id} 
-                  className="bg-white rounded-3xl border border-sand-200 p-6 sm:p-10 hover:shadow-lg hover:scale-[1.005] transition-all duration-500"
+                  className="bg-white rounded-3xl border border-sand-200 p-6 sm:p-10 hover:shadow-lg hover:scale-[1.005] transition-all duration-500 min-w-0"
                   id={`founder-deck-${fnd.id}`}
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-w-0">
                     
                     {/* Big Image box */}
                     <div className={`col-span-12 lg:col-span-5 ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
@@ -2464,8 +2464,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     </div>
                     
                     {/* Bio Text */}
-                    <div className={`col-span-12 lg:col-span-7 flex flex-col justify-between ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
-                      <div>
+                    <div className={`col-span-12 lg:col-span-7 flex flex-col justify-between min-w-0 ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
+                      <div className="min-w-0 break-words">
                         <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4BC96] font-bold block mb-2">
                           {fnd.role}
                         </span>
