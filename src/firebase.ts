@@ -6,8 +6,8 @@ import firebaseConfig from "../firebase-applet-config.json";
 
 const app = initializeApp(firebaseConfig);
 
-// The AI Studio project uses a specific named database, not the (default) database
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || "(default)");
+// Connect to the (default) database created by the user in the Firebase Console
+export const db = getFirestore(app);
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);
