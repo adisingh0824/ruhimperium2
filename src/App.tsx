@@ -94,17 +94,15 @@ export default function App() {
 
   // Dynamic Products collection
   const [products, setProducts] = useState<Product[]>(() => {
-    const cached = localStorage.getItem("ruh-products") || localStorage.getItem("raahi-products");
+    const cached = localStorage.getItem("ruh-products");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (parsed.length !== 16 || parsed.some((p: any) => p.id === "citrus-sandalwood") || !JSON.stringify(parsed).includes("Safar EDP")) {
-          localStorage.setItem("ruh-products", JSON.stringify(PRODUCTS));
-          return PRODUCTS;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
         }
-        return parsed;
       } catch (e) {
-        return PRODUCTS;
+        // Fall through to defaults
       }
     }
     return PRODUCTS;
@@ -169,11 +167,8 @@ export default function App() {
 
   // Dynamic Cover Hero Graphic
   const [coverPhoto, setCoverPhoto] = useState<string>(() => {
-    const cached = localStorage.getItem("ruh-cover-photo") || localStorage.getItem("raahi-cover-photo");
-    if (!cached || cached.includes("unsplash") || cached.includes("raahi")) {
-      return "/src/assets/images/traditional_degh_distillation_pots_1781437229236.jpg";
-    }
-    return cached;
+    const cached = localStorage.getItem("ruh-cover-photo");
+    return cached || "/src/assets/images/traditional_degh_distillation_pots_1781437229236.jpg";
   });
 
   useEffect(() => {
@@ -182,8 +177,7 @@ export default function App() {
 
   // Dynamic Hero Video URL
   const [heroVideoUrl, setHeroVideoUrl] = useState<string>(() => {
-    const cached = localStorage.getItem("ruh-hero-video-url") || localStorage.getItem("raahi-hero-video-url");
-    // Ensure default fallback uses a high-performance raw CDN stream that is never blocked (Vimeo external CDN)
+    const cached = localStorage.getItem("ruh-hero-video-url");
     return cached || "https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761";
   });
 
@@ -215,37 +209,13 @@ export default function App() {
 
   // Dynamic leadership profiles with default social handles
   const [founders, setFounders] = useState<Founder[]>(() => {
-    const cached = localStorage.getItem("ruh-founders") || localStorage.getItem("raahi-founders");
+    const cached = localStorage.getItem("ruh-founders");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (parsed.some((f: any) => f.image && f.image.includes("/src/assets/images")) || parsed.some((f: any) => f.linkedin && f.linkedin.includes("raahi"))) {
-          const defaults = [
-            {
-              id: "vimal",
-              name: "Vimal Singh",
-              role: "FOUNDER & HEAD PERFUMER",
-              bio: "Deeply passionate about reviving traditional Indian hydro-distillation methods (Degh-Bhapka). Vimal spends months in the Kannauj flower belts ensuring our extracts remain uncompromised.",
-              image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600",
-              linkedin: "https://linkedin.com/in/vimalsingh-ruh",
-              instagram: "https://instagram.com/vimalsingh.ruh",
-              twitter: "https://twitter.com/vimalsingh_ruh"
-            },
-            {
-              id: "aditya",
-              name: "Aditya Singh",
-              role: "CO-FOUNDER & CHIEF EXPLORER",
-              bio: "Aditya spearheads our wilderness sourcing expeditions. From trekking into Assam's agarwood jungles to securing sustainable cardamom contracts with local co-operatives in Wayanad.",
-              image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600",
-              linkedin: "https://linkedin.com/in/adityasingh-ruh",
-              instagram: "https://instagram.com/adityasingh.ruh",
-              twitter: "https://twitter.com/adityasingh_ruh"
-            }
-          ];
-          localStorage.setItem("ruh-founders", JSON.stringify(defaults));
-          return defaults;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
         }
-        return parsed;
       } catch (e) {
         // Fall through
       }
@@ -280,27 +250,13 @@ export default function App() {
 
   // Dynamic site textual configuration settings
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
-    const cached = localStorage.getItem("raahi-site-settings") || localStorage.getItem("ruh-site-settings");
+    const cached = localStorage.getItem("ruh-site-settings");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (!parsed.heroHeadline || JSON.stringify(parsed).includes("Raahi") || JSON.stringify(parsed).includes("raahiparfums")) {
-          const migrated = {
-            ...parsed,
-            contactPhone: "+91 91167 11413",
-            contactEmail: "support@ruhimperium.com",
-            contactAddress: "Ruh Imperium Luxury Ateliers, Kannauj, Uttar Pradesh, India",
-            footerAbout: "Handcrafted slow-perfumery masterpieces straight from India's perfume capital Kannauj. Pure alcohol-free perfume oils and luxury Eau De Parfums.",
-            whyChooseHeading: "Why Choose Ruh Imperium?",
-            foundersText: "Ruh Imperium was sparked by a shared vision to traverse India’s historic trade routes, distilling pristine biological extracts and crafting honest, high-concentration luxury fragrances.",
-            heroTagline: "TRADITIONAL COPPER DISTILLED FRAGRANCES",
-            heroHeadline: "Where Fragrance Meets Tradition",
-            heroDescription: "Explore fine alcohol-free pure oils and elegant luxury Eau De Parfums hydro-distilled in 204-year-old copper stills of Kannauj.",
-          };
-          localStorage.setItem("ruh-site-settings", JSON.stringify(migrated));
-          return migrated;
+        if (parsed && parsed.heroHeadline) {
+          return parsed;
         }
-        return parsed;
       } catch (e) {
         // Fall through
       }
@@ -349,9 +305,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Dynamic system coupon tokens register
   const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    const cached = localStorage.getItem("ruh-coupons") || localStorage.getItem("raahi-coupons");
-    if (cached) return JSON.parse(cached);
-    // Presetted active dynamic coupons
+    const cached = localStorage.getItem("ruh-coupons");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) { /* Fall through */ }
+    }
     return [
       { code: "RUH20", discountPercent: 20 },
       { code: "WELCOME10", discountPercent: 10 }
@@ -364,12 +324,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Dynamic orders ledger
   const [orders, setOrders] = useState<Order[]>(() => {
-    const cached = localStorage.getItem("ruh-orders") || localStorage.getItem("raahi-orders");
-    if (cached) return JSON.parse(cached);
-    
-    // Seed sample order to make HQ panel look wonderful on first launch
-    const sampleProduct = PRODUCTS[0] || products[0];
+    const cached = localStorage.getItem("ruh-orders");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) { /* Fall through */ }
+    }
     const generatedTracking = `RUH-38410-IN`;
+    const seedProduct = PRODUCTS[0];
     const sampleOrder: Order = {
       id: "ORD-1781324500123",
       fullName: "Aditya Singh",
@@ -380,12 +343,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       paymentMode: "UPI",
       items: [
         {
-          product: sampleProduct,
+          product: seedProduct,
           quantity: 1,
           selectedSize: "50 ml"
         }
       ],
-      total: sampleProduct.salePrice,
+      total: seedProduct.salePrice,
       date: new Date().toISOString().split("T")[0],
       status: "In Transit",
       trackingCode: generatedTracking
@@ -409,7 +372,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // General Customer Accounts Registry & Lounge Trigger
   const [users, setUsers] = useState<UserAccount[]>(() => {
     const cached = localStorage.getItem("ruh-users");
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) { /* Fall through */ }
+    }
     return [
       {
         email: "guest@ruh-imperium.com",
@@ -457,8 +425,14 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Custom reviews list state allowing real-time submissions
   const [reviews, setReviews] = useState<Review[]>(() => {
-    const cached = localStorage.getItem("ruh-reviews") || localStorage.getItem("raahi-reviews");
-    return cached ? JSON.parse(cached) : PRE_SEEDED_REVIEWS;
+    const cached = localStorage.getItem("ruh-reviews");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) { /* Fall through */ }
+    }
+    return PRE_SEEDED_REVIEWS;
   });
 
   // Modals state
@@ -475,7 +449,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // Custom blog articles state allowing real-time admin updates & picture uploads
   const [blogArticles, setBlogArticles] = useState<BlogArticle[]>(() => {
     const cached = localStorage.getItem("ruh-blog-articles");
-    return cached ? JSON.parse(cached) : BLOG_ARTICLES;
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) { /* Fall through */ }
+    }
+    return BLOG_ARTICLES;
   });
 
   // Newsletter email state
