@@ -1198,7 +1198,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   };
 
   return (
-    <div className="min-h-screen bg-sand-50/70 text-sand-900 font-sans antialiased text-sm flex flex-col justify-between">
+    <div className="min-h-screen overflow-x-hidden bg-sand-50/70 text-sand-900 font-sans antialiased text-sm flex flex-col justify-between">
       
       {/* Editorial Luxury Splash Screen */}
       <AnimatePresence mode="wait">
@@ -2438,7 +2438,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               <p className="text-sm text-sand-500 font-light leading-relaxed">
                 {siteSettings.foundersText}
               </p>
-                        {/* Founders Grid */}
+            </div>
+
+            {/* Founders Grid */}
             <div className="grid grid-cols-1 gap-12 max-w-5xl mx-auto">
               
               {founders.map((fnd, idx) => (
@@ -2521,7 +2523,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                 </div>
               ))}
-            </div>  </div>
+            </div>
           </div>
         </section>
 
