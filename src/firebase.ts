@@ -9,7 +9,7 @@ const app = initializeApp(firebaseConfig);
 // Force Long Polling to bypass mobile carrier WebSocket blocks and guarantee sync
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
-}, firebaseConfig.firestoreDatabaseId);
+});
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);
