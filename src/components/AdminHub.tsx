@@ -224,13 +224,33 @@ export default function AdminHub({
     }
   };
 
-  // Helper to convert selected file into persistent Base64 Data URI directly
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (base64: string) => void) => {
+  // Helper to upload selected file via server API and return a persistent URL path
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        callback(reader.result as string);
+      reader.onloadend = async () => {
+        try {
+          const base64 = reader.result as string;
+          const response = await fetch("/api/upload-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageData: base64, filename: file.name }),
+          });
+          if (!response.ok) {
+            throw new Error("Failed to upload image to server");
+          }
+          const res = await response.json();
+          if (res.success && res.url) {
+            callback(res.url);
+          } else {
+            throw new Error("Could not retrieve uploaded image URL");
+          }
+        } catch (err: any) {
+          console.error("Image upload error:", err);
+          // Fallback to base64 if server upload fails (e.g., in production without Express server)
+          callback(reader.result as string);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -1019,12 +1039,33 @@ export default function AdminHub({
                                         const file = e.target.files?.[0];
                                         if (file) {
                                           const reader = new FileReader();
-                                          reader.onloadend = () => {
-                                            setProdProductImages(prev => {
-                                              const updated = [...prev];
-                                              updated[idx] = reader.result as string;
-                                              return updated;
-                                            });
+                                          reader.onloadend = async () => {
+                                            try {
+                                              const base64 = reader.result as string;
+                                              const response = await fetch("/api/upload-image", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ imageData: base64, filename: file.name }),
+                                              });
+                                              if (!response.ok) throw new Error("Upload failed");
+                                              const res = await response.json();
+                                              if (res.success && res.url) {
+                                                setProdProductImages(prev => {
+                                                  const updated = [...prev];
+                                                  updated[idx] = res.url;
+                                                  return updated;
+                                                });
+                                              } else {
+                                                throw new Error("No URL returned");
+                                              }
+                                            } catch (err) {
+                                              console.error("Product image upload error:", err);
+                                              setProdProductImages(prev => {
+                                                const updated = [...prev];
+                                                updated[idx] = reader.result as string;
+                                                return updated;
+                                              });
+                                            }
                                           };
                                           reader.readAsDataURL(file);
                                         }
@@ -1100,12 +1141,33 @@ export default function AdminHub({
                                           const file = e.target.files?.[0];
                                           if (file) {
                                             const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                              setProdGalleryImages(prev => {
-                                                const updated = [...prev];
-                                                updated[idx] = reader.result as string;
-                                                return updated;
-                                              });
+                                            reader.onloadend = async () => {
+                                              try {
+                                                const base64 = reader.result as string;
+                                                const response = await fetch("/api/upload-image", {
+                                                  method: "POST",
+                                                  headers: { "Content-Type": "application/json" },
+                                                  body: JSON.stringify({ imageData: base64, filename: file.name }),
+                                                });
+                                                if (!response.ok) throw new Error("Upload failed");
+                                                const res = await response.json();
+                                                if (res.success && res.url) {
+                                                  setProdGalleryImages(prev => {
+                                                    const updated = [...prev];
+                                                    updated[idx] = res.url;
+                                                    return updated;
+                                                  });
+                                                } else {
+                                                  throw new Error("No URL returned");
+                                                }
+                                              } catch (err) {
+                                                console.error("Gallery image upload error:", err);
+                                                setProdGalleryImages(prev => {
+                                                  const updated = [...prev];
+                                                  updated[idx] = reader.result as string;
+                                                  return updated;
+                                                });
+                                              }
                                             };
                                             reader.readAsDataURL(file);
                                           }
