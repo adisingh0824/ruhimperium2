@@ -33,7 +33,7 @@ import OrderTracker from "./components/OrderTracker";
 import UserLoungeModal from "./components/UserLoungeModal";
 import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
-import { db } from './firebase';
+import { db, withTimeout } from './firebase';
 import { doc, setDoc, onSnapshot, collection, deleteDoc, writeBatch } from 'firebase/firestore';
 
 const isEmbedIframe = (url: string): boolean => {
@@ -725,7 +725,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           ];
           const cached = localStorage.getItem("ruh-collections");
           const startingCollections = cached ? JSON.parse(cached) : initialCollections;
-          await setDoc(doc(db, "settings", "collections"), { list: startingCollections });
+          await withTimeout(setDoc(doc(db, "settings", "collections"), { list: startingCollections }));
         } catch (err) {
           console.error("Error setting collections:", err);
           initPendingRef.current["collections"] = false;
@@ -746,7 +746,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         try {
           const cachedCover = localStorage.getItem("ruh-cover-photo") || "/src/assets/images/traditional_degh_distillation_pots_1781437229236.jpg";
           const cachedVideo = localStorage.getItem("ruh-hero-video-url") || "https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4";
-          await setDoc(doc(db, "settings", "assets"), { coverPhoto: cachedCover, heroVideoUrl: cachedVideo });
+          await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: cachedCover, heroVideoUrl: cachedVideo }));
         } catch (err) {
           console.error("Error setting assets:", err);
           initPendingRef.current["assets"] = false;
@@ -816,7 +816,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     }
     setSiteSettings(resolved);
     try {
-      await setDoc(doc(db, "settings", "site"), resolved);
+      await withTimeout(setDoc(doc(db, "settings", "site"), resolved));
     } catch (e) {
       console.error("Firestore settings sync error: ", e);
     } finally {
@@ -834,7 +834,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     }
     setFounders(resolved);
     try {
-      await setDoc(doc(db, "settings", "founders"), { list: resolved });
+      await withTimeout(setDoc(doc(db, "settings", "founders"), { list: resolved }));
     } catch (e) {
       console.error("Firestore founders sync error: ", e);
     } finally {
@@ -853,7 +853,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setCollections(resolved);
     collectionsRef.current = resolved;
     try {
-      await setDoc(doc(db, "settings", "collections"), { list: resolved });
+      await withTimeout(setDoc(doc(db, "settings", "collections"), { list: resolved }));
     } catch (e) {
       console.error("Firestore collections sync error: ", e);
     } finally {
@@ -866,7 +866,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setCoverPhoto(newVal);
     coverPhotoRef.current = newVal;
     try {
-      await setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true });
+      await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true }));
     } catch (e) {
       console.error("Firestore cover photo sync error: ", e);
     } finally {
@@ -879,7 +879,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setHeroVideoUrl(newVal);
     heroVideoUrlRef.current = newVal;
     try {
-      await setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true });
+      await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }));
     } catch (e) {
       console.error("Firestore hero video sync error: ", e);
     } finally {
@@ -902,10 +902,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       const currentIds = new Set(resolved.map(p => p.id));
       const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
       for (const id of deletedIds) {
-        await deleteDoc(doc(db, "products", id));
+        await withTimeout(deleteDoc(doc(db, "products", id)));
       }
       for (const p of resolved) {
-        await setDoc(doc(db, "products", p.id), p);
+        await withTimeout(setDoc(doc(db, "products", p.id), p));
       }
     } catch (e) {
       console.error("Firestore products sync error: ", e);

@@ -6,13 +6,28 @@ import firebaseConfig from "../firebase-applet-config.json";
 
 const app = initializeApp(firebaseConfig);
 
-// Force Long Polling to bypass mobile carrier WebSocket blocks and guarantee sync
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-});
+export const db = getFirestore(app);
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+
+// Helper to prevent infinite hangs on offline/missing databases
+export const withTimeout = <T>(promise: Promise<T>, ms: number = 4000): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error("Connection to live database timed out. Ensure your database is active."));
+    }, ms);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((reason) => {
+        clearTimeout(timer);
+        reject(reason);
+      });
+  });
+};
 
 // Validate and test initial connection, and sign in anonymously to satisfy Storage rules
 async function validateConnection() {

@@ -132,8 +132,9 @@ export default function AdminHub({
       setIsSiteDirty(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save site and founders error:", err);
+      alert("Failed to publish: " + err.message);
     } finally {
       setIsSaving(false);
     }
@@ -1484,43 +1485,22 @@ export default function AdminHub({
                             id="hero-video-upload-direct"
                             className="hidden"
                             disabled={isUploadingVideo}
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (file) {
                                 setIsUploadingVideo(true);
-                                const reader = new FileReader();
-                                reader.onload = async () => {
-                                  try {
-                                    const base64 = reader.result as string;
-                                    const response = await fetch("/api/upload-video", {
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                      },
-                                      body: JSON.stringify({
-                                        videoData: base64,
-                                        filename: file.name,
-                                      }),
-                                    });
-                                    if (!response.ok) {
-                                      const errorDetails = await response.json().catch(() => ({}));
-                                      throw new Error(errorDetails.error || "Failed to upload video to server");
-                                    }
-                                    const resJson = await response.json();
-                                    if (resJson.success && resJson.url) {
-                                      setHeroVideoUrl(resJson.url);
-                                      alert(`Scent film file "${file.name}" uploaded to server and broadcasting successfully! All customers will now see this video live in the ambient background.`);
-                                    } else {
-                                      throw new Error("Could not retrieve uploaded URL link");
-                                    }
-                                  } catch (err: any) {
-                                    console.error("Upload error:", err);
-                                    alert(`Failed to upload scent film: ${err.message}`);
-                                  } finally {
-                                    setIsUploadingVideo(false);
-                                  }
-                                };
-                                reader.readAsDataURL(file);
+                                try {
+                                  const storageRef = ref(storage, `videos/hero-video-${Date.now()}-${file.name}`);
+                                  await uploadBytes(storageRef, file);
+                                  const downloadUrl = await getDownloadURL(storageRef);
+                                  setHeroVideoUrl(downloadUrl);
+                                  alert(`Scent film file "${file.name}" uploaded to server and broadcasting successfully! All customers will now see this video live in the ambient background.`);
+                                } catch (err: any) {
+                                  console.error("Upload error:", err);
+                                  alert(`Failed to upload scent film: ${err.message}`);
+                                } finally {
+                                  setIsUploadingVideo(false);
+                                }
                               }
                             }}
                           />
