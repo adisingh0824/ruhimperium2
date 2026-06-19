@@ -23,6 +23,8 @@ import {
   Star
 } from "lucide-react";
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
+import { storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface AdminHubProps {
   isOpen: boolean;
@@ -224,35 +226,27 @@ export default function AdminHub({
     }
   };
 
-  // Helper to upload selected file via server API and return a persistent URL path
+  // Helper to upload selected file to Firebase Storage and return a persistent download URL
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
+      const uploadToStorage = async () => {
         try {
-          const base64 = reader.result as string;
-          const response = await fetch("/api/upload-image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ imageData: base64, filename: file.name }),
-          });
-          if (!response.ok) {
-            throw new Error("Failed to upload image to server");
-          }
-          const res = await response.json();
-          if (res.success && res.url) {
-            callback(res.url);
-          } else {
-            throw new Error("Could not retrieve uploaded image URL");
-          }
+          const timestamp = Date.now();
+          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          const storageRef = ref(storage, `uploads/${timestamp}_${safeName}`);
+          await uploadBytes(storageRef, file);
+          const downloadUrl = await getDownloadURL(storageRef);
+          callback(downloadUrl);
         } catch (err: any) {
-          console.error("Image upload error:", err);
-          // Fallback to base64 if server upload fails (e.g., in production without Express server)
-          callback(reader.result as string);
+          console.error("Firebase Storage upload error:", err);
+          // Fallback: convert to base64 (may fail on large files due to Firestore limits)
+          const reader = new FileReader();
+          reader.onloadend = () => callback(reader.result as string);
+          reader.readAsDataURL(file);
         }
       };
-      reader.readAsDataURL(file);
+      uploadToStorage();
     }
   };
 
@@ -1038,36 +1032,32 @@ export default function AdminHub({
                                       onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                          const reader = new FileReader();
-                                          reader.onloadend = async () => {
+                                          const doUpload = async () => {
                                             try {
-                                              const base64 = reader.result as string;
-                                              const response = await fetch("/api/upload-image", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ imageData: base64, filename: file.name }),
-                                              });
-                                              if (!response.ok) throw new Error("Upload failed");
-                                              const res = await response.json();
-                                              if (res.success && res.url) {
-                                                setProdProductImages(prev => {
-                                                  const updated = [...prev];
-                                                  updated[idx] = res.url;
-                                                  return updated;
-                                                });
-                                              } else {
-                                                throw new Error("No URL returned");
-                                              }
-                                            } catch (err) {
-                                              console.error("Product image upload error:", err);
+                                              const ts = Date.now();
+                                              const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+                                              const storageRef = ref(storage, `products/${ts}_${safeName}`);
+                                              await uploadBytes(storageRef, file);
+                                              const url = await getDownloadURL(storageRef);
                                               setProdProductImages(prev => {
                                                 const updated = [...prev];
-                                                updated[idx] = reader.result as string;
+                                                updated[idx] = url;
                                                 return updated;
                                               });
+                                            } catch (err) {
+                                              console.error("Product image upload error:", err);
+                                              const reader = new FileReader();
+                                              reader.onloadend = () => {
+                                                setProdProductImages(prev => {
+                                                  const updated = [...prev];
+                                                  updated[idx] = reader.result as string;
+                                                  return updated;
+                                                });
+                                              };
+                                              reader.readAsDataURL(file);
                                             }
                                           };
-                                          reader.readAsDataURL(file);
+                                          doUpload();
                                         }
                                       }}
                                     />
@@ -1140,36 +1130,32 @@ export default function AdminHub({
                                         onChange={(e) => {
                                           const file = e.target.files?.[0];
                                           if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = async () => {
+                                            const doUpload = async () => {
                                               try {
-                                                const base64 = reader.result as string;
-                                                const response = await fetch("/api/upload-image", {
-                                                  method: "POST",
-                                                  headers: { "Content-Type": "application/json" },
-                                                  body: JSON.stringify({ imageData: base64, filename: file.name }),
-                                                });
-                                                if (!response.ok) throw new Error("Upload failed");
-                                                const res = await response.json();
-                                                if (res.success && res.url) {
-                                                  setProdGalleryImages(prev => {
-                                                    const updated = [...prev];
-                                                    updated[idx] = res.url;
-                                                    return updated;
-                                                  });
-                                                } else {
-                                                  throw new Error("No URL returned");
-                                                }
-                                              } catch (err) {
-                                                console.error("Gallery image upload error:", err);
+                                                const ts = Date.now();
+                                                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+                                                const storageRef = ref(storage, `gallery/${ts}_${safeName}`);
+                                                await uploadBytes(storageRef, file);
+                                                const url = await getDownloadURL(storageRef);
                                                 setProdGalleryImages(prev => {
                                                   const updated = [...prev];
-                                                  updated[idx] = reader.result as string;
+                                                  updated[idx] = url;
                                                   return updated;
                                                 });
+                                              } catch (err) {
+                                                console.error("Gallery image upload error:", err);
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                  setProdGalleryImages(prev => {
+                                                    const updated = [...prev];
+                                                    updated[idx] = reader.result as string;
+                                                    return updated;
+                                                  });
+                                                };
+                                                reader.readAsDataURL(file);
                                               }
                                             };
-                                            reader.readAsDataURL(file);
+                                            doUpload();
                                           }
                                         }}
                                       />
@@ -2963,35 +2949,19 @@ export default function AdminHub({
                                   const file = e.target.files?.[0];
                                   if (file) {
                                     setIsUploadingNewColImg(true);
-                                    const reader = new FileReader();
-                                    reader.onload = async () => {
-                                      try {
-                                        const base64 = reader.result as string;
-                                        const response = await fetch("/api/upload-image", {
-                                          method: "POST",
-                                          headers: {
-                                            "Content-Type": "application/json",
-                                          },
-                                          body: JSON.stringify({
-                                            imageData: base64,
-                                            filename: file.name,
-                                          }),
-                                        });
-                                        if (!response.ok) {
-                                          throw new Error("Failed to upload image file");
-                                        }
-                                        const res = await response.json();
-                                        if (res.success && res.url) {
-                                          setNewColImageUrl(res.url);
-                                        }
-                                      } catch (err: any) {
-                                        console.error(err);
-                                        alert("Failed to upload collection image: " + err.message);
-                                      } finally {
-                                        setIsUploadingNewColImg(false);
-                                      }
-                                    };
-                                    reader.readAsDataURL(file);
+                                    try {
+                                      const ts = Date.now();
+                                      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+                                      const storageRef = ref(storage, `collections/${ts}_${safeName}`);
+                                      await uploadBytes(storageRef, file);
+                                      const url = await getDownloadURL(storageRef);
+                                      setNewColImageUrl(url);
+                                    } catch (err: any) {
+                                      console.error(err);
+                                      alert("Failed to upload collection image: " + err.message);
+                                    } finally {
+                                      setIsUploadingNewColImg(false);
+                                    }
                                   }
                                 }}
                               />
@@ -3100,35 +3070,19 @@ export default function AdminHub({
                                           const file = e.target.files?.[0];
                                           if (file) {
                                             setUploadingColId(col.id);
-                                            const reader = new FileReader();
-                                            reader.onload = async () => {
-                                              try {
-                                                const base64 = reader.result as string;
-                                                const response = await fetch("/api/upload-image", {
-                                                  method: "POST",
-                                                  headers: {
-                                                    "Content-Type": "application/json",
-                                                  },
-                                                  body: JSON.stringify({
-                                                    imageData: base64,
-                                                    filename: file.name,
-                                                  }),
-                                                });
-                                                if (!response.ok) {
-                                                  throw new Error("Failed to upload image file");
-                                                }
-                                                const res = await response.json();
-                                                if (res.success && res.url) {
-                                                  setCollections(prev => prev.map(c => c.id === col.id ? { ...c, image: res.url } : c));
-                                                }
-                                              } catch (err: any) {
-                                                console.error(err);
-                                                alert("Failed to upload collection image: " + err.message);
-                                              } finally {
-                                                setUploadingColId(null);
-                                              }
-                                            };
-                                            reader.readAsDataURL(file);
+                                            try {
+                                              const ts = Date.now();
+                                              const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+                                              const storageRef = ref(storage, `collections/${ts}_${safeName}`);
+                                              await uploadBytes(storageRef, file);
+                                              const url = await getDownloadURL(storageRef);
+                                              setCollections(prev => prev.map(c => c.id === col.id ? { ...c, image: url } : c));
+                                            } catch (err: any) {
+                                              console.error(err);
+                                              alert("Failed to upload collection image: " + err.message);
+                                            } finally {
+                                              setUploadingColId(null);
+                                            }
                                           }
                                         }}
                                       />
