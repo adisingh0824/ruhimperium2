@@ -76,6 +76,13 @@ export default function App() {
   const reviewsRef = useRef<Review[]>([]);
   const ordersRef = useRef<Order[]>([]);
   const usersRef = useRef<UserAccount[]>([]);
+  
+  // NEW REFS for settings to prevent stale closures
+  const siteSettingsRef = useRef<SiteSettings>({} as SiteSettings);
+  const foundersRef = useRef<Founder[]>([]);
+  const collectionsRef = useRef<Collection[]>([]);
+  const coverPhotoRef = useRef<string>("");
+  const heroVideoUrlRef = useRef<string>("");
   // Full-screen editorial brand splash loader
   const [isSplashLoading, setIsSplashLoading] = useState(true);
 
@@ -487,6 +494,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   useEffect(() => { reviewsRef.current = reviews; }, [reviews]);
   useEffect(() => { ordersRef.current = orders; }, [orders]);
   useEffect(() => { usersRef.current = users; }, [users]);
+  useEffect(() => { siteSettingsRef.current = siteSettings; }, [siteSettings]);
+  useEffect(() => { foundersRef.current = founders; }, [founders]);
+  useEffect(() => { collectionsRef.current = collections; }, [collections]);
+  useEffect(() => { coverPhotoRef.current = coverPhoto; }, [coverPhoto]);
+  useEffect(() => { heroVideoUrlRef.current = heroVideoUrl; }, [heroVideoUrl]);
 
   // -------------------------------------------------------------
   // FIRESTORE ENHANCED PERMANENT SYNCHRONIZATION ENGINE
@@ -798,7 +810,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     writeLockRef.current["site"] = true;
     let resolved: SiteSettings;
     if (typeof newVal === "function") {
-      resolved = newVal(siteSettings);
+      resolved = newVal(siteSettingsRef.current);
     } else {
       resolved = newVal;
     }
@@ -816,7 +828,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     writeLockRef.current["founders"] = true;
     let resolved: Founder[];
     if (typeof newVal === "function") {
-      resolved = newVal(founders);
+      resolved = newVal(foundersRef.current);
     } else {
       resolved = newVal;
     }
@@ -834,11 +846,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     writeLockRef.current["collections"] = true;
     let resolved: Collection[];
     if (typeof newVal === "function") {
-      resolved = newVal(collections);
+      resolved = newVal(collectionsRef.current);
     } else {
       resolved = newVal;
     }
     setCollections(resolved);
+    collectionsRef.current = resolved;
     try {
       await setDoc(doc(db, "settings", "collections"), { list: resolved });
     } catch (e) {
@@ -848,11 +861,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     }
   };
 
-  const updateCoverPhoto = async (photoUrl: string) => {
+  const updateCoverPhoto = async (newVal: string) => {
     writeLockRef.current["assets"] = true;
-    setCoverPhoto(photoUrl);
+    setCoverPhoto(newVal);
+    coverPhotoRef.current = newVal;
     try {
-      await setDoc(doc(db, "settings", "assets"), { coverPhoto: photoUrl }, { merge: true });
+      await setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true });
     } catch (e) {
       console.error("Firestore cover photo sync error: ", e);
     } finally {
@@ -860,11 +874,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     }
   };
 
-  const updateHeroVideoUrl = async (videoUrl: string) => {
+  const updateHeroVideoUrl = async (newVal: string) => {
     writeLockRef.current["assets"] = true;
-    setHeroVideoUrl(videoUrl);
+    setHeroVideoUrl(newVal);
+    heroVideoUrlRef.current = newVal;
     try {
-      await setDoc(doc(db, "settings", "assets"), { heroVideoUrl: videoUrl }, { merge: true });
+      await setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true });
     } catch (e) {
       console.error("Firestore hero video sync error: ", e);
     } finally {
