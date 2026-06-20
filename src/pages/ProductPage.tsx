@@ -125,22 +125,22 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
                 `}</style>
                 
                 {/* Main image */}
-                <div className="flex-none w-full aspect-[3/4] lg:aspect-[4/5] snap-center relative bg-sand-100">
+                <div className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     referrerPolicy="no-referrer"
                   />
                 </div>
 
                 {/* Additional gallery images */}
                 {product.galleryImages?.map((img, idx) => (
-                  <div key={idx} className="flex-none w-full aspect-[3/4] lg:aspect-[4/5] snap-center relative bg-sand-100">
+                  <div key={idx} className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
                     <img 
                       src={img} 
                       alt={`${product.name} gallery view ${idx + 1}`} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       referrerPolicy="no-referrer"
                     />
                   </div>
@@ -149,10 +149,10 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
 
               {/* Minimal dots indicator for mobile (shows if there are gallery images) */}
               {(product.galleryImages && product.galleryImages.length > 0) && (
-                <div className="flex justify-center gap-2 mt-4 mb-2 lg:hidden">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 lg:hidden z-10 bg-white/30 backdrop-blur-md px-3 py-1.5 rounded-full">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#2D2926]"></div>
                   {product.galleryImages.map((_, idx) => (
-                    <div key={idx} className="w-1.5 h-1.5 rounded-full bg-sand-300"></div>
+                    <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
                   ))}
                 </div>
               )}
@@ -160,11 +160,11 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
           </div>
 
           {/* Right: Product Details */}
-          <div className="w-full lg:w-1/2 px-4 sm:px-0 py-8">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light font-display text-sand-950 mb-2">
+          <div className="w-full lg:w-1/2 px-4 sm:px-0 pt-5 pb-8 lg:py-8">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light font-display text-sand-950 mb-1.5">
               {product.name}
             </h1>
-            <p className="text-sm sm:text-base text-[#D4BC96] uppercase tracking-widest font-semibold mb-6">
+            <p className="text-[11px] sm:text-sm text-[#D4BC96] uppercase tracking-widest font-semibold mb-5">
               {product.tagline}
             </p>
 
