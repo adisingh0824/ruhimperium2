@@ -566,7 +566,7 @@ export default function CartDrawer({
                     }`}
                   >
                     <CreditCard className="w-4 h-4" />
-                    <span className="text-[10px] font-semibold tracking-wider">COD / PAY LATER</span>
+                    <span className="text-[10px] font-semibold tracking-wider">CASH ON DELIVERY (COD)</span>
                   </button>
                 </div>
               </div>
