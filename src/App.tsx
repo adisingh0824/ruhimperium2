@@ -1,4 +1,5 @@
 import { useState, useEffect, FormEvent, useRef } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { 
   Compass, 
   MapPin, 
@@ -27,6 +28,7 @@ import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data';
 import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
 import Header from "./components/Header";
 import ProductDetailsModal from "./components/ProductDetailsModal";
+import ProductPage from "./pages/ProductPage";
 import CartDrawer from "./components/CartDrawer";
 import AdminHub from "./components/AdminHub";
 import OrderTracker from "./components/OrderTracker";
@@ -445,6 +447,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // Modals state
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  // Mobile menu and utility state
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
@@ -1287,6 +1292,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
       {/* Main Content Body */}
       <main className="flex-1">
+        <Routes>
+          <Route path="/" element={
+            <>
 
         {/* HERO BANNER SECTION */}
         <section 
@@ -1687,16 +1695,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       {/* Quick look overlay block */}
                       <button
                         type="button"
-                        onClick={() => handleOpenPDP(prod)}
-                        className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white text-sand-900 text-xs font-semibold tracking-[0.2em] font-serif uppercase px-6 py-3 rounded shadow-lg border border-sand-200 hover:bg-[#2D2926] hover:text-[#FAFAFA] transition-all translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-300 focus:outline-none cursor-pointer"
-                        id={`quick-look-btn-${prod.id}`}
+                        onClick={() => navigate(`/product/${prod.id}`)}
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-white/95 backdrop-blur-sm px-6 py-2.5 text-[10px] font-sans font-bold tracking-[0.2em] uppercase text-sand-950 flex items-center gap-2 hover:bg-[#2D2926] hover:text-white rounded-sm shadow-xl"
                       >
-                        JOURNAL & NOTES
+                        <Eye className="w-3.5 h-3.5" /> Quick Look
                       </button>
                     </div>
 
                     {/* Card Content Data block */}
-                    <div className="p-4 sm:p-6 flex flex-col flex-grow">
+                    <div className="flex flex-col flex-grow p-5 bg-white/40">
                       <div className="flex-grow">
                         
                         {/* Rating block */}
@@ -1717,8 +1724,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         </div>
 
                         <button 
-                          onClick={() => handleOpenPDP(prod)}
-                          className="text-left block text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide mb-1.5 group-hover:text-[#D4BC96] transition-colors focus:outline-none"
+                          onClick={() => navigate(`/product/${prod.id}`)}
+                          className="text-left block text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide mb-1.5 group-hover:text-[#D4BC96] transition-colors focus:outline-none cursor-pointer"
                         >
                           {prod.name}
                         </button>
@@ -1761,7 +1768,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               // If filtering by specific search or category, show raw layout query
               if (selectedCategory !== "All" || searchQuery !== "") {
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
                     {filteredList.map((prod) => renderProductCard(prod))}
                   </div>
                 );
@@ -1795,7 +1802,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         </div>
 
                         {/* Shelf Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
                           {groupProds.map((prod) => renderProductCard(prod))}
                         </div>
                       </div>
@@ -2609,6 +2616,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           );
         })()}
 
+            </>
+          } />
+          <Route path="/product/:id" element={
+            <ProductPage 
+              onAddToCart={handleAddToCart}
+              setIsCartOpen={setIsCartOpen}
+            />
+          } />
+        </Routes>
       </main>
 
       {/* LUXURY BRANDS FOOTER */}
