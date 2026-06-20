@@ -1253,7 +1253,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-sand-50/70 text-sand-900 font-sans antialiased text-sm flex flex-col justify-between">
+    <div className="min-h-screen overflow-x-hidden bg-white text-[#111111] font-sans antialiased text-sm flex flex-col justify-between">
       
       {/* Editorial Luxury Splash Screen */}
       <AnimatePresence mode="wait">
@@ -1262,7 +1262,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.7, ease: "easeInOut" }}
-            className="fixed inset-0 z-[9999] bg-[#F9F7F2] flex flex-col items-center justify-center pointer-events-auto select-none"
+            className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center pointer-events-auto select-none"
             id="ruh-splash-loader"
           >
             <motion.div
@@ -1368,26 +1368,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
           <div className="relative z-10 mx-auto max-w-5xl px-4 text-center flex flex-col items-center">
             
-
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-[#D4BC96] font-semibold mb-4 animate-fade-in">
-              {siteSettings.heroTagline}
-            </span>
-            
-            <h1 className="text-4xl sm:text-7xl font-light font-display text-white tracking-[0.08em] leading-tight mb-6 max-w-4xl">
-              {siteSettings.heroHeadline}
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif text-white tracking-widest leading-tight mb-8 max-w-4xl uppercase">
+              {siteSettings.heroHeadline || "FRAGRANCE"}
             </h1>
             
-            <p className="text-sm sm:text-lg text-sand-300 font-light tracking-wide max-w-2xl mb-10 leading-relaxed">
-              {siteSettings.heroDescription}
-            </p>
-
             <div className="flex justify-center w-full">
               <button
                 type="button"
                 onClick={() => handleSectionNavigate("shop")}
-                className="px-8 py-4 bg-[#D4BC96] hover:bg-white hover:text-black hover:scale-101 outline-none text-white text-xs uppercase tracking-[0.22em] font-medium rounded shadow-lg transition-all duration-300 font-display cursor-pointer"
+                className="px-12 py-3.5 bg-white hover:bg-stone-200 text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer"
               >
-                DISCOVER THE COLLECTION
+                SHOP NOW
               </button>
             </div>
 
@@ -2648,104 +2639,75 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       </main>
 
       {/* LUXURY BRANDS FOOTER */}
-      <footer className="bg-[#0D0B0A] text-[#FAFAFA] py-16 sm:py-20 border-t border-sand-900/45">
+      <footer className="bg-black text-[#FAFAFA] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
             
-            {/* Info and Address (LHS - 4 cols) */}
-            <div className="md:col-span-4 space-y-4">
-              <Logo variant="footer" className="!items-start" customLogoUrl={siteSettings.customLogoUrl} />
-              <p className="text-xs text-sand-400 font-light leading-relaxed">
-                {siteSettings.footerAbout}
-              </p>
-
-              <div className="space-y-1.5 pt-4 text-xs font-light text-sand-400">
-                <p className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#D4BC96]" />
-                  <span>{siteSettings.contactAddress}</span>
-                </p>
-                <p className="flex items-center gap-2 font-mono">
-                  <Mail className="w-4 h-4 text-[#D4BC96]" />
-                  <span>{siteSettings.contactEmail}</span>
-                </p>
-                {siteSettings.contactPhone && (
-                  <p className="flex items-center gap-2 font-mono">
-                    <span className="text-[#D4BC96] font-bold">P:</span>
-                    <span>{siteSettings.contactPhone}</span>
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Quick sections links (Medium - 4 cols split) */}
-            <div className="md:col-span-4 grid grid-cols-2 gap-4 text-xs font-light text-sand-400">
-              <div className="space-y-3">
-                <h4 className="text-[10px] uppercase tracking-widest text-[#D4BC96] font-semibold">THE COLLECTIONS</h4>
-                <ul className="space-y-2">
-                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors text-left block">Next Gen Fragrances</button></li>
-                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors text-left block">Authentic Indian Attars</button></li>
-                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors text-left block">Best Selling Attars</button></li>
-                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors text-left block">Eau De Parfums</button></li>
-                </ul>
-              </div>
-
-              <div className="space-y-3">
-                <h4 className="text-[10px] uppercase tracking-widest text-[#D4BC96] font-semibold">EXPLORER LOGS</h4>
-                <ul className="space-y-2">
-                  <li><button type="button" onClick={() => {
-                    const el = document.getElementById("distillery-video-section");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }} className="hover:text-white cursor-pointer transition-colors text-left block">Our Distillery</button></li>
-                  <li><button type="button" onClick={() => handleSectionNavigate("journal")} className="hover:text-white cursor-pointer transition-colors text-left block">Travel Journal</button></li>
-                  <li><button type="button" onClick={() => {
-                    const el = document.getElementById("story-cards-section");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }} className="hover:text-white cursor-pointer transition-colors text-left block">Handcrafted Sourcing</button></li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Newsletter capture (RHS - 4 cols) */}
-            <div className="md:col-span-4 space-y-4">
-              <h4 className="text-[10px] uppercase tracking-widest text-[#D4BC96] font-semibold">
+            {/* Newsletter capture (LHS - 5 cols) */}
+            <div className="md:col-span-5 space-y-6">
+              <h4 className="text-sm font-serif tracking-widest text-white uppercase">
                 JOIN THE WAYFARER CLUB
               </h4>
-              <p className="text-xs text-sand-400 font-light leading-relaxed">
+              <p className="text-[11px] text-stone-400 font-sans leading-relaxed max-w-sm">
                 Subscribe to coordinate alerts. Get early access to new seasonal scent logs and private pre-launch reservations.
               </p>
 
               {newsSuccess && (
-                <div className="bg-gold-50/10 border border-[#D4BC96]/30 text-[#D4BC96] text-xs p-3 rounded-lg flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#D4BC96]" />
-                  <span>Welcome to the registry log! 10% exclusive coupon code dispatched.</span>
+                <div className="text-emerald-400 text-xs flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Welcome to the registry log! 10% code dispatched.</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubscribe} className="flex gap-2">
+              <form onSubmit={handleSubscribe} className="flex gap-0 border-b border-stone-700 pb-1 max-w-sm">
                 <input
                   type="email"
                   required
                   placeholder="Enter email address"
                   value={newsEmail}
                   onChange={(e) => setNewsEmail(e.target.value)}
-                  className="bg-transparent border border-sand-800 rounded px-3 py-2 text-xs text-white w-full focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                  className="bg-transparent border-0 px-0 py-2 text-xs text-white w-full focus:ring-0 outline-none placeholder-stone-500"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-[#D4BC96] hover:bg-white hover:text-black rounded text-[10px] uppercase tracking-widest font-medium transition-all cursor-pointer shadow-md"
+                  className="px-2 py-2 text-stone-300 hover:text-white text-[10px] uppercase tracking-widest font-semibold transition-all cursor-pointer"
                 >
                   JOIN
                 </button>
               </form>
 
-              <div className="flex space-x-4 pt-3 text-sand-400">
-                <button type="button" className="hover:text-[#D4BC96] cursor-pointer" aria-label="Instagram"><Instagram className="w-4 h-4" /></button>
-                <div className="text-[11px] font-mono text-sand-500 flex items-center gap-1 leading-none uppercase tracking-widest select-none">
-                  <Atom className="w-3.5 h-3.5 animate-spin-slow text-[#D4BC96]" />
-                  <span>COORDINATES-SECURE</span>
-                </div>
+              <div className="flex space-x-6 pt-4 text-stone-400">
+                <button type="button" className="hover:text-white cursor-pointer transition-colors"><Instagram className="w-4 h-4" /></button>
+                <button type="button" className="hover:text-white cursor-pointer transition-colors"><Twitter className="w-4 h-4" /></button>
               </div>
+            </div>
+
+            {/* Empty Spacer */}
+            <div className="hidden md:block md:col-span-1"></div>
+
+            {/* Quick sections links (Right aligned - 3 cols each) */}
+            <div className="md:col-span-3 space-y-6">
+              <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">SHOP</h4>
+              <ul className="space-y-4 text-xs font-light text-stone-300">
+                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop All</button></li>
+                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Best Sellers</button></li>
+                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Discovery Set</button></li>
+                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Gifting</button></li>
+              </ul>
+            </div>
+
+            <div className="md:col-span-3 space-y-6">
+              <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">ABOUT</h4>
+              <ul className="space-y-4 text-xs font-light text-stone-300">
+                <li><button type="button" onClick={() => {
+                  const el = document.getElementById("story-cards-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
+                <li><button type="button" onClick={() => handleSectionNavigate("journal")} className="hover:text-white cursor-pointer transition-colors block">Journal</button></li>
+                <li><button type="button" className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
+                <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">FAQ</button></li>
+              </ul>
             </div>
 
           </div>

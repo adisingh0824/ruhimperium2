@@ -286,60 +286,11 @@ export default function Header({
           </div>
         </div>
 
-        {/* BOTTOM ROW: Double-Decker Navigation Links (matching user's uploaded image exactly) */}
-        <nav className="hidden lg:flex items-center justify-center h-12 relative">
-          <ul className="flex items-center space-x-7 xl:space-x-9 text-xs tracking-wider" style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif" }}>
+        {/* BOTTOM ROW: Minimalist Navigation Links */}
+        <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-stone-100">
+          <ul className="flex items-center space-x-12 text-[12px] tracking-[0.15em] uppercase font-sans text-stone-800 font-medium">
             
-            {/* 1. Home Link */}
-            <li className="relative py-3">
-              <button
-                type="button"
-                onClick={() => onNavigate("hero")}
-                className={`text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1 relative`}
-              >
-                Home
-                {activeSection === "hero" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-stone-950 duration-300" />
-                )}
-              </button>
-            </li>
-
-            {/* 2. Shop Dropdown Link */}
-            <li 
-              className="relative py-3"
-              onMouseEnter={() => setShopDropdownOpen(true)}
-              onMouseLeave={() => setShopDropdownOpen(false)}
-            >
-              <button
-                type="button"
-                className="flex items-center gap-1.5 text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1"
-                onClick={() => onNavigate("shop")}
-              >
-                <span>Shop</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${shopDropdownOpen ? "rotate-180 text-gold-700" : "text-stone-600"}`} />
-              </button>
-
-              {/* High End Category Dropdown Overlay */}
-              {shopDropdownOpen && (
-                <div className="absolute top-[85%] left-1/2 -translate-x-1/2 w-64 bg-white border border-stone-100 shadow-[0_10px_30px_rgba(0,0,0,0.06)] rounded-lg py-3 z-50 animate-fade-in">
-                  <div className="px-4 py-2 border-b border-stone-50 mb-1.5">
-                    <p className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold">Imperial Collections</p>
-                  </div>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => handleCategorySelect(cat.id)}
-                      className="w-full text-left px-4 py-2 text-xs font-serif text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </li>
-
-            {/* 3. Shop All */}
+            {/* 1. Shop All */}
             <li className="relative py-3">
               <button
                 type="button"
@@ -347,16 +298,17 @@ export default function Header({
                   if (setSelectedCategory) setSelectedCategory("All");
                   onNavigate("shop");
                 }}
-                className={`text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1 relative`}
+                className={`hover:text-black transition-colors cursor-pointer relative group`}
               >
                 Shop All
                 {activeSection === "shop" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-stone-950 duration-300" />
+                  <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black" />
                 )}
+                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
-            {/* 4. Discovery Set */}
+            {/* 2. Discovery Set */}
             <li className="relative py-3">
               <button
                 type="button"
@@ -364,65 +316,49 @@ export default function Header({
                   if (setSelectedCategory) setSelectedCategory("Discovery Set");
                   onNavigate("shop");
                 }}
-                className={`text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1 relative`}
+                className={`hover:text-black transition-colors cursor-pointer relative group`}
               >
                 Discovery Set
+                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
-            {/* 6. For Bulk Enquiry (Wedding & Signature Gifting form) */}
+            {/* 3. Gifting (Bulk Enquiry mapped to Gifting) */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={() => setBulkEnquiryOpen(true)}
-                className="text-[#84663B] hover:text-[#5E4726] font-bold font-serif text-[16.5px] cursor-pointer pb-0.5 transition-colors relative"
+                className={`hover:text-black transition-colors cursor-pointer relative group`}
               >
-                For Bulk Enquiry
-                <span className="absolute bottom-0.5 left-0 right-0 h-[1.5px] bg-[#84663B]/60 animate-pulse" />
+                Gifting
+                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
-            {/* 7. Our Story */}
+            {/* 4. Our Story */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("journal")}
-                className={`text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1 relative`}
+                className={`hover:text-black transition-colors cursor-pointer relative group`}
               >
                 Our Story
                 {activeSection === "journal" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-stone-950 duration-300" />
+                  <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black" />
                 )}
+                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
-            {/* 8. Contact Us */}
-            <li className="relative py-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const element = document.getElementById("footer-site-info");
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-                  }
-                }}
-                className="text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1"
-              >
-                Contact Us
-              </button>
-            </li>
-
-            {/* 9. Track your order Link */}
+            {/* 5. Track Order */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={onTrackOrderClick}
-                className="text-stone-950 hover:text-black transition-colors font-bold font-serif text-[16.5px] cursor-pointer pb-1 flex items-center gap-1.5 group"
+                className="hover:text-black transition-colors cursor-pointer relative flex items-center gap-1.5 group"
               >
-                <Truck className="w-4.5 h-4.5 text-gold-700 animate-pulse group-hover:scale-110 duration-200" />
-                <span>Track your order</span>
+                <span>Track Order</span>
+                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
