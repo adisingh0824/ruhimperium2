@@ -244,7 +244,7 @@ export default function CartDrawer({
       address,
       pincode,
       paymentMode: isRazorpayActive ? "Razorpay Gateway (Online)" : paymentMode,
-      items: [...cart],
+      items: cart.map(item => ({ ...item, product: products.find(p => p.id === item.product.id) || item.product })),
       total: calculatedTotal,
       date: new Date().toISOString().split("T")[0],
       status: "Processing",

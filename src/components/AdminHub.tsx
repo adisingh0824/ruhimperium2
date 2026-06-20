@@ -373,6 +373,21 @@ export default function AdminHub({
       // Edit Existing Product details
       setProducts(prev => prev.map(p => {
         if (p.id === isEditingProduct) {
+          
+          let updatedVariants = [];
+          if (prodSize.includes('12 ml')) {
+            updatedVariants = [
+              { size: '12ML Roll On', price: Number(prodPrice), salePrice: Number(prodSalePrice) },
+              { size: '6ML Roll On', price: Math.round(Number(prodPrice) * 0.55), salePrice: Math.round(Number(prodSalePrice) * 0.55) },
+              { size: '3ML Roll On', price: Math.round(Number(prodPrice) * 0.3), salePrice: Math.round(Number(prodSalePrice) * 0.3) },
+            ];
+          } else if (prodSize.includes('50 ml')) {
+            updatedVariants = [
+              { size: '50ML Spray', price: Number(prodPrice), salePrice: Number(prodSalePrice) },
+              { size: '10ML Travel Spray', price: Math.round(Number(prodPrice) * 0.25), salePrice: Math.round(Number(prodSalePrice) * 0.25) },
+            ];
+          }
+
           return {
             ...p,
             name: prodName,
@@ -392,7 +407,8 @@ export default function AdminHub({
             category: prodCategory,
             galleryImages: prodGalleryImages,
             galleryTexts: prodGalleryTexts,
-            productImages: prodProductImages
+            productImages: prodProductImages,
+            variants: updatedVariants.length > 0 ? updatedVariants : p.variants
           };
         }
         return p;
