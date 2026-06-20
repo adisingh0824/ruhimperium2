@@ -1692,6 +1692,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   ? parseFloat((totalItemReviews.reduce((s, r) => s + r.rating, 0) / totalItemReviews.length).toFixed(1))
                   : prod.rating;
 
+                const hoverImage = prod.galleryImages?.find(img => img && img.trim() !== "");
+
                 return (
                   <div 
                     key={prod.id} 
@@ -1706,9 +1708,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       <img 
                         src={prod.image} 
                         alt={prod.name} 
-                        className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                        className={`w-full h-full object-contain p-4 transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
                         referrerPolicy="no-referrer"
                       />
+                      {hoverImage && (
+                        <img 
+                          src={hoverImage} 
+                          alt={`${prod.name} alternate view`} 
+                          className="absolute inset-0 w-full h-full object-contain p-4 transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                          referrerPolicy="no-referrer"
+                        />
+                      )}
                       {/* Sale Badge */}
                       {prod.price > prod.salePrice && (
                         <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2 py-1 leading-none shadow-sm">
