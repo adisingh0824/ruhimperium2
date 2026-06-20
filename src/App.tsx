@@ -1654,7 +1654,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     </div>
 
                     {/* Image visual wrapper with zoom on hover */}
-                    <div className="relative aspect-[1/1] overflow-hidden bg-sand-100 border-b border-sand-200/60">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-sand-100 border-b border-sand-200/60">
                       <img 
                         src={prod.image} 
                         alt={prod.name} 
@@ -1740,7 +1740,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               // If filtering by specific search or category, show raw layout query
               if (selectedCategory !== "All" || searchQuery !== "") {
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 -mx-2 sm:mx-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 -mx-3 sm:mx-0">
                     {filteredList.map((prod) => renderProductCard(prod))}
                   </div>
                 );
@@ -1774,7 +1774,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         </div>
 
                         {/* Shelf Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 -mx-2 sm:mx-0">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 -mx-3 sm:mx-0">
                           {groupProds.map((prod) => renderProductCard(prod))}
                         </div>
                       </div>
