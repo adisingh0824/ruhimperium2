@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Product, Review } from '../types';
@@ -19,13 +19,22 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
-  const [expandedSection, setExpandedSection] = useState<string | null>('description');
+  const [expandedSection, setExpandedSection] = useState<string | null>('story');
 
   // Reviews state
   const [reviewerName, setReviewerName] = useState("");
   const [ratingInput, setRatingInput] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [formSuccess, setFormSuccess] = useState(false);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollGallery = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = scrollRef.current.clientWidth;
+      scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -133,9 +142,27 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
           
           {/* Left: Sticky Image Gallery */}
           <div className="w-full lg:w-1/2">
-            <div className="lg:sticky lg:top-24">
+            <div className="lg:sticky lg:top-24 relative group">
+              {/* Desktop Slider Arrows */}
+              {validGalleryImages.length > 0 && (
+                <>
+                  <button 
+                    onClick={() => scrollGallery('left')}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white shadow-md rounded-full p-2 text-sand-800 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block cursor-pointer"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={() => scrollGallery('right')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white shadow-md rounded-full p-2 text-sand-800 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block cursor-pointer"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+
               {/* Swipeable Container */}
-              <div className="w-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:rounded-lg" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div ref={scrollRef} className="w-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:rounded-lg" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <style>{`
                   .scrollbar-hide::-webkit-scrollbar {
                     display: none;
