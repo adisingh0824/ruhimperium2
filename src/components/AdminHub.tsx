@@ -3315,6 +3315,79 @@ export default function AdminHub({
                     </p>
                   </div>
 
+                  {/* EMAILJS INTEGRATION CONFIGURATOR */}
+                  <div className="bg-sand-50/70 border border-sand-200 p-6 rounded-2xl space-y-4 mt-6">
+                    <div className="flex items-center justify-between border-b border-sand-200 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">📧</span>
+                        <div>
+                          <h4 className="text-sm font-semibold uppercase tracking-wider text-sand-900 font-mono">EmailJS Automated Notifications</h4>
+                          <p className="text-[10px] text-sand-400 font-light font-sans">Configure your EmailJS keys to instantly receive new order alerts in your inbox.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Service ID</label>
+                        <input
+                          type="text"
+                          value={siteSettings.emailjsServiceId || ""}
+                          placeholder="e.g. service_xyz123"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setSiteSettings(prev => ({
+                              ...prev,
+                              emailjsServiceId: val
+                            }));
+                          }}
+                          className="w-full bg-white border border-sand-200 p-2.5 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96] font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Template ID</label>
+                        <input
+                          type="text"
+                          value={siteSettings.emailjsTemplateId || ""}
+                          placeholder="e.g. template_abc456"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setSiteSettings(prev => ({
+                              ...prev,
+                              emailjsTemplateId: val
+                            }));
+                          }}
+                          className="w-full bg-white border border-sand-200 p-2.5 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96] font-mono"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Public Key</label>
+                        <input
+                          type="text"
+                          value={siteSettings.emailjsPublicKey || ""}
+                          placeholder="e.g. xyzABC123key"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setSiteSettings(prev => ({
+                              ...prev,
+                              emailjsPublicKey: val
+                            }));
+                          }}
+                          className="w-full bg-white border border-sand-200 p-2.5 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96] font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] leading-relaxed text-sand-500 bg-white/70 border border-sand-200/50 p-3 rounded-lg flex items-start gap-2">
+                      <span className="text-stone-500">💡</span>
+                      <span>
+                        <strong>Free Email Dispatch:</strong> To activate, create a free account at <strong>emailjs.com</strong>. Add a Gmail service, create a template with your two emails in the "To" field, and paste the 3 keys above. Once saved, you will get instant receipts on every purchase!
+                      </span>
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                     {/* Add New Admin Account */}
                     <div className="md:col-span-5 bg-sand-50/70 border border-sand-200 p-5 rounded-2xl h-fit space-y-4">

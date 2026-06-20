@@ -163,6 +163,11 @@ export interface SiteSettings {
   statsCard7Value?: string;
   statsCard7Title?: string;
   statsCard7Desc?: string;
+  
+  // EmailJS integration
+  emailjsServiceId?: string;
+  emailjsTemplateId?: string;
+  emailjsPublicKey?: string;
 }
 
 export interface UserAccount {
