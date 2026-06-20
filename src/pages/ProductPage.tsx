@@ -114,16 +114,48 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
         <div className="flex flex-col lg:flex-row gap-0 sm:gap-12 lg:gap-20">
           
           {/* Left: Sticky Image Gallery */}
-          <div className="w-full lg:w-1/2 bg-sand-50">
-            <div className="sticky top-24">
-              <div className="aspect-[4/5] bg-sand-100 overflow-hidden sm:rounded-lg">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
+          <div className="w-full lg:w-1/2">
+            <div className="lg:sticky lg:top-24">
+              {/* Swipeable Container */}
+              <div className="w-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:rounded-lg" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{`
+                  .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                  }
+                `}</style>
+                
+                {/* Main image */}
+                <div className="flex-none w-full aspect-[3/4] lg:aspect-[4/5] snap-center relative bg-sand-100">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+
+                {/* Additional gallery images */}
+                {product.galleryImages?.map((img, idx) => (
+                  <div key={idx} className="flex-none w-full aspect-[3/4] lg:aspect-[4/5] snap-center relative bg-sand-100">
+                    <img 
+                      src={img} 
+                      alt={`${product.name} gallery view ${idx + 1}`} 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                ))}
               </div>
+
+              {/* Minimal dots indicator for mobile (shows if there are gallery images) */}
+              {(product.galleryImages && product.galleryImages.length > 0) && (
+                <div className="flex justify-center gap-2 mt-4 mb-2 lg:hidden">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#2D2926]"></div>
+                  {product.galleryImages.map((_, idx) => (
+                    <div key={idx} className="w-1.5 h-1.5 rounded-full bg-sand-300"></div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
