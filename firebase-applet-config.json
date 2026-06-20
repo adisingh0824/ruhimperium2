@@ -1,10 +1,9 @@
 {
-  "projectId": "gen-lang-client-0055666418",
-  "appId": "1:46388686647:web:d59c78720b50131d3234b2",
-  "apiKey": "AIzaSyDJwq8lhHndtY_eabh_kEoEAV_53MB7ad4",
-  "authDomain": "gen-lang-client-0055666418.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-55576d2c-4eaa-4f3e-a0b6-8f7cdf4f24da",
-  "storageBucket": "gen-lang-client-0055666418.firebasestorage.app",
-  "messagingSenderId": "46388686647",
-  "measurementId": ""
+  "apiKey": "AIzaSyCHzalBGVMTP3rRAdLaUZsbpl56JhY6l54",
+  "authDomain": "ruh-imperium.firebaseapp.com",
+  "projectId": "ruh-imperium",
+  "storageBucket": "ruh-imperium.firebasestorage.app",
+  "messagingSenderId": "117266018138",
+  "appId": "1:117266018138:web:fe9873ad4de79a4f4dcd63",
+  "measurementId": "G-818PXTEQSR"
 }
