@@ -2446,13 +2446,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               {founders.map((fnd, idx) => (
                 <div 
                   key={fnd.id} 
-                  className="bg-white rounded-3xl border border-sand-200 p-6 sm:p-10 hover:shadow-lg hover:scale-[1.005] transition-all duration-500 min-w-0"
+                  className="bg-white rounded-3xl border border-sand-200 p-6 sm:p-10 hover:shadow-lg hover:scale-[1.005] transition-all duration-500 min-w-0 overflow-hidden"
                   id={`founder-deck-${fnd.id}`}
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-w-0">
                     
                     {/* Big Image box */}
-                    <div className={`col-span-12 lg:col-span-5 ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
+                    <div className={`col-span-12 lg:col-span-5 min-w-0 overflow-hidden ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
                       <div className="relative w-full aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-xl border-2 border-[#D4BC96]/20 bg-sand-100">
                         <img
                           src={fnd.image}
