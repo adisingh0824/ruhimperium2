@@ -1,7 +1,6 @@
 import { useState, FormEvent, useEffect } from "react";
 import { X, Trash2, ShoppingBag, Percent, ArrowLeft, ShieldCheck, Ticket, Landmark, CreditCard, ChevronRight, CheckCircle, Sparkles, Award, ScrollText, AlertTriangle } from "lucide-react";
 import { CartItem, Product, Order, Coupon, SiteSettings } from "../types";
-import emailjs from '@emailjs/browser';
 
 // Helper script loader to connect dynamically with the official indian razorpay secure checkout system
 const loadRazorpayScript = (): Promise<boolean> => {
@@ -113,37 +112,19 @@ export default function CartDrawer({
     }
   };
 
-  // NEW: EmailJS Notification Logic
+  // NEW: Vercel Backend Notification Logic
   const sendAdminNotificationEmail = async (order: Order) => {
     try {
-      const templateParams = {
-        order_id: order.id,
-        customer_name: order.fullName,
-        customer_email: order.email,
-        customer_phone: order.phone,
-        order_total: `₹${order.total}`,
-        order_items: order.items.map(item => `${item.quantity}x ${item.product.name} (${item.selectedSize})`).join(", "),
-        shipping_address: `${order.address}, ${order.pincode}`,
-        admin_email_1: "ruhimperiun9@gmail.com",
-        admin_email_2: "saditya7990@gmail.com"
-      };
-
-      // ⚠️ IMPORTANT DEVELOPER NOTE:
-      // You must create a free account at https://www.emailjs.com/
-      // 1. Add an Email Service (Gmail) -> Get SERVICE_ID
-      // 2. Create an Email Template -> Get TEMPLATE_ID
-      //    (In the template, use variables like {{order_id}}, {{customer_name}}, {{order_items}}, {{admin_email_1}}, {{admin_email_2}})
-      //    Make sure the template's "To Email" field contains: {{admin_email_1}}, {{admin_email_2}}
-      // 3. Get your PUBLIC_KEY from Account -> API Keys
-      const SERVICE_ID = "YOUR_EMAILJS_SERVICE_ID";
-      const TEMPLATE_ID = "YOUR_EMAILJS_TEMPLATE_ID"; 
-      const PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
-
-      if (SERVICE_ID !== "YOUR_EMAILJS_SERVICE_ID") {
-        await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
-        console.log("Admin notification email sent successfully via EmailJS!");
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order })
+      });
+      
+      if (response.ok) {
+        console.log("Admin notification email sent successfully via Vercel Backend!");
       } else {
-        console.warn("EmailJS keys are not configured yet! Check CartDrawer.tsx to add your API keys.");
+        console.error("Failed to send email. Check Vercel logs.");
       }
     } catch (error) {
       console.error("Failed to send admin notification email:", error);
