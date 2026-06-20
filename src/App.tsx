@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, useRef } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Compass, 
   MapPin, 
@@ -98,7 +98,9 @@ export default function App() {
     }, 4500);
   };
 
-  // Navigation active section
+  // Core State
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeSection, setActiveSection] = useState("hero");
 
   // Dynamic Products collection
@@ -447,7 +449,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // Modals state
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
+
   // Mobile menu and utility state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -1198,6 +1200,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // Safe navigation scroll-into-view helper
   const handleSectionNavigate = (sectionId: string) => {
     setActiveSection(sectionId);
+    
+    // If not on homepage, navigate to homepage and pass state
+    if (location.pathname !== '/') {
+      navigate('/', { state: { scrollTo: sectionId } });
+      return;
+    }
+
     if (sectionId === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -1207,6 +1216,26 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       matchingElement.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  // Listen for scrollTo requests from other pages (e.g., coming back from ProductPage)
+  useEffect(() => {
+    if (location.pathname === '/' && location.state?.scrollTo) {
+      const sectionId = location.state.scrollTo;
+      // Slight delay to ensure DOM is rendered after route change
+      setTimeout(() => {
+        if (sectionId === "hero") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          const matchingElement = document.getElementById(`${sectionId}-section`);
+          if (matchingElement) {
+            matchingElement.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+        // Clear state so it doesn't re-scroll on refresh
+        navigate('/', { replace: true, state: {} });
+      }, 100);
+    }
+  }, [location.pathname, location.state, navigate]);
 
   // Open review modal for standalone PDP experience
   const handleOpenPDP = (product: Product) => {
