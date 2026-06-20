@@ -1444,7 +1444,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
         {/* SHOP / COLLECTION DIVISION */}
         <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="shop-section">
-          <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-0 sm:px-6 lg:px-8">
             
             {/* Header */}
             <div className="text-center max-w-3xl mx-auto mb-10">
@@ -1637,7 +1637,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 return (
                   <div 
                     key={prod.id} 
-                    className="group bg-white rounded-2xl border border-sand-200 overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-all duration-300 relative"
+                    className="group bg-white sm:rounded-2xl border-y sm:border border-sand-200 overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-all duration-300 relative"
                     id={`product-card-${prod.id}`}
                   >
                     
@@ -1740,7 +1740,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               // If filtering by specific search or category, show raw layout query
               if (selectedCategory !== "All" || searchQuery !== "") {
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 -mx-3 sm:mx-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                     {filteredList.map((prod) => renderProductCard(prod))}
                   </div>
                 );
@@ -1774,7 +1774,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         </div>
 
                         {/* Shelf Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 -mx-3 sm:mx-0">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                           {groupProds.map((prod) => renderProductCard(prod))}
                         </div>
                       </div>
