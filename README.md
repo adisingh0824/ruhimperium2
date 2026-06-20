@@ -42,8 +42,8 @@ Ruh Imperium is structured on a bespoke luxury editorial design, straying away f
 ### 7. 🔐 Executive HQ Control Panel (Admin Portal)
 - Accessible by clicking **HQ Login** in the top navigation header or mobile drawers.
 - **Corporate Credentials**:
-  - **Username/Email**: `saditya7990@gmail.com`
-  - **Cipher Password**: `Adi19983@`
+  - **Username/Email**: 
+  - **Cipher Password**: 
 - **Dynamic Capabilities**:
   - **Product Deck**: Modulate or sunset existing fragrances, edit pricing rates, size details, sillage specs, and upload replacement bottle photos directly from any local device (phone/laptop) via instant Base64 compression. Supports adding entirely new perfumes.
   - **Consignment Operations (Orders)**: View real-time consumer orders placed via the website checkout. Update fulfillment statuses (Processing, Dispatched, In Transit, Out for Delivery, Delivered, Cancelled) and edit speed courier tracking codes.
