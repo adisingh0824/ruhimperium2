@@ -308,74 +308,72 @@ export default function CartDrawer({
                    
                    const isCustom = latestProduct.image === "custom_blend_flask";
  
-                   return (
-                     <div key={`${item.product.id}-${item.selectedSize}-${idx}`} className="bg-white border border-sand-200 rounded-xl p-3 flex gap-3 shadow-xs">
-                       
-                       {/* Product Thumbnail */}
-                       <div className="w-16 h-20 bg-sand-100 rounded-lg overflow-hidden relative border border-sand-200 shrink-0">
-                         {isCustom ? (
-                           /* Render custom aesthetic flask graphic */
-                           <div className="w-full h-full bg-gradient-to-t from-gold-500/20 to-lime-50/10 flex flex-col items-center justify-center p-1 font-sans text-center">
-                             <span className="text-[5.5px] uppercase tracking-widest text-[#D4BC96] font-mono leading-none">BESPOKE</span>
-                             <span className="text-[6.5px] font-serif font-semibold text-sand-800 truncate max-w-full leading-none mt-1">MIX</span>
-                           </div>
-                         ) : (
-                           <img 
-                             src={latestProduct.image} 
-                             alt={latestProduct.name} 
-                             className="w-full h-full object-cover"
-                             referrerPolicy="no-referrer"
-                           />
-                         )}
-                         <div className="absolute inset-0 bg-[#D4BC96]/10 mix-blend-color"></div>
-                       </div>
+                    return (
+                      <div key={`${item.product.id}-${item.selectedSize}-${idx}`} className="bg-white border-b border-sand-100 py-4 flex gap-4">
+                        
+                        {/* Product Thumbnail */}
+                        <div className="w-20 h-24 bg-[#F8F8F8] shrink-0 border border-sand-100">
+                          {isCustom ? (
+                            /* Render custom aesthetic flask graphic */
+                            <div className="w-full h-full bg-gradient-to-t from-gold-500/20 to-lime-50/10 flex flex-col items-center justify-center p-1 font-sans text-center">
+                              <span className="text-[5.5px] uppercase tracking-widest text-[#D4BC96] font-mono leading-none">BESPOKE</span>
+                              <span className="text-[6.5px] font-serif font-semibold text-sand-800 truncate max-w-full leading-none mt-1">MIX</span>
+                            </div>
+                          ) : (
+                            <img 
+                              src={latestProduct.image} 
+                              alt={latestProduct.name} 
+                              className="w-full h-full object-contain p-2"
+                              referrerPolicy="no-referrer"
+                            />
+                          )}
+                        </div>
  
-                       {/* Info / Title */}
-                       <div className="flex-1 flex flex-col justify-between">
-                         <div className="flex justify-between items-start">
-                           <div>
-                             <h4 className="text-xs font-serif font-semibold text-sand-900 leading-tight">
-                               {latestProduct.name}
-                             </h4>
-                             <p className="text-[9.5px] text-[#D4BC96] uppercase tracking-wider font-light mt-0.5">
-                               {item.selectedSize} vial • {latestProduct.destinationState}
-                             </p>
-                           </div>
-                           <button
-                             type="button"
-                             onClick={() => onRemoveItem(item.product.id, item.selectedSize)}
-                             className="text-sand-300 hover:text-red-500 transition-colors p-0.5"
-                           >
-                             <Trash2 className="w-3.5 h-3.5" />
-                           </button>
-                         </div>
- 
-                         {/* Quantity triggers and price */}
-                         <div className="flex justify-between items-center mt-2 pt-2 border-t border-sand-50">
-                           <div className="flex items-center border border-sand-200 rounded bg-sand-50 h-6">
-                             <button
-                               type="button"
-                               onClick={() => onUpdateQuantity(item.product.id, item.selectedSize, -1)}
-                               className="px-2 text-sand-500 hover:bg-sand-100 h-full flex items-center justify-center text-xs"
-                             >
-                               -
-                             </button>
-                             <span className="px-2 text-[10.5px] text-sand-800 font-mono font-medium">{item.quantity}</span>
-                             <button
-                               type="button"
-                               onClick={() => onUpdateQuantity(item.product.id, item.selectedSize, 1)}
-                               className="px-2 text-sand-500 hover:bg-sand-100 h-full flex items-center justify-center text-xs"
-                             >
-                               +
-                             </button>
-                           </div>
-                           
-                           <span className="text-xs font-semibold text-sand-800 font-mono">
-                             ₹{activePrice * item.quantity}
-                           </span>
-                         </div>
-                       </div>
- 
+                        {/* Info / Title */}
+                        <div className="flex-1 flex flex-col justify-between py-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="text-[13px] font-serif text-[#2D2926] tracking-wide leading-tight">
+                                {latestProduct.name}
+                              </h4>
+                              <p className="text-[10px] text-sand-500 uppercase tracking-widest font-semibold mt-1">
+                                {item.selectedSize}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => onRemoveItem(item.product.id, item.selectedSize)}
+                              className="text-sand-400 hover:text-[#2D2926] transition-colors p-1"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+  
+                          {/* Quantity triggers and price */}
+                          <div className="flex justify-between items-end mt-2">
+                            <div className="flex items-center border border-sand-300 h-8">
+                              <button
+                                type="button"
+                                onClick={() => onUpdateQuantity(item.product.id, item.selectedSize, -1)}
+                                className="w-8 h-full flex items-center justify-center text-sand-600 hover:bg-sand-50"
+                              >
+                                -
+                              </button>
+                              <span className="w-6 text-center text-[12px] text-sand-900 font-sans font-medium">{item.quantity}</span>
+                              <button
+                                type="button"
+                                onClick={() => onUpdateQuantity(item.product.id, item.selectedSize, 1)}
+                                className="w-8 h-full flex items-center justify-center text-sand-600 hover:bg-sand-50"
+                              >
+                                +
+                              </button>
+                            </div>
+                            
+                            <span className="text-[14px] font-sans text-sand-900 font-medium">
+                              ₹{activePrice * item.quantity}
+                            </span>
+                          </div>
+                        </div>
                      </div>
                    );
                  })}
@@ -522,10 +520,9 @@ export default function CartDrawer({
                 <button
                   type="button"
                   onClick={() => setCheckoutStep("form")}
-                  className="w-full mt-6 py-4 bg-[#0D0B0A] hover:bg-[#D4BC96] text-white text-xs uppercase tracking-[0.2em] font-medium rounded shadow flex items-center justify-center gap-2 cursor-pointer focus:outline-none"
+                  className="w-full mt-4 py-4 bg-[#2D2926] hover:bg-black text-white text-[11px] uppercase tracking-[0.2em] font-bold flex flex-col items-center justify-center transition-colors cursor-pointer focus:outline-none"
                 >
-                  <span>PROCEED TO CHECKOUT</span>
-                  <ChevronRight className="w-4 h-4" />
+                  CHECKOUT
                 </button>
               </div>
             )}
