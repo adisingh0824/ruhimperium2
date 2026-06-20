@@ -1643,18 +1643,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     
                     {/* Discount or Category pill top-left */}
                     <div className="absolute top-4 left-4 z-10 flex flex-col gap-1">
-                      <span className="bg-[#2D2926]/95 text-white text-[8.5px] uppercase tracking-widest font-mono font-medium px-2.5 py-1 rounded-sm border border-sand-900 leading-none">
+                      <span className="bg-[#2D2926]/95 text-white text-[10px] uppercase tracking-widest font-mono font-medium px-3 py-1.5 rounded-sm border border-sand-900 leading-none">
                         {prod.size}
                       </span>
                       {prod.price > prod.salePrice && (
-                        <span className="bg-amber-600 text-white text-[8px] uppercase tracking-widest font-sans font-bold px-2 py-0.5 rounded-sm shadow-xs leading-none">
+                        <span className="bg-amber-600 text-white text-[10px] uppercase tracking-widest font-sans font-bold px-3 py-1 rounded-sm shadow-xs leading-none">
                           SAVE {Math.round(((prod.price - prod.salePrice) / prod.price) * 100)}%
                         </span>
                       )}
                     </div>
 
                     {/* Image visual wrapper with zoom on hover */}
-                    <div className="relative aspect-[4/5] overflow-hidden bg-sand-100 border-b border-sand-200/60">
+                    <div className="relative aspect-[3/4] overflow-hidden bg-sand-100 border-b border-sand-200/60">
                       <img 
                         src={prod.image} 
                         alt={prod.name} 
@@ -1667,53 +1667,54 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       <button
                         type="button"
                         onClick={() => handleOpenPDP(prod)}
-                        className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-sand-900 text-[10px] font-medium tracking-[0.2em] font-serif uppercase px-5 py-2.5 rounded shadow-lg border border-sand-200 hover:bg-[#2D2926] hover:text-[#FAFAFA] transition-all translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-300 focus:outline-none cursor-pointer"
+                        className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white text-sand-900 text-xs font-semibold tracking-[0.2em] font-serif uppercase px-6 py-3 rounded shadow-lg border border-sand-200 hover:bg-[#2D2926] hover:text-[#FAFAFA] transition-all translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-300 focus:outline-none cursor-pointer"
                         id={`quick-look-btn-${prod.id}`}
                       >
                         JOURNAL & NOTES
                       </button>
                     </div>
 
-                    {/* Scent Info details down */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
-                      <div>
+                    {/* Card Content Data block */}
+                    <div className="p-6 sm:p-7 flex flex-col flex-grow">
+                      <div className="flex-grow">
+                        
                         {/* Rating block */}
-                        <div className="flex items-center space-x-1 mb-2">
+                        <div className="flex items-center space-x-1.5 mb-3">
                           <div className="flex text-[#D4BC96]">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star 
                                 key={i} 
-                                className={`w-3 h-3 ${
+                                className={`w-4 h-4 ${
                                   i < Math.floor(overallRating) ? "fill-[#D4BC96]" : "text-sand-200"
                                 }`} 
                               />
                             ))}
                           </div>
-                          <span className="text-[9.5px] font-semibold text-sand-600 font-mono mt-0.5">
+                          <span className="text-xs font-semibold text-sand-600 font-mono mt-0.5">
                             {overallRating} ({totalItemReviews.length})
                           </span>
                         </div>
 
                         <button 
                           onClick={() => handleOpenPDP(prod)}
-                          className="text-left block text-lg font-light font-display text-sand-900 tracking-wide mb-1 group-hover:text-[#D4BC96] transition-colors focus:outline-none"
+                          className="text-left block text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide mb-1.5 group-hover:text-[#D4BC96] transition-colors focus:outline-none"
                         >
                           {prod.name}
                         </button>
-                        <p className="text-[10px] text-[#D4BC96] uppercase tracking-widest font-semibold mb-2.5 leading-snug">
+                        <p className="text-xs text-[#D4BC96] uppercase tracking-widest font-semibold mb-3 leading-snug">
                           {prod.tagline}
                         </p>
-                        <p className="text-xs text-sand-400 font-light leading-relaxed line-clamp-2 mb-4">
+                        <p className="text-sm text-sand-400 font-light leading-relaxed line-clamp-2 mb-6">
                           {prod.description}
                         </p>
                       </div>
 
                       {/* Pricing and cart addition */}
-                      <div className="pt-4 border-t border-sand-100 flex items-center justify-between">
+                      <div className="pt-5 border-t border-sand-100 flex items-center justify-between">
                         <div>
-                          <div className="text-base font-serif text-sand-950 font-medium leading-none">₹{prod.salePrice}</div>
+                          <div className="text-xl font-serif text-sand-950 font-medium leading-none">₹{prod.salePrice}</div>
                           {prod.price > prod.salePrice && (
-                            <span className="text-[10px] text-sand-400 line-through">₹{prod.price}</span>
+                            <span className="text-xs text-sand-400 line-through mt-1 block">₹{prod.price}</span>
                           )}
                         </div>
                         
@@ -1723,11 +1724,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             handleAddToCart(prod, prod.size);
                             setIsCartOpen(true);
                           }}
-                          className="px-3.5 py-2.5 bg-[#2D2926] hover:bg-[#D4BC96] border border-sand-900 rounded-sm text-white text-[9px] font-medium tracking-widest uppercase transition-all duration-300 flex items-center gap-1 cursor-pointer focus:outline-none"
+                          className="px-5 py-3 bg-[#2D2926] hover:bg-[#D4BC96] border border-sand-900 rounded-sm text-white text-[10px] font-semibold tracking-widest uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer focus:outline-none"
                           id={`add-cart-btn-${prod.id}`}
                         >
                           <span>ADD TO CART</span>
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
