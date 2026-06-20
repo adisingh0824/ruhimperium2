@@ -143,7 +143,7 @@ export default function CartDrawer({
 
   const executeOrderPlacement = async (newOrder: Order) => {
     setIsSubmitting(true);
-    const isRazorpayActive = siteSettings?.razorpayEnabled && siteSettings?.razorpayKeyId;
+    const isRazorpayActive = siteSettings?.razorpayEnabled && siteSettings?.razorpayKeyId && newOrder.paymentMode !== "COD";
     const generatedTracking = newOrder.trackingCode;
     const orderId = newOrder.id;
     const calculatedTotal = newOrder.total;
