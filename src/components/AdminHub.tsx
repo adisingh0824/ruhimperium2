@@ -1497,7 +1497,11 @@ export default function AdminHub({
                                   alert(`Scent film file "${file.name}" uploaded to server and broadcasting successfully! All customers will now see this video live in the ambient background.`);
                                 } catch (err: any) {
                                   console.error("Upload error:", err);
-                                  alert(`Failed to upload scent film: ${err.message}`);
+                                  if (err.message.includes("permission") || err.message.includes("does not exist")) {
+                                    alert(`Failed to upload: You must enable "Storage" in your Firebase Console first! Click "Storage" on the left menu in Firebase, then click "Get Started" and choose "Start in test mode".`);
+                                  } else {
+                                    alert(`Failed to upload scent film: ${err.message}`);
+                                  }
                                 } finally {
                                   setIsUploadingVideo(false);
                                 }
