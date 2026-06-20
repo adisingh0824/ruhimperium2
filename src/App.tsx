@@ -1403,7 +1403,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
         {/* PRESTIGE EDITORIAL PRESS COVERAGE */}
         <section className="bg-[#FAF5F2] py-10 border-b border-sand-200/60 select-none" id="press-section">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-2">
             <p className="text-[9px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold text-center mb-6">
               AS FEATURED IN PRINCIPAL EDITORIALS
             </p>
@@ -1444,7 +1444,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
         {/* SHOP / COLLECTION DIVISION */}
         <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="shop-section">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
             
             {/* Header */}
             <div className="text-center max-w-3xl mx-auto mb-10">
@@ -1654,7 +1654,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     </div>
 
                     {/* Image visual wrapper with zoom on hover */}
-                    <div className="relative aspect-[3/4] overflow-hidden bg-sand-100 border-b border-sand-200/60">
+                    <div className="relative aspect-[1/1] overflow-hidden bg-sand-100 border-b border-sand-200/60">
                       <img 
                         src={prod.image} 
                         alt={prod.name} 
@@ -1675,7 +1675,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     </div>
 
                     {/* Card Content Data block */}
-                    <div className="p-6 sm:p-7 flex flex-col flex-grow">
+                    <div className="p-4 sm:p-6 flex flex-col flex-grow">
                       <div className="flex-grow">
                         
                         {/* Rating block */}
@@ -1740,7 +1740,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               // If filtering by specific search or category, show raw layout query
               if (selectedCategory !== "All" || searchQuery !== "") {
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 -mx-2 sm:mx-0">
                     {filteredList.map((prod) => renderProductCard(prod))}
                   </div>
                 );
@@ -1774,7 +1774,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         </div>
 
                         {/* Shelf Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 -mx-2 sm:mx-0">
                           {groupProds.map((prod) => renderProductCard(prod))}
                         </div>
                       </div>
