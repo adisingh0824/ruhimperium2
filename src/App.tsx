@@ -559,13 +559,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           const p = d.data() as Product;
           if (!p.variants || p.variants.length === 0) {
             let variants = [];
-            if (p.size.includes('12 ml')) {
+            if (p.size?.includes('12 ml')) {
               variants = [
                 { size: '12ML Roll On', price: p.price, salePrice: p.salePrice },
                 { size: '6ML Roll On', price: Math.round(p.price * 0.55), salePrice: Math.round(p.salePrice * 0.55) },
                 { size: '3ML Roll On', price: Math.round(p.price * 0.3), salePrice: Math.round(p.salePrice * 0.3) },
               ];
-            } else if (p.size.includes('50 ml')) {
+            } else if (p.size?.includes('50 ml')) {
               variants = [
                 { size: '50ML Spray', price: p.price, salePrice: p.salePrice },
                 { size: '10ML Travel Spray', price: Math.round(p.price * 0.25), salePrice: Math.round(p.salePrice * 0.25) },
@@ -1742,7 +1742,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         <button
                           type="button"
                           onClick={() => {
-                            handleAddToCart(prod, prod.size);
+                            handleAddToCart(prod, prod.variants?.[0]?.size || prod.size);
                             setIsCartOpen(true);
                           }}
                           className="px-5 py-3 bg-[#2D2926] hover:bg-[#D4BC96] border border-sand-900 rounded-sm text-white text-[10px] font-semibold tracking-widest uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer focus:outline-none"
