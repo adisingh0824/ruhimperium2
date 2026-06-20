@@ -413,29 +413,7 @@ export default function CartDrawer({
             {/* Calculations & coupons footer block */}
             {cart.length > 0 && (
               <div className="border-t border-sand-100 pt-4 mt-4 bg-white">
-                {/* Apply coupon form */}
-                <form onSubmit={handleApplyCoupon} className="flex gap-2 mb-3">
-                  <div className="relative flex-1">
-                    <Ticket className="w-4 h-4 text-sand-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="TRY WAYFARER15 OR FREESHIP"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded pl-9 pr-3 py-2 text-[10.5px] font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-sand-900 text-white rounded text-[10px] uppercase font-medium tracking-wider hover:bg-gold-600 transition-colors"
-                  >
-                    APPLY
-                  </button>
-                </form>
 
-                {couponError && (
-                  <p className="text-[10px] text-red-500 mb-4 -mt-3 pl-1">{couponError}</p>
-                )}
 
                 {activeDiscount && (
                   <div className="bg-gold-50 border border-gold-200 rounded p-2.5 mb-4 flex justify-between items-center text-[10.5px] text-gold-900">
