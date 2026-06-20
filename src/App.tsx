@@ -2622,6 +2622,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             <ProductPage 
               onAddToCart={handleAddToCart}
               setIsCartOpen={setIsCartOpen}
+              reviews={reviews}
             />
           } />
         </Routes>

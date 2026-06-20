@@ -3,14 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Product } from '../types';
+import { Product, Review } from '../types';
 
 interface ProductPageProps {
   onAddToCart: (product: Product, size: string) => void;
   setIsCartOpen: (open: boolean) => void;
+  reviews: Review[];
 }
 
-export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageProps) {
+export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: ProductPageProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -19,6 +20,12 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>('description');
+
+  // Reviews state
+  const [reviewerName, setReviewerName] = useState("");
+  const [ratingInput, setRatingInput] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [formSuccess, setFormSuccess] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -96,6 +103,17 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
     setExpandedSection(expandedSection === section ? null : section);
   };
 
+  const handleReviewSubmit = () => {
+    if (!reviewerName.trim() || !reviewText.trim()) return;
+    setFormSuccess(true);
+    setReviewerName("");
+    setReviewText("");
+    setTimeout(() => setFormSuccess(false), 4000);
+  };
+
+  const productReviews = product ? reviews.filter((r) => r.productId === product.id) : [];
+  const validGalleryImages = product.galleryImages?.filter(img => img && img.trim() !== "") || [];
+
   return (
     <div className="min-h-[100vh] bg-white text-sand-900 pb-20 sm:pb-0 pt-20">
       
@@ -135,7 +153,7 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
                 </div>
 
                 {/* Additional gallery images */}
-                {product.galleryImages?.map((img, idx) => (
+                {validGalleryImages.map((img, idx) => (
                   <div key={idx} className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
                     <img 
                       src={img} 
@@ -148,10 +166,10 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
               </div>
 
               {/* Minimal dots indicator for mobile (shows if there are gallery images) */}
-              {(product.galleryImages && product.galleryImages.length > 0) && (
+              {validGalleryImages.length > 0 && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 lg:hidden z-10 bg-white/30 backdrop-blur-md px-3 py-1.5 rounded-full">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#2D2926]"></div>
-                  {product.galleryImages.map((_, idx) => (
+                  {validGalleryImages.map((_, idx) => (
                     <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
                   ))}
                 </div>
@@ -322,6 +340,127 @@ export default function ProductPage({ onAddToCart, setIsCartOpen }: ProductPageP
                     {product.projection && <li><strong>Projection:</strong> {product.projection}</li>}
                   </ul>
                 </div>
+              </div>
+            </div>
+
+            {/* REVIEWS SECTION */}
+            <div className="mt-16 border-t border-sand-200 pt-10" id="product-reviews-section">
+              <h4 className="text-2xl font-light font-display text-sand-900 tracking-wide mb-8">
+                Client Scent Reviews ({productReviews.length})
+              </h4>
+
+              {/* List Reviews */}
+              <div className="space-y-6 mb-12">
+                {productReviews.length === 0 ? (
+                  <p className="text-sm text-sand-400 font-light italic bg-sand-50 p-6 rounded-lg border border-sand-200">
+                    Be the first traveler to document an olfactory response for {product.name}.
+                  </p>
+                ) : (
+                  productReviews.map((rev) => (
+                    <div key={rev.id} className="bg-white border border-sand-200/60 rounded-xl p-6 shadow-xs">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <span className="text-sm font-serif text-sand-900 font-semibold">{rev.author}</span>
+                          <div className="flex items-center space-x-1 mt-1.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-3.5 h-3.5 ${
+                                  i < rev.rating ? "fill-[#D4BC96] text-[#D4BC96]" : "text-sand-200"
+                                }`} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end text-[10px] text-sand-400 font-mono">
+                          <span>{rev.date}</span>
+                          {rev.verified && (
+                            <span className="text-green-600 font-semibold tracking-wider flex items-center gap-1 mt-1">
+                              <ShieldCheck className="w-3.5 h-3.5 text-green-500 fill-current text-white" />
+                              <span>VERIFIED</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm text-sand-600 font-light leading-relaxed">
+                        {rev.text}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Submit a review Form */}
+              <div className="bg-[#FAF5F2] border border-sand-200 p-8 rounded-2xl">
+                <h5 className="text-[10px] tracking-widest text-[#D4BC96] uppercase font-semibold mb-1.5">
+                  OLFACTORY LOGBOOK ENTRY
+                </h5>
+                <h6 className="text-lg font-serif text-sand-800 tracking-wide mb-6">
+                  Leave a Verified Scent review
+                </h6>
+
+                {formSuccess && (
+                  <div className="bg-green-50 border border-green-200 text-green-700 text-xs p-4 rounded-lg mb-6 flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-green-600" />
+                    <span>Thank you! Your olfactory feedback has been logged and indexed for community viewing.</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                  <div>
+                    <label className="text-[10px] uppercase tracking-widest text-sand-500 font-semibold block mb-2">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="E.g. Dr. Sid Vimal"
+                      value={reviewerName}
+                      onChange={(e) => setReviewerName(e.target.value)}
+                      className="w-full bg-white border border-sand-200 rounded p-3 text-sm focus:ring-1 focus:ring-[#D4BC96] focus:outline-none shadow-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase tracking-widest text-sand-500 font-semibold block mb-2">Star Assessment</label>
+                    <div className="flex items-center space-x-2 h-[46px]">
+                      {Array.from({ length: 5 }).map((_, idx) => {
+                        const num = idx + 1;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setRatingInput(num)}
+                            className="p-1 focus:outline-none cursor-pointer"
+                          >
+                            <Star 
+                              className={`w-6 h-6 transition-transform duration-100 hover:scale-110 ${
+                                num <= ratingInput ? "fill-[#D4BC96] text-[#D4BC96]" : "text-sand-200"
+                              }`} 
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="text-[10px] uppercase tracking-widest text-sand-500 font-semibold block mb-2">Detailed Olfactory Scent Response</label>
+                  <textarea
+                    required
+                    rows={4}
+                    placeholder="Describe your assessment of the longevity, top notes, and the general wanderlust vibe..."
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    className="w-full bg-white border border-sand-200 rounded p-4 text-sm focus:ring-1 focus:ring-[#D4BC96] focus:outline-none shadow-xs"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleReviewSubmit}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] border border-transparent hover:border-[#D4BC96] text-white text-[11px] uppercase tracking-[0.2em] font-semibold rounded transition-colors shadow-sm cursor-pointer"
+                >
+                  SUBMIT LOG ENTRY
+                </button>
               </div>
             </div>
 
