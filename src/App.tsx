@@ -2449,10 +2449,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   className="bg-white rounded-3xl border border-sand-200 p-6 sm:p-10 hover:shadow-lg hover:scale-[1.005] transition-all duration-500 min-w-0 overflow-hidden"
                   id={`founder-deck-${fnd.id}`}
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-w-0">
+                  <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center w-full min-w-0">
                     
                     {/* Big Image box */}
-                    <div className={`col-span-12 lg:col-span-5 min-w-0 overflow-hidden ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
+                    <div className={`w-full lg:w-5/12 min-w-0 overflow-hidden shrink-0 ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
                       <div className="relative w-full aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-xl border-2 border-[#D4BC96]/20 bg-sand-100">
                         <img
                           src={fnd.image}
@@ -2464,8 +2464,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     </div>
                     
                     {/* Bio Text */}
-                    <div className={`col-span-12 lg:col-span-7 flex flex-col justify-between min-w-0 ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
-                      <div className="min-w-0 break-words">
+                    <div className={`w-full lg:w-7/12 flex flex-col justify-between min-w-0 ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
+                      <div className="min-w-0 break-words whitespace-normal">
                         <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4BC96] font-bold block mb-2">
                           {fnd.role}
                         </span>
