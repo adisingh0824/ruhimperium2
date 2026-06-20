@@ -1695,7 +1695,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 return (
                   <div 
                     key={prod.id} 
-                    className="group flex flex-col justify-between transition-all duration-300 relative"
+                    className="group flex flex-col justify-between transition-all duration-300 relative border border-sand-200"
                     id={`product-card-${prod.id}`}
                   >
                     {/* Image visual wrapper */}
@@ -1706,7 +1706,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       <img 
                         src={prod.image} 
                         alt={prod.name} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
                         referrerPolicy="no-referrer"
                       />
                       {/* Sale Badge */}
