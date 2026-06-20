@@ -90,15 +90,7 @@ export default function CartDrawer({
     ? Math.round(cartSubtotal * (activeDiscount.percent / 100)) 
     : 0;
 
-  // Shipping flat rate: 100 INR, free if subtotal > 1500 or code is matched
-  const shippingFee = (cartSubtotal > 1500 || (activeDiscount && activeDiscount.code === "FREESHIP")) 
-    ? 0 
-    : 100;
-
-  // Scent Luxury GST
-  const gstAmount = Math.round((cartSubtotal - discountAmount) * 0.12);
-
-  const cartTotal = cartSubtotal - discountAmount + shippingFee + gstAmount;
+  const cartTotal = cartSubtotal - discountAmount;
 
   const handleApplyCoupon = (e: FormEvent) => {
     e.preventDefault();
@@ -459,35 +451,6 @@ export default function CartDrawer({
                     APPLY
                   </button>
                 </form>
-
-                {/* Active Store Offers clickable chips */}
-                {coupons && coupons.length > 0 && (
-                  <div className="mb-4 px-1">
-                    <p className="text-[8.5px] uppercase tracking-widest text-sand-400 font-mono mb-1.5 font-semibold">ACTIVE COUPE OFFERS (CLICK TO REDEEM)</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {coupons.map((c) => (
-                        <button
-                          key={c.code}
-                          type="button"
-                          onClick={() => {
-                            setCouponCode(c.code);
-                            setActiveDiscount({ code: c.code, percent: c.discountPercent });
-                            setCouponError("");
-                          }}
-                          className={`px-2 py-1 text-[9px] font-mono rounded tracking-wider flex items-center gap-1 cursor-pointer border transition-all duration-200 ${
-                            activeDiscount?.code === c.code
-                              ? "bg-[#2D2926] text-[#D4BC96] border-[#D4BC96] shadow-xs"
-                              : "bg-white text-sand-700 border-sand-200 hover:border-[#D4BC96] hover:bg-sand-50"
-                          }`}
-                        >
-                          <span className="text-[8px]">🎫</span>
-                          <span className="font-bold">{c.code}</span>
-                          <span className="text-[8px] opacity-75">({c.discountPercent}%)</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {couponError && (
                   <p className="text-[10px] text-red-500 mb-4 -mt-3 pl-1">{couponError}</p>
