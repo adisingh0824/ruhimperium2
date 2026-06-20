@@ -257,16 +257,15 @@ export default function CartDrawer({
       <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
 
       {/* Cart Container Drawer */}
-      <div className="relative w-full max-w-md bg-sand-50 h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto">
+      <div className="relative w-full max-w-[400px] bg-white h-full p-5 shadow-2xl flex flex-col justify-between overflow-y-auto">
         
         {/* Header section */}
-        <div className="flex items-center justify-between border-b border-sand-200 pb-4 mb-4">
+        <div className="flex items-center justify-between pb-4 mb-4">
           <div className="flex items-center space-x-2">
-            <ShoppingBag className="w-5 h-5 text-[#D4BC96]" />
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-sand-900 font-serif">
-              {checkoutStep === "cart" && "Olfactory Cart Log"}
-              {checkoutStep === "form" && "Secure Checkout Form"}
-              {checkoutStep === "success" && "Wanderlust Receipt"}
+            <span className="text-[14px] uppercase tracking-[0.1em] font-medium text-[#2D2926] font-sans">
+              {checkoutStep === "cart" && `YOUR CART (${cart.length})`}
+              {checkoutStep === "form" && "SECURE CHECKOUT"}
+              {checkoutStep === "success" && "ORDER CONFIRMED"}
             </span>
           </div>
           
@@ -286,21 +285,37 @@ export default function CartDrawer({
           <div className="flex-1 flex flex-col justify-between overflow-y-auto">
             {cart.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                <ShoppingBag className="w-12 h-12 text-sand-300 stroke-[1] mb-4" />
-                <h4 className="text-base font-serif text-sand-800">Your suitcase is empty</h4>
-                <p className="text-xs text-sand-400 font-light mt-1.5 max-w-xs">
-                  Browse our travel-inspired collections and secure your first sensory destination bottle.
-                </p>
+                <p className="text-sm font-sans text-sand-500 mb-6">Your cart is currently empty.</p>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mt-6 px-5 py-2.5 bg-[#0D0B0A] hover:bg-gold-600 text-[#FAFAFA] text-[10px] tracking-widest uppercase rounded font-medium cursor-pointer"
+                  className="px-8 py-3 bg-[#2D2926] hover:bg-black text-white text-[11px] tracking-[0.15em] uppercase font-bold transition-colors"
                 >
-                  START SHOPPING
+                  CONTINUE SHOPPING
                 </button>
               </div>
             ) : (
-              <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+              <div className="flex-1 overflow-y-auto space-y-0 pr-1">
+                {/* Free Shipping Progress Bar */}
+                <div className="bg-[#F8F8F8] p-3 mb-4 text-center">
+                  {cartSubtotal >= 1500 ? (
+                    <p className="text-[11px] font-sans text-[#2D2926] font-semibold">
+                      You are eligible for <span className="font-bold">Free Shipping!</span>
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-[11px] font-sans text-[#2D2926] mb-2">
+                        You are <span className="font-bold">₹{1500 - cartSubtotal}</span> away from <span className="font-bold">Free Shipping!</span>
+                      </p>
+                      <div className="w-full bg-sand-200 h-1.5 overflow-hidden">
+                        <div 
+                          className="bg-[#2D2926] h-full transition-all duration-500" 
+                          style={{ width: `${Math.min((cartSubtotal / 1500) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </>
+                  )}
+                </div>
                  {cart.map((item, idx) => {
                    const latestProduct = products.find(p => p.id === item.product.id) || item.product;
                    const selectedVariant = latestProduct.variants?.find(v => v.size === item.selectedSize);
@@ -377,51 +392,12 @@ export default function CartDrawer({
                      </div>
                    );
                  })}
-
-                {/* Personal Curated Recommendations */}
-                {products && products.length > 0 && onAddToCart && (
-                  <div className="mt-6 pt-5 border-t border-[#D4BC96]/20">
-                    <p className="text-[9.5px] uppercase tracking-[0.2em] text-[#D4BC96] font-mono mb-3 font-semibold flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                      <span>Curated Scent Pairings</span>
-                    </p>
-                    <div className="grid grid-cols-1 gap-3">
-                      {products
-                        .filter(p => !cart.some(item => item.product.id === p.id))
-                        .slice(0, 2)
-                        .map((recProd) => (
-                          <div key={recProd.id} className="bg-white/80 rounded-xl border border-sand-200 p-3.5 flex gap-3.5 hover:shadow-xs transition-shadow duration-300">
-                            <div className="w-12 h-15 bg-sand-100 rounded-lg overflow-hidden border border-sand-200 shrink-0">
-                              <img src={recProd.image} alt={recProd.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                            </div>
-                            <div className="flex-1 flex flex-col justify-between">
-                              <div>
-                                <h5 className="text-[11px] font-serif font-bold text-sand-905 leading-tight">{recProd.name}</h5>
-                                <p className="text-[9px] text-sand-400 mt-1 line-clamp-1">{recProd.tagline}</p>
-                              </div>
-                              <div className="flex items-center justify-between mt-1.5">
-                                <span className="text-[10px] font-mono text-emerald-800 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">₹{recProd.salePrice}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => onAddToCart(recProd, recProd.size)}
-                                  className="px-2.5 py-1 text-[8.5px] font-mono uppercase font-bold tracking-wider text-white bg-[#2D2926] hover:bg-[#D4BC96] rounded transition-all cursor-pointer flex items-center gap-1"
-                                >
-                                  <span>+ Add Scent</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      }
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
             {/* Calculations & coupons footer block */}
             {cart.length > 0 && (
-              <div className="border-t border-sand-200 pt-4 mt-4 bg-sand-50">
+              <div className="border-t border-sand-100 pt-4 mt-4 bg-white">
                 {/* Apply coupon form */}
                 <form onSubmit={handleApplyCoupon} className="flex gap-2 mb-3">
                   <div className="relative flex-1">
@@ -484,36 +460,11 @@ export default function CartDrawer({
 
                 {/* Sub aggregates */}
                 <div className="space-y-2 text-xs text-sand-500 font-light px-1">
-                  <div className="flex justify-between">
-                    <span>Scent Subtotal</span>
-                    <span className="font-mono text-sand-800">₹{cartSubtotal}</span>
+                  <div className="flex justify-between text-[14px] text-[#2D2926] font-sans pt-1">
+                    <span>Subtotal</span>
+                    <span className="font-bold">₹{cartTotal}</span>
                   </div>
-                  
-                  {activeDiscount && (
-                    <div className="flex justify-between text-gold-600">
-                      <span>Wayfarer Discount</span>
-                      <span className="font-mono">-₹{discountAmount}</span>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between">
-                    <span>GST (12% Fragrance Surcharge)</span>
-                    <span className="font-mono text-sand-800">₹{gstAmount}</span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span>Premium Indian Delivery</span>
-                    <span className="font-mono text-sand-800">
-                      {shippingFee === 0 ? "FREE" : `₹${shippingFee}`}
-                    </span>
-                  </div>
-
-                  <div className="border-t border-sand-200 my-2" />
-
-                  <div className="flex justify-between text-sm text-sand-900 font-semibold font-serif pt-1">
-                    <span>Estimated Total</span>
-                    <span className="font-mono">₹{cartTotal}</span>
-                  </div>
+                  <p className="text-[10px] text-sand-400 mt-1">Shipping, taxes, and discount codes calculated at checkout.</p>
                 </div>
 
                 {/* Checkout Trigger */}
