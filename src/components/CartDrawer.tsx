@@ -79,10 +79,9 @@ export default function CartDrawer({
   // Cart math
   const cartSubtotal = cart.reduce((sums, item) => {
     const latestProduct = products.find(p => p.id === item.product.id) || item.product;
-    const itemPrice = item.selectedSize === latestProduct.size 
-      ? latestProduct.salePrice 
-      : Math.round(latestProduct.salePrice * 0.2); // Travel vial price ratio
-    return sums + (itemPrice * item.quantity);
+    const selectedVariant = latestProduct.variants?.find(v => v.size === item.selectedSize);
+    const activePrice = selectedVariant ? selectedVariant.salePrice : latestProduct.salePrice;
+    return sums + (activePrice * item.quantity);
   }, 0);
 
   // Discount
@@ -304,9 +303,8 @@ export default function CartDrawer({
               <div className="flex-1 overflow-y-auto space-y-4 pr-1">
                  {cart.map((item, idx) => {
                    const latestProduct = products.find(p => p.id === item.product.id) || item.product;
-                   const itemPrice = item.selectedSize === latestProduct.size 
-                     ? latestProduct.salePrice 
-                     : Math.round(latestProduct.salePrice * 0.2);
+                   const selectedVariant = latestProduct.variants?.find(v => v.size === item.selectedSize);
+                   const activePrice = selectedVariant ? selectedVariant.salePrice : latestProduct.salePrice;
                    
                    const isCustom = latestProduct.image === "custom_blend_flask";
  
@@ -373,7 +371,7 @@ export default function CartDrawer({
                            </div>
                            
                            <span className="text-xs font-semibold text-sand-800 font-mono">
-                             ₹{itemPrice * item.quantity}
+                             ₹{activePrice * item.quantity}
                            </span>
                          </div>
                        </div>

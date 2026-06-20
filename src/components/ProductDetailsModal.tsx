@@ -25,9 +25,16 @@ export default function ProductDetailsModal({
   onToggleWishlist,
   isWishlisted = false
 }: ProductDetailsModalProps) {
-  const [selectedSize, setSelectedSize] = useState(product.size);
+  const [selectedSize, setSelectedSize] = useState(product.variants?.[0]?.size || product.size);
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState(false);
+
+  // Reset state when product changes
+  useEffect(() => {
+    setSelectedSize(product.variants?.[0]?.size || product.size);
+    setQuantity(1);
+    setRatingInput(5);
+  }, [product]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Touch gesture state for swiping product photos
@@ -71,8 +78,9 @@ export default function ProductDetailsModal({
     setTimeout(() => setFormSuccess(false), 4000);
   };
 
-  const activePrice = selectedSize === product.size ? product.salePrice : Math.round(product.salePrice * 0.2); // Smaller travel size price calculation
-  const originalPrice = selectedSize === product.size ? product.price : Math.round(product.price * 0.22);
+  const selectedVariant = product.variants?.find(v => v.size === selectedSize);
+  const activePrice = selectedVariant ? selectedVariant.salePrice : product.salePrice;
+  const originalPrice = selectedVariant ? selectedVariant.price : product.price;
 
   const handleAddToCartClick = () => {
     for (let i = 0; i < quantity; i++) {
@@ -389,30 +397,22 @@ export default function ProductDetailsModal({
             {/* Sizing dropdown selectors */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="text-[9.5px] uppercase tracking-[0.15em] text-sand-500 block mb-1.5 font-medium">Bottle Volume</label>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedSize(product.size)}
-                    className={`flex-1 py-2.5 text-xs tracking-wider rounded border cursor-pointer ${
-                      selectedSize === product.size 
-                        ? "border-[#2D2926] bg-[#2D2926] text-white" 
-                        : "border-sand-200 bg-white text-sand-600 hover:border-sand-400"
-                    }`}
-                  >
-                    {product.size} (Full Flacon)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedSize("10 ml")}
-                    className={`flex-1 py-2.5 text-xs tracking-wider rounded border cursor-pointer ${
-                      selectedSize === "10 ml" 
-                        ? "border-[#2D2926] bg-[#2D2926] text-white" 
-                        : "border-sand-200 bg-white text-sand-600 hover:border-sand-400"
-                    }`}
-                  >
-                    10 ml (Travel Spray)
-                  </button>
+                <label className="text-[9.5px] uppercase tracking-[0.15em] text-sand-500 block mb-1.5 font-medium">Select Size</label>
+                <div className="flex gap-2 flex-wrap">
+                  {(product.variants || [{size: product.size, price: product.price, salePrice: product.salePrice}]).map((variant) => (
+                    <button
+                      key={variant.size}
+                      type="button"
+                      onClick={() => setSelectedSize(variant.size)}
+                      className={`flex-1 py-2 px-2 text-[11px] font-medium tracking-widest uppercase rounded-sm border cursor-pointer transition-colors ${
+                        selectedSize === variant.size 
+                          ? "border-[#2D2926] bg-[#2D2926] text-white shadow-sm" 
+                          : "border-sand-300 bg-white text-sand-700 hover:border-sand-900 hover:text-sand-900"
+                      }`}
+                    >
+                      {variant.size}
+                    </button>
+                  ))}
                 </div>
               </div>
 

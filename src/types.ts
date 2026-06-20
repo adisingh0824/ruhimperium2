@@ -24,6 +24,7 @@ export interface Product {
   galleryImages?: string[];
   galleryTexts?: { title: string; desc: string }[];
   productImages?: string[];
+  variants?: { size: string; price: number; salePrice: number; }[];
 }
 
 export interface Review {

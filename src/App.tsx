@@ -556,7 +556,28 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         if (writeLockRef.current["products"]) return;
         const list: Product[] = [];
         snap.forEach((d) => {
-          list.push(d.data() as Product);
+          const p = d.data() as Product;
+          if (!p.variants || p.variants.length === 0) {
+            let variants = [];
+            if (p.size.includes('12 ml')) {
+              variants = [
+                { size: '12ML Roll On', price: p.price, salePrice: p.salePrice },
+                { size: '6ML Roll On', price: Math.round(p.price * 0.55), salePrice: Math.round(p.salePrice * 0.55) },
+                { size: '3ML Roll On', price: Math.round(p.price * 0.3), salePrice: Math.round(p.salePrice * 0.3) },
+              ];
+            } else if (p.size.includes('50 ml')) {
+              variants = [
+                { size: '50ML Spray', price: p.price, salePrice: p.salePrice },
+                { size: '10ML Travel Spray', price: Math.round(p.price * 0.25), salePrice: Math.round(p.salePrice * 0.25) },
+              ];
+            } else {
+              variants = [
+                { size: p.size, price: p.price, salePrice: p.salePrice }
+              ];
+            }
+            p.variants = variants;
+          }
+          list.push(p);
         });
         setProducts(list);
       } else {
