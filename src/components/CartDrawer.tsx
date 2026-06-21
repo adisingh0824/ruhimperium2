@@ -80,7 +80,12 @@ export default function CartDrawer({
   // Cart math
   const cartSubtotal = cart.reduce((sums, item) => {
     const latestProduct = products.find(p => p.id === item.product.id) || item.product;
-    const selectedVariant = latestProduct.variants?.find(v => v.size === item.selectedSize);
+    const selectedVariant = latestProduct.variants?.find(v => 
+      v.size === item.selectedSize ||
+      v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
+      (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
+      (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+    );
     const activePrice = selectedVariant ? selectedVariant.salePrice : latestProduct.salePrice;
     return sums + (activePrice * item.quantity);
   }, 0);
@@ -243,7 +248,7 @@ export default function CartDrawer({
       phone,
       address,
       pincode,
-      paymentMode: isRazorpayActive ? "Razorpay Gateway (Online)" : paymentMode,
+      paymentMode: (isRazorpayActive && paymentMode !== "COD") ? "Razorpay Gateway (Online)" : paymentMode,
       items: cart.map(item => ({ ...item, product: products.find(p => p.id === item.product.id) || item.product })),
       total: calculatedTotal,
       date: new Date().toISOString().split("T")[0],
@@ -341,9 +346,14 @@ export default function CartDrawer({
                     </>
                   )}
                 </div>
-                 {cart.map((item, idx) => {
+                  {cart.map((item, idx) => {
                    const latestProduct = products.find(p => p.id === item.product.id) || item.product;
-                   const selectedVariant = latestProduct.variants?.find(v => v.size === item.selectedSize);
+                   const selectedVariant = latestProduct.variants?.find(v => 
+                     v.size === item.selectedSize ||
+                     v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
+                     (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
+                     (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+                   );
                    const activePrice = selectedVariant ? selectedVariant.salePrice : latestProduct.salePrice;
                    
                    const isCustom = latestProduct.image === "custom_blend_flask";

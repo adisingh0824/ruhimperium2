@@ -28,13 +28,6 @@ export default function ProductDetailsModal({
   const [selectedSize, setSelectedSize] = useState(product.variants?.[0]?.size || product.size);
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState(false);
-
-  // Reset state when product changes
-  useEffect(() => {
-    setSelectedSize(product.variants?.[0]?.size || product.size);
-    setQuantity(1);
-    setRatingInput(5);
-  }, [product]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Touch gesture state for swiping product photos
@@ -44,9 +37,13 @@ export default function ProductDetailsModal({
   // Reset active state when product changes
   useEffect(() => {
     setCurrentSlide(0);
-    setSelectedSize(product.size);
+    setSelectedSize((prev) => {
+      if (prev && product.variants?.some(v => v.size === prev)) return prev;
+      return product.variants?.[0]?.size || product.size;
+    });
     setQuantity(1);
-  }, [product.id, product.size]);
+    setRatingInput(5);
+  }, [product.id, product.size, product.variants]);
   
   // Review form states
   const [reviewerName, setReviewerName] = useState("");
@@ -78,7 +75,12 @@ export default function ProductDetailsModal({
     setTimeout(() => setFormSuccess(false), 4000);
   };
 
-  const selectedVariant = product.variants?.find(v => v.size === selectedSize);
+  const selectedVariant = product.variants?.find(v => 
+    v.size === selectedSize ||
+    v.size.toLowerCase().replace(/\s+/g, '') === selectedSize.toLowerCase().replace(/\s+/g, '') ||
+    (selectedSize === "50 ml" && v.size === "50ML Spray") ||
+    (selectedSize === "12 ml" && v.size === "12ML Roll On")
+  );
   const activePrice = selectedVariant ? selectedVariant.salePrice : product.salePrice;
   const originalPrice = selectedVariant ? selectedVariant.price : product.price;
 

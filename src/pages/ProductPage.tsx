@@ -37,6 +37,11 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
   };
 
   useEffect(() => {
+    setSelectedSize('');
+    setQuantity(1);
+  }, [id]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     if (!id) return;
     
@@ -66,13 +71,16 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
           p.variants = variants;
         }
         setProduct(p);
-        if (!selectedSize) setSelectedSize(p.variants?.[0]?.size || p.size);
+        setSelectedSize(prev => {
+          if (prev && p.variants.some(v => v.size === prev)) return prev;
+          return p.variants?.[0]?.size || p.size;
+        });
       }
       setLoading(false);
     });
 
     return () => unsub();
-  }, [id, selectedSize]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -91,7 +99,12 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
     );
   }
 
-  const selectedVariant = product.variants?.find(v => v.size === selectedSize);
+  const selectedVariant = product.variants?.find(v => 
+    v.size === selectedSize ||
+    v.size.toLowerCase().replace(/\s+/g, '') === selectedSize.toLowerCase().replace(/\s+/g, '') ||
+    (selectedSize === "50 ml" && v.size === "50ML Spray") ||
+    (selectedSize === "12 ml" && v.size === "12ML Roll On")
+  );
   const activePrice = selectedVariant ? selectedVariant.salePrice : product.salePrice;
   const originalPrice = selectedVariant ? selectedVariant.price : product.price;
 

@@ -386,6 +386,10 @@ export default function AdminHub({
               { size: '50ML Spray', price: Number(prodPrice), salePrice: Number(prodSalePrice) },
               { size: '10ML Travel Spray', price: Math.round(Number(prodPrice) * 0.25), salePrice: Math.round(Number(prodSalePrice) * 0.25) },
             ];
+          } else {
+            updatedVariants = [
+              { size: prodSize, price: Number(prodPrice), salePrice: Number(prodSalePrice) }
+            ];
           }
 
           return {
