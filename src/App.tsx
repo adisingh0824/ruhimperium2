@@ -2644,8 +2644,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
             
-            {/* Newsletter capture (LHS - 5 cols) */}
-            <div className="md:col-span-5 space-y-6">
+            {/* Newsletter capture (LHS - 4 cols) */}
+            <div className="md:col-span-4 space-y-6">
               <h4 className="text-sm font-serif tracking-widest text-white uppercase">
                 JOIN THE WAYFARER CLUB
               </h4>
@@ -2683,11 +2683,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             </div>
 
-            {/* Empty Spacer */}
-            <div className="hidden md:block md:col-span-1"></div>
-
-            {/* Quick sections links (Right aligned - 3 cols each) */}
-            <div className="md:col-span-3 space-y-6">
+            {/* Quick sections links (Right aligned - 2 cols each) */}
+            <div className="md:col-span-2 space-y-6">
               <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">SHOP</h4>
               <ul className="space-y-4 text-xs font-light text-stone-300">
                 <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop All</button></li>
@@ -2697,7 +2694,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </ul>
             </div>
 
-            <div className="md:col-span-3 space-y-6">
+            <div className="md:col-span-2 space-y-6">
               <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">ABOUT</h4>
               <ul className="space-y-4 text-xs font-light text-stone-300">
                 <li><button type="button" onClick={() => {
@@ -2708,6 +2705,34 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <li><button type="button" className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
                 <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">FAQ</button></li>
               </ul>
+            </div>
+
+            {/* Brand contact details (RHS - 4 cols) */}
+            <div className="md:col-span-4 space-y-6">
+              <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">CONTACT & ATELIER</h4>
+              <div className="space-y-4 text-xs font-light text-stone-300">
+                <div>
+                  <span className="text-[9px] uppercase tracking-widest text-stone-500 block mb-1 font-mono">Atelier Address</span>
+                  <p className="leading-relaxed font-sans">{siteSettings.contactAddress}</p>
+                </div>
+                <div>
+                  <span className="text-[9px] uppercase tracking-widest text-stone-500 block mb-1 font-mono">Olfactory Assistance (WhatsApp)</span>
+                  <p className="font-sans">
+                    <a 
+                      href={`https://wa.me/${siteSettings.contactPhone.replace(/\D/g, '')}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-white transition-colors underline decoration-stone-500 hover:decoration-white underline-offset-4 font-mono font-medium"
+                    >
+                      {siteSettings.contactPhone}
+                    </a>
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[9px] uppercase tracking-widest text-stone-500 block mb-1 font-mono">General Enquiries</span>
+                  <p className="font-sans"><a href={`mailto:${siteSettings.contactEmail}`} className="hover:text-white transition-colors">{siteSettings.contactEmail}</a></p>
+                </div>
+              </div>
             </div>
 
           </div>
