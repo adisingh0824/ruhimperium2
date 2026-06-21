@@ -1314,12 +1314,21 @@ export default function AdminHub({
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                             <div className="md:col-span-8 bg-white/70 rounded-xl p-3 border border-sand-150 text-[11px] space-y-1">
                               <span className="text-[8px] uppercase tracking-widest text-[#D4BC96] font-semibold block mb-1">COMPILATION ITEMS LOG</span>
-                              {o.items.map((item, id) => (
-                                <div key={id} className="flex justify-between font-mono text-sand-700">
-                                  <span>{item.product.name} ({item.selectedSize}) x {item.quantity}</span>
-                                  <span className="text-sand-400 font-sans">₹{item.selectedSize === item.product.size ? item.product.salePrice : Math.round(item.product.salePrice * 0.2)} total each</span>
-                                </div>
-                              ))}
+                              {o.items.map((item, id) => {
+                                const selectedVariant = item.product.variants?.find(v => 
+                                  v.size === item.selectedSize ||
+                                  v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
+                                  (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
+                                  (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+                                );
+                                const activePrice = selectedVariant ? selectedVariant.salePrice : item.product.salePrice;
+                                return (
+                                  <div key={id} className="flex justify-between font-mono text-sand-700">
+                                    <span>{item.product.name} ({item.selectedSize}) x {item.quantity}</span>
+                                    <span className="text-sand-600 font-sans">₹{activePrice} each</span>
+                                  </div>
+                                );
+                              })}
                               
                               <div className="border-t border-sand-100 pt-2.5 mt-2.5">
                                 <span className="text-[8px] uppercase tracking-widest text-sand-400 block">DELIVERY DROPOFF COÖRDINATES</span>

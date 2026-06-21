@@ -127,10 +127,23 @@ export default function CartDrawer({
         customer_email: order.email,
         customer_phone: order.phone,
         order_total: `₹${order.total}`,
-        order_items: order.items.map(item => `${item.quantity}x ${item.product.name} (${item.selectedSize})`).join(", "),
+        order_items: order.items.map(item => {
+          const selectedVariant = item.product.variants?.find(v => 
+            v.size === item.selectedSize ||
+            v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
+            (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
+            (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+          );
+          const itemPrice = selectedVariant ? selectedVariant.salePrice : item.product.salePrice;
+          return `${item.quantity}x ${item.product.name} (${item.selectedSize}) - ₹${itemPrice} each`;
+        }).join(", "),
         shipping_address: `${order.address}, ${order.pincode}`,
-        admin_email_1: "ruhimperiun9@gmail.com",
-        admin_email_2: "saditya7990@gmail.com"
+        payment_mode: order.paymentMode,
+        tracking_code: order.trackingCode,
+        order_date: order.date,
+        admin_email_1: "ruhimperium9@gmail.com",
+        admin_email_2: "saditya7990@gmail.com",
+        admin_email_3: "ruhimperiun9@gmail.com"
       };
 
       const { emailjsServiceId, emailjsTemplateId, emailjsPublicKey } = siteSettings;
