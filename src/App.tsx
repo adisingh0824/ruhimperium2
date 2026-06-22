@@ -1252,6 +1252,107 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setTimeout(() => setNewsSuccess(false), 5000);
   };
 
+  // Card renderer helper for catalogue & best sellers
+  const renderProductCard = (prod: Product) => {
+    const totalItemReviews = reviews.filter((r) => r.productId === prod.id);
+    const overallRating = totalItemReviews.length > 0 
+      ? parseFloat((totalItemReviews.reduce((s, r) => s + r.rating, 0) / totalItemReviews.length).toFixed(1))
+      : prod.rating;
+
+    const hoverImage = prod.galleryImages?.find(img => img && img.trim() !== "");
+
+    return (
+      <div 
+        key={prod.id} 
+        className="group flex flex-col justify-between transition-all duration-300 relative bg-white border border-stone-100/60 p-4"
+        id={`product-card-${prod.id}`}
+      >
+        {/* Image visual wrapper */}
+        <div 
+          className="relative w-full aspect-[4/5] bg-white overflow-hidden mb-4 cursor-pointer"
+          onClick={() => navigate(`/product/${prod.id}`)}
+        >
+          <img 
+            src={prod.image} 
+            alt={prod.name} 
+            className={`w-full h-full object-contain p-2 transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0 group-hover:scale-102' : 'group-hover:scale-103'}`}
+            referrerPolicy="no-referrer"
+          />
+          {hoverImage && (
+            <img 
+              src={hoverImage} 
+              alt={`${prod.name} alternate view`} 
+              className="absolute inset-0 w-full h-full object-contain p-2 transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-102"
+              referrerPolicy="no-referrer"
+            />
+          )}
+          {/* Sale Badge */}
+          {prod.price > prod.salePrice && (
+            <div className="absolute top-3 left-3 bg-black text-white text-[8px] uppercase tracking-widest font-sans font-semibold px-2.5 py-0.5 leading-none">
+              SALE
+            </div>
+          )}
+        </div>
+
+        {/* Card Content Data block */}
+        <div className="flex flex-col items-center text-center px-1 flex-grow">
+          {/* Rating block */}
+          {totalItemReviews.length > 0 && (
+            <div className="flex items-center space-x-1 mb-2">
+              <div className="flex text-stone-850">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`w-3.5 h-3.5 ${
+                      i < Math.floor(overallRating) ? "fill-stone-850 text-stone-850" : "text-stone-200"
+                    }`} 
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] text-stone-500 font-mono mt-0.5">
+                ({totalItemReviews.length})
+              </span>
+            </div>
+          )}
+
+          <button 
+            type="button"
+            onClick={() => navigate(`/product/${prod.id}`)}
+            className="text-[12px] font-sans font-medium text-black uppercase tracking-widest mb-1.5 hover:text-stone-600 transition-colors focus:outline-none leading-tight"
+          >
+            {prod.name}
+          </button>
+          
+          <p className="text-[9px] text-stone-400 uppercase tracking-widest mb-2 font-mono">
+            {prod.size}
+          </p>
+
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-xs font-mono text-black font-semibold">₹{prod.salePrice}</span>
+            {prod.price > prod.salePrice && (
+              <span className="text-xs font-mono text-stone-400 line-through">₹{prod.price}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Full-width Add to Cart Button */}
+        <button
+          type="button"
+          onClick={() => {
+            const defaultVariant = prod.variants && prod.variants.length > 0 
+              ? prod.variants[0].size 
+              : prod.size;
+            handleAddToCart(prod, defaultVariant);
+            setIsCartOpen(true);
+          }}
+          className="w-full py-3 bg-black hover:bg-stone-900 text-white transition-colors text-[9px] uppercase tracking-widest font-semibold focus:outline-none rounded-none"
+        >
+          ADD TO CART
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-white text-[#111111] font-sans antialiased text-sm flex flex-col justify-between">
       
@@ -1321,6 +1422,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
       {/* Main Content Body */}
       <main className="flex-1">
+        {siteSettings.marqueeEnabled && siteSettings.marqueeText && (
+          <div className="bg-[#111111] text-[#D4BC96] py-1.5 overflow-hidden w-full flex border-b border-[#D4BC96]/20">
+            <div className="animate-marquee whitespace-nowrap text-[9px] font-mono tracking-[0.2em] uppercase flex space-x-12 px-4">
+              <span>{siteSettings.marqueeText}</span>
+              <span>{siteSettings.marqueeText}</span>
+              <span>{siteSettings.marqueeText}</span>
+              <span>{siteSettings.marqueeText}</span>
+              <span>{siteSettings.marqueeText}</span>
+              <span>{siteSettings.marqueeText}</span>
+            </div>
+          </div>
+        )}
         <Routes>
           <Route path="/" element={
             <>
@@ -1457,12 +1570,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               AS FEATURED IN PRINCIPAL EDITORIALS
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 sm:justify-between text-[#8C8279] font-display text-sm tracking-[0.25em] font-light opacity-75">
-              <span className="hover:text-sand-900 transition-colors cursor-default">VOGUE</span>
-              <span className="hover:text-sand-900 transition-colors cursor-default font-serif italic">GQ INDIA</span>
-              <span className="hover:text-sand-900 transition-colors cursor-default">ELLE</span>
-              <span className="hover:text-sand-900 transition-colors cursor-default font-serif">AD DIGEST</span>
-              <span className="hover:text-[#D4BC96] transition-colors cursor-default">L'OFFICIEL</span>
-              <span className="hover:text-sand-900 transition-colors cursor-default font-sans font-bold">BAZAAR</span>
+              {siteSettings.pressLogosUrls && siteSettings.pressLogosUrls.trim() !== "" ? (
+                siteSettings.pressLogosUrls.split(",").map((url, i) => (
+                  <img key={i} src={url.trim()} alt="Press" className="h-6 sm:h-8 object-contain cursor-pointer grayscale hover:grayscale-0 transition-all opacity-80 hover:opacity-100" referrerPolicy="no-referrer" />
+                ))
+              ) : (
+                <>
+                  <span className="hover:text-sand-900 transition-colors cursor-default">VOGUE</span>
+                  <span className="hover:text-sand-900 transition-colors cursor-default font-serif italic">GQ INDIA</span>
+                  <span className="hover:text-sand-900 transition-colors cursor-default">ELLE</span>
+                  <span className="hover:text-sand-900 transition-colors cursor-default font-serif">AD DIGEST</span>
+                  <span className="hover:text-[#D4BC96] transition-colors cursor-default">L'OFFICIEL</span>
+                  <span className="hover:text-sand-900 transition-colors cursor-default font-sans font-bold">BAZAAR</span>
+                </>
+              )}
             </div>
           </div>
         </section>
@@ -1784,40 +1905,35 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 );
               }
 
-              // Otherwise, group neatly by categories as requested
-              const groups = collections;
+              // Otherwise, display Best Sellers / Selected Products
+              let bestSellers = [];
+              if (siteSettings.bestsellerProductIds && siteSettings.bestsellerProductIds.trim() !== "") {
+                const ids = siteSettings.bestsellerProductIds.split(",").map(id => id.trim());
+                bestSellers = products.filter(p => ids.includes(p.id));
+              }
+              if (bestSellers.length === 0) {
+                // fallback to top 4 highest rated products
+                bestSellers = [...products].sort((a, b) => b.rating - a.rating).slice(0, 4);
+              }
 
               return (
                 <div className="space-y-16">
-                  {groups.map((grp) => {
-                    const groupProds = products.filter((p) => p.category === grp.id);
-                    if (groupProds.length === 0) return null;
-                    return (
-                      <div key={grp.id} id={`collection-grid-header-${grp.id}`} className="space-y-6 scroll-mt-24">
-                        {/* Group Title Box */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-sand-200 pb-4 gap-2">
-                          <div>
-                            <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide uppercase">
-                              {grp.name}
-                            </h3>
-                            <p className="text-xs text-sand-500 font-light mt-0.5">{grp.tag}</p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedCategory(grp.id)}
-                            className="text-[10px] uppercase font-semibold tracking-widest text-sand-900 border-b border-black pb-0.5 hover:text-[#D4BC96] hover:border-[#D4BC96] transition-colors focus:outline-none"
-                          >
-                            View All Items →
-                          </button>
-                        </div>
-
-                        {/* Shelf Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
-                          {groupProds.map((prod) => renderProductCard(prod))}
-                        </div>
+                  <div className="space-y-6 scroll-mt-24">
+                    {/* Group Title Box */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-sand-200 pb-4 gap-2">
+                      <div>
+                        <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide uppercase">
+                          {siteSettings.bestsellerHeading || "Selected Products"}
+                        </h3>
+                        <p className="text-xs text-sand-500 font-light mt-0.5">Curated selections just for you.</p>
                       </div>
-                    );
-                  })}
+                    </div>
+
+                    {/* Shelf Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
+                      {bestSellers.map((prod) => renderProductCard(prod))}
+                    </div>
+                  </div>
                 </div>
               );
             })()}
@@ -2004,16 +2120,16 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-14 items-center">
               <div className="order-2 md:order-1 space-y-4">
                 <h3 className="text-xl sm:text-2xl font-serif font-bold text-sand-950">
-                  {siteSettings.story01Title || "01 The Art Of Perfume Making"}
+                  {siteSettings.aboutUsHeading || siteSettings.story01Title || "01 The Art Of Perfume Making"}
                 </h3>
-                <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed">
-                  {siteSettings.story01Text || "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions."}
+                <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
+                  {siteSettings.aboutUsText || siteSettings.story01Text || "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions."}
                 </p>
               </div>
               <div className="order-1 md:order-2">
                 <div className="aspect-video sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border border-sand-200">
                   <img
-                    src={siteSettings.story01Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600"}
+                    src={siteSettings.aboutUsImage || siteSettings.story01Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600"}
                     alt="The Art Of Perfume Making"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"

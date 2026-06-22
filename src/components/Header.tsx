@@ -128,12 +128,10 @@ export default function Header({
     <header className="sticky top-0 z-50 w-full bg-white border-b border-stone-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] transition-all duration-300">
 
       {/* Luxury Minimalist Announcement Bar */}
-      <div className="bg-[#1C1917] text-[#FAF8F5] py-2.5 px-4 border-b border-stone-900 relative overflow-hidden select-none">
+      <div className="bg-black text-white py-2 px-4 relative overflow-hidden select-none">
         <div className="max-w-7xl mx-auto flex items-center justify-center">
-          <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9.5px] font-sans font-semibold uppercase tracking-[0.25em] text-[#D4BC96] text-center min-h-[14px]">
-            <span>✦</span>
+          <div className="flex items-center gap-2 text-xs font-sans font-medium uppercase tracking-widest text-white text-center">
             <span>{announcements[currentAnnouncementIdx]}</span>
-            <span>✦</span>
           </div>
         </div>
       </div>
@@ -195,92 +193,59 @@ export default function Header({
             </div>
           </div>
 
-          {/* TOP CENTER: Royal Ruh Imperium Logo Replica */}
+          {/* TOP CENTER: Logo */}
           <div className="flex items-center justify-center">
             <button
               type="button"
               onClick={() => onNavigate("hero")}
               className="cursor-pointer focus:outline-none py-1 group"
             >
-              <Logo variant="header" customLogoUrl={siteSettings?.customLogoUrl} />
+              {siteSettings?.customLogoUrl ? (
+                <img src={siteSettings.customLogoUrl} alt="Logo" className="h-8 md:h-12 object-contain" />
+              ) : (
+                <span className="text-2xl md:text-3xl font-serif font-bold tracking-widest uppercase">Raahi</span>
+              )}
             </button>
           </div>
 
-          {/* TOP RIGHT: Account (HQ Access) & Shopping Cart */}
-          <div className="flex items-center justify-end gap-3 sm:gap-5">
-            
-            {/* Currency Note indicator (aesthetic luxury standard) */}
-            <span className="hidden sm:inline-block text-[9.5px] uppercase tracking-widest text-stone-400 border border-stone-200/65 px-2 py-0.5 rounded font-mono">
-              INR (₹)
-            </span>
-
-            {/* Customer Scent Lounge Trigger */}
+          {/* TOP RIGHT: Account & Bag */}
+          <div className="flex items-center justify-end gap-4 sm:gap-6">
             <button
               type="button"
               onClick={onLoungeClick}
-              className={`p-2 transition-all duration-300 relative group rounded-full border ${
-                currentUser 
-                  ? "bg-[#D4BC96]/10 text-[#D4BC96] border-[#D4BC96]/30 font-semibold scale-102" 
-                  : "text-stone-600 border-transparent hover:text-gold-600"
-              }`}
-              title={currentUser ? `Imperial Lounge: ${currentUser.fullName}` : "Customer Scent Lounge Entrance"}
-              id="header_lounge_btn"
+              className="text-black hover:text-gray-500 transition-colors"
             >
-              <User className="w-[18px] h-[18px] stroke-[1.5]" />
-              {currentUser && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-amber-500 rounded-full border border-white animate-pulse" />
-              )}
-              
-              {/* Tooltip */}
-              <div className="absolute right-0 top-10 w-40 bg-stone-950 text-stone-200 text-[9px] tracking-wider p-2 rounded shadow-xl opacity-0 py-1.5 group-hover:opacity-100 pointer-events-none transition-opacity font-mono z-50">
-                {currentUser ? `${currentUser.fullName.split(" ")[0]}'s Royal Vault` : "Enter Member Lounge"}
-              </div>
+              <User className="w-5 h-5" />
             </button>
 
-            {/* Profile / Admin HQ Login Trigger */}
             <button
               type="button"
               onClick={onAdminClick}
-              className={`p-2 transition-colors relative group rounded-full ${
-                isAdminLoggedIn ? "bg-emerald-50/70 border border-emerald-100 text-emerald-800" : "text-stone-500 hover:text-gold-600"
-              }`}
-              title={isAdminLoggedIn ? "HQ Control Panel Active" : "Bespoke Ambassador Login"}
+              className="text-black hover:text-gray-500 transition-colors"
             >
-              <LockKeyhole className="w-[17px] h-[17px] stroke-[1.5]" />
-              {isAdminLoggedIn && (
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-              )}
-              
-              {/* Small hover alert explaining account access */}
-              <div className="absolute right-0 top-10 w-48 bg-stone-950 text-white text-[9px] tracking-wider p-2 rounded shadow-xl opacity-0 py-1.5 group-hover:opacity-100 pointer-events-none transition-opacity font-mono z-50">
-                {isAdminLoggedIn ? "HQ Control Center Activated" : "Ambassador HQ Access"}
-              </div>
+              <LockKeyhole className="w-4 h-4" />
             </button>
 
-            {/* Shopping Bag Button (Aesthetic vector from user requested layout) */}
             <button
               type="button"
               onClick={onOpenCart}
-              className="relative p-2 text-stone-600 hover:text-stone-900 transition-all duration-300 hover:scale-105 focus:outline-none"
-              id="header-cart-btn-luxury"
+              className="relative text-black hover:text-gray-500 transition-colors"
             >
-              <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
+              <ShoppingBag className="w-5 h-5" />
               {cartTotalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gold-600 text-[#FAFAFA] text-[8px] font-semibold w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white">
+                <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartTotalItems}
                 </span>
               )}
             </button>
 
-            {/* If Admin logged in, quick sign out icon button */}
             {isAdminLoggedIn && (
               <button
                 type="button"
                 onClick={onLogout}
-                className="text-[9px] uppercase tracking-widest text-red-500 hover:text-red-700 bg-red-50 px-2 py-1.5 rounded font-medium border border-red-100 transition-colors"
-                title="Secure Sign-out from HQ Room"
+                className="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-700 font-medium transition-colors"
               >
-                Sign out
+                Logout
               </button>
             )}
           </div>
@@ -288,7 +253,7 @@ export default function Header({
 
         {/* BOTTOM ROW: Minimalist Navigation Links */}
         <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-stone-100">
-          <ul className="flex items-center space-x-12 text-[12px] tracking-[0.15em] uppercase font-sans text-stone-800 font-medium">
+          <ul className="flex items-center space-x-12 text-[12px] tracking-widest uppercase font-sans text-stone-800 font-medium">
             
             {/* 1. Shop All */}
             <li className="relative py-3">
@@ -298,17 +263,13 @@ export default function Header({
                   if (setSelectedCategory) setSelectedCategory("All");
                   onNavigate("shop");
                 }}
-                className={`hover:text-black transition-colors cursor-pointer relative group`}
+                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
               >
                 Shop All
-                {activeSection === "shop" && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black" />
-                )}
-                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
-            {/* 2. Discovery Set */}
+            {/* 2. Collections */}
             <li className="relative py-3">
               <button
                 type="button"
@@ -316,22 +277,20 @@ export default function Header({
                   if (setSelectedCategory) setSelectedCategory("Discovery Set");
                   onNavigate("shop");
                 }}
-                className={`hover:text-black transition-colors cursor-pointer relative group`}
+                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
               >
-                Discovery Set
-                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
+                Collections
               </button>
             </li>
 
-            {/* 3. Gifting (Bulk Enquiry mapped to Gifting) */}
+            {/* 3. Gifting */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={() => setBulkEnquiryOpen(true)}
-                className={`hover:text-black transition-colors cursor-pointer relative group`}
+                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
               >
                 Gifting
-                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
@@ -340,13 +299,9 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => onNavigate("journal")}
-                className={`hover:text-black transition-colors cursor-pointer relative group`}
+                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
               >
                 Our Story
-                {activeSection === "journal" && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black" />
-                )}
-                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
               </button>
             </li>
 
@@ -355,10 +310,9 @@ export default function Header({
               <button
                 type="button"
                 onClick={onTrackOrderClick}
-                className="hover:text-black transition-colors cursor-pointer relative flex items-center gap-1.5 group"
+                className="hover:text-gray-500 transition-colors cursor-pointer relative group"
               >
-                <span>Track Order</span>
-                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
+                Track Order
               </button>
             </li>
 

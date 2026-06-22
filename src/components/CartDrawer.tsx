@@ -95,7 +95,11 @@ export default function CartDrawer({
     ? Math.round(cartSubtotal * (activeDiscount.percent / 100)) 
     : 0;
 
-  const cartTotal = cartSubtotal - discountAmount;
+  const freeShippingThreshold = siteSettings?.freeShippingThreshold || 600;
+  const flatShippingRate = siteSettings?.flatShippingRate || 80;
+  const shippingFee = (cartSubtotal > 0 && cartSubtotal < freeShippingThreshold) ? flatShippingRate : 0;
+
+  const cartTotal = cartSubtotal - discountAmount + shippingFee;
 
   const handleApplyCoupon = (e: FormEvent) => {
     e.preventDefault();
@@ -341,19 +345,19 @@ export default function CartDrawer({
               <div className="flex-1 overflow-y-auto space-y-0 pr-1">
                 {/* Free Shipping Progress Bar */}
                 <div className="bg-[#F8F8F8] p-3 mb-4 text-center">
-                  {cartSubtotal >= 1500 ? (
+                  {cartSubtotal >= freeShippingThreshold ? (
                     <p className="text-[11px] font-sans text-[#2D2926] font-semibold">
                       You are eligible for <span className="font-bold">Free Shipping!</span>
                     </p>
                   ) : (
                     <>
                       <p className="text-[11px] font-sans text-[#2D2926] mb-2">
-                        You are <span className="font-bold">₹{1500 - cartSubtotal}</span> away from <span className="font-bold">Free Shipping!</span>
+                        Add more products to get <span className="font-bold">Free Delivery!</span> You are <span className="font-bold">₹{freeShippingThreshold - cartSubtotal}</span> away.
                       </p>
                       <div className="w-full bg-sand-200 h-1.5 overflow-hidden">
                         <div 
                           className="bg-[#2D2926] h-full transition-all duration-500" 
-                          style={{ width: `${Math.min((cartSubtotal / 1500) * 100, 100)}%` }}
+                          style={{ width: `${Math.min((cartSubtotal / freeShippingThreshold) * 100, 100)}%` }}
                         ></div>
                       </div>
                     </>
@@ -459,9 +463,25 @@ export default function CartDrawer({
                 <div className="space-y-2 text-xs text-sand-500 font-light px-1">
                   <div className="flex justify-between text-[14px] text-[#2D2926] font-sans pt-1">
                     <span>Subtotal</span>
+                    <span className="font-bold">₹{cartSubtotal}</span>
+                  </div>
+                  {shippingFee > 0 && (
+                    <div className="flex justify-between text-[14px] text-[#2D2926] font-sans pt-1">
+                      <span>Shipping</span>
+                      <span className="font-bold">₹{shippingFee}</span>
+                    </div>
+                  )}
+                  {activeDiscount && (
+                    <div className="flex justify-between text-[14px] text-[#2D2926] font-sans pt-1 text-gold-900">
+                      <span>Discount</span>
+                      <span className="font-bold">-₹{discountAmount}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-[16px] text-[#2D2926] font-sans font-bold pt-2 border-t border-sand-200 mt-1">
+                    <span>Total</span>
                     <span className="font-bold">₹{cartTotal}</span>
                   </div>
-                  <p className="text-[10px] text-sand-400 mt-1">Shipping, taxes, and discount codes calculated at checkout.</p>
+                  <p className="text-[10px] text-sand-400 mt-1">Taxes calculated at checkout if applicable.</p>
                 </div>
 
                 {/* Checkout Trigger */}

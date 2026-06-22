@@ -81,6 +81,7 @@ export interface Order {
   date: string;
   status: "Processing" | "Dispatched" | "In Transit" | "Out for Delivery" | "Delivered" | "Cancelled";
   trackingCode: string;
+  courierService?: string;
 }
 
 export interface Coupon {
@@ -164,10 +165,24 @@ export interface SiteSettings {
   statsCard7Title?: string;
   statsCard7Desc?: string;
   
+  // Raahi Parfums / Modern Storefront Extras
+  marqueeText?: string;
+  marqueeEnabled?: boolean;
+  bestsellerHeading?: string;
+  bestsellerProductIds?: string; // Comma-separated IDs
+  aboutUsImage?: string;
+  aboutUsHeading?: string;
+  aboutUsText?: string;
+  pressLogosUrls?: string; // Comma-separated URLs
+  
   // EmailJS integration
   emailjsServiceId?: string;
   emailjsTemplateId?: string;
   emailjsPublicKey?: string;
+
+  // Shipping Configuration
+  freeShippingThreshold?: number;
+  flatShippingRate?: number;
 }
 
 export interface UserAccount {

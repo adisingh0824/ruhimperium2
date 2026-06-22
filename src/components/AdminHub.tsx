@@ -430,6 +430,26 @@ export default function AdminHub({
     }
   };
 
+  // Update specific order's phone number
+  const handleUpdateOrderPhone = (orderId: string, phone: string) => {
+    setOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return { ...o, phone };
+      }
+      return o;
+    }));
+  };
+
+  // Update specific order's courier service
+  const handleUpdateOrderCourier = (orderId: string, courierService: string) => {
+    setOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return { ...o, courierService };
+      }
+      return o;
+    }));
+  };
+
   // Update specific order's delivery status
   const handleUpdateOrderStatus = (orderId: string, status: Order["status"]) => {
     setOrders(prev => prev.map(o => {
@@ -1270,10 +1290,21 @@ export default function AdminHub({
                                 <span className="text-xs font-bold font-mono tracking-wider text-sand-900 bg-sand-200 px-2 py-0.5 rounded">{o.id}</span>
                                 <span className="text-[10px] text-sand-400 font-mono">{o.date}</span>
                               </div>
-                              <p className="text-xs font-semibold text-sand-700 mt-1 flex items-center gap-1">
+                              <p className="text-xs font-semibold text-sand-700 mt-1 flex flex-col md:flex-row md:items-center gap-1.5">
                                 <span>Wayfarer: {o.fullName}</span>
-                                <span className="font-light text-[10.5px] text-sand-500">({o.phone} • {o.email})</span>
+                                <span className="font-light text-[10.5px] text-sand-500">({o.email})</span>
                               </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <a href={`https://wa.me/91${o.phone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-green-600 hover:text-green-700 underline decoration-green-300 decoration-dashed underline-offset-2 font-mono flex items-center gap-1">
+                                  <span>WhatsApp</span>
+                                </a>
+                                <input 
+                                  type="text" 
+                                  value={o.phone} 
+                                  onChange={(e) => handleUpdateOrderPhone(o.id, e.target.value)}
+                                  className="text-[10.5px] font-mono text-sand-600 bg-transparent border-b border-dashed border-sand-300 focus:outline-none focus:border-[#D4BC96] w-24 px-1"
+                                />
+                              </div>
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3">
@@ -1331,8 +1362,13 @@ export default function AdminHub({
                               })}
                               
                               <div className="border-t border-sand-100 pt-2.5 mt-2.5">
-                                <span className="text-[8px] uppercase tracking-widest text-sand-400 block">DELIVERY DROPOFF COÖRDINATES</span>
-                                <p className="text-xs font-light text-sand-600 font-sans leading-tight mt-0.5">{o.address}, PIN {o.pincode} • Pay Mode: <span className="font-mono bg-sand-200 px-1 py-0.2 ml-1 text-[10px] rounded">{o.paymentMode}</span></p>
+                                <span className="text-[8px] uppercase tracking-widest text-sand-400 block mb-1">DELIVERY DESTINATION ADDRESS</span>
+                                <div className="bg-sand-100 p-2.5 rounded border border-sand-200">
+                                  <p className="text-xs font-semibold text-sand-900 mb-0.5">{o.fullName}</p>
+                                  <p className="text-[11px] font-light text-sand-700 font-sans leading-relaxed whitespace-pre-wrap">{o.address}</p>
+                                  <p className="text-xs font-bold text-sand-900 font-mono mt-1.5">PIN: {o.pincode}</p>
+                                </div>
+                                <p className="text-xs font-light text-sand-600 font-sans leading-tight mt-2.5">Pay Mode: <span className="font-mono bg-sand-200 px-1 py-0.2 ml-1 text-[10px] rounded">{o.paymentMode}</span></p>
                               </div>
                             </div>
 
@@ -1340,17 +1376,30 @@ export default function AdminHub({
                             <div className="md:col-span-4 bg-[#D4BC96]/5 rounded-xl p-3 border border-[#D4BC96]/20 flex flex-col justify-between">
                               <div>
                                 <span className="text-[8px] uppercase tracking-widest text-[#D4BC96] font-bold block mb-1">AIR COURIER WAYBILL CODE</span>
-                                <p className="text-[9.5px] text-sand-400 font-light leading-tight">Edit and share tracking code below so the buyer can trace live dispatch transit vectors in real-time.</p>
+                                <p className="text-[9.5px] text-sand-400 font-light leading-tight">Edit courier and tracking code below so the buyer can trace live dispatch transit vectors in real-time.</p>
                               </div>
 
-                              <div className="mt-2.5">
-                                <input
-                                  type="text"
-                                  placeholder="RP-XXXXX-IN"
-                                  value={o.trackingCode || ""}
-                                  onChange={(e) => handleUpdateOrderTracking(o.id, e.target.value.toUpperCase())}
-                                  className="w-full bg-white border border-[#D4BC96]/30 rounded px-2 py-1.5 text-xs text-center font-mono font-bold uppercase select-all tracking-wider focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
-                                />
+                              <div className="mt-2.5 space-y-2">
+                                <div>
+                                  <label className="text-[8px] uppercase tracking-widest text-[#D4BC96]/80 block mb-0.5 font-mono">Courier Service</label>
+                                  <input
+                                    type="text"
+                                    placeholder="E.g. DTDC, Blue Dart"
+                                    value={o.courierService || ""}
+                                    onChange={(e) => handleUpdateOrderCourier(o.id, e.target.value)}
+                                    className="w-full bg-white border border-[#D4BC96]/30 rounded px-2 py-1.5 text-xs text-center font-mono font-bold select-all tracking-wider focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[8px] uppercase tracking-widest text-[#D4BC96]/80 block mb-0.5 font-mono">Tracking Code</label>
+                                  <input
+                                    type="text"
+                                    placeholder="RP-XXXXX-IN"
+                                    value={o.trackingCode || ""}
+                                    onChange={(e) => handleUpdateOrderTracking(o.id, e.target.value.toUpperCase())}
+                                    className="w-full bg-white border border-[#D4BC96]/30 rounded px-2 py-1.5 text-xs text-center font-mono font-bold uppercase select-all tracking-wider focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                                  />
+                                </div>
                               </div>
                             </div>
 
@@ -1438,6 +1487,133 @@ export default function AdminHub({
                               <span>Reset to Default</span>
                             </button>
                           )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* MODERN STOREFRONT EXTRAS (Raahi Style) */}
+                  <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-[#D4BC96]">
+                      <span className="text-sm">🌟</span>
+                      <span className="text-xs font-bold font-mono uppercase tracking-widest">Storefront Dynamic Elements</span>
+                    </div>
+
+                    <div className="space-y-4 bg-white p-4 rounded-xl border border-sand-200">
+                      <div>
+                        <label className="flex items-center gap-2 cursor-pointer mb-2">
+                          <input
+                            type="checkbox"
+                            checked={siteSettings.marqueeEnabled || false}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, marqueeEnabled: e.target.checked })}
+                            className="w-4 h-4 text-[#D4BC96] rounded border-sand-300 focus:ring-[#D4BC96]"
+                          />
+                          <span className="text-[10px] uppercase tracking-widest text-sand-800 font-bold">Enable Marquee Banner</span>
+                        </label>
+                        {siteSettings.marqueeEnabled && (
+                          <input
+                            type="text"
+                            placeholder="Free Shipping Across India • 100% Authentic Attars • Cruelty-Free"
+                            value={siteSettings.marqueeText || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, marqueeText: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        )}
+                      </div>
+
+                      <div className="border-t border-sand-100 pt-4">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Free Shipping Threshold (₹)</label>
+                        <p className="text-[9px] text-sand-500 mb-2">Orders below this amount will be charged the flat shipping rate. Default: 600</p>
+                        <input
+                          type="number"
+                          placeholder="600"
+                          value={siteSettings.freeShippingThreshold || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, freeShippingThreshold: parseInt(e.target.value) || 0 })}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none mb-4"
+                        />
+
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Flat Shipping Rate (₹)</label>
+                        <p className="text-[9px] text-sand-500 mb-2">Delivery charge added to orders below the threshold. Default: 80</p>
+                        <input
+                          type="number"
+                          placeholder="80"
+                          value={siteSettings.flatShippingRate || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, flatShippingRate: parseInt(e.target.value) || 0 })}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                      </div>
+                      
+                      <div className="border-t border-sand-100 pt-4">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Best Sellers Heading</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Best Sellers"
+                          value={siteSettings.bestsellerHeading || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, bestsellerHeading: e.target.value })}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none mb-2"
+                        />
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Best Sellers Product IDs (Comma separated)</label>
+                        <p className="text-[9px] text-sand-500 mb-2">Leave blank to auto-select top rated products.</p>
+                        <input
+                          type="text"
+                          placeholder="prod_1, prod_2"
+                          value={siteSettings.bestsellerProductIds || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, bestsellerProductIds: e.target.value })}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="border-t border-sand-100 pt-4">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Press Logos (Comma separated image URLs)</label>
+                        <textarea
+                          placeholder="https://example.com/logo1.png, https://example.com/logo2.png"
+                          value={siteSettings.pressLogosUrls || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, pressLogosUrls: e.target.value })}
+                          rows={2}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="border-t border-sand-100 pt-4 space-y-3">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">About Us / Story Section</label>
+                        <input
+                          type="text"
+                          placeholder="Story Heading (e.g. Our Heritage)"
+                          value={siteSettings.aboutUsHeading || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, aboutUsHeading: e.target.value })}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                        <textarea
+                          placeholder="Story Body Text"
+                          value={siteSettings.aboutUsText || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, aboutUsText: e.target.value })}
+                          rows={3}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Image URL"
+                            value={siteSettings.aboutUsImage || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, aboutUsImage: e.target.value })}
+                            className="flex-1 bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="about-us-upload"
+                            onChange={(e) => {
+                              handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, aboutUsImage: base64 })));
+                            }}
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById('about-us-upload')?.click()}
+                            className="px-3 py-2 bg-sand-200 hover:bg-sand-300 text-sand-800 text-[10px] uppercase font-mono rounded cursor-pointer transition-colors"
+                          >
+                            Upload
+                          </button>
                         </div>
                       </div>
                     </div>
