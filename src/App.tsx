@@ -914,7 +914,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       setTimeout(() => { writeLockRef.current["assets"] = false; }, 1000);
     }
   };
-
   const updateProducts = async (newVal: Product[] | ((prev: Product[]) => Product[])) => {
     writeLockRef.current["products"] = true;
     const previousProducts = productsRef.current;
@@ -927,18 +926,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setProducts(resolved);
     productsRef.current = resolved;
     try {
+      const batch = writeBatch(db);
       const currentIds = new Set(resolved.map(p => p.id));
       const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
       for (const id of deletedIds) {
-        await withTimeout(deleteDoc(doc(db, "products", id)));
+        batch.delete(doc(db, "products", id));
       }
       for (const p of resolved) {
-        await withTimeout(setDoc(doc(db, "products", p.id), p));
+        batch.set(doc(db, "products", p.id), p);
       }
+      await withTimeout(batch.commit());
     } catch (e) {
       console.error("Firestore products sync error: ", e);
     } finally {
-      setTimeout(() => { writeLockRef.current["products"] = false; }, 1500);
+      setTimeout(() => { writeLockRef.current["products"] = false; }, 1000);
     }
   };
 
@@ -954,18 +955,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setBlogArticles(resolved);
     blogArticlesRef.current = resolved;
     try {
+      const batch = writeBatch(db);
       const currentIds = new Set(resolved.map(b => b.id));
       const deletedIds = previousBlogs.filter(b => !currentIds.has(b.id)).map(b => b.id);
       for (const id of deletedIds) {
-        await deleteDoc(doc(db, "blogArticles", id));
+        batch.delete(doc(db, "blogArticles", id));
       }
       for (const b of resolved) {
-        await setDoc(doc(db, "blogArticles", b.id), b);
+        batch.set(doc(db, "blogArticles", b.id), b);
       }
+      await withTimeout(batch.commit());
     } catch (e) {
       console.error("Firestore blog sync error: ", e);
     } finally {
-      setTimeout(() => { writeLockRef.current["blogs"] = false; }, 1500);
+      setTimeout(() => { writeLockRef.current["blogs"] = false; }, 1000);
     }
   };
 
@@ -981,18 +984,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setCoupons(resolved);
     couponsRef.current = resolved;
     try {
+      const batch = writeBatch(db);
       const currentCodes = new Set(resolved.map(c => c.code));
       const deletedCodes = previousCoupons.filter(c => !currentCodes.has(c.code)).map(c => c.code);
       for (const code of deletedCodes) {
-        await deleteDoc(doc(db, "coupons", code));
+        batch.delete(doc(db, "coupons", code));
       }
       for (const c of resolved) {
-        await setDoc(doc(db, "coupons", c.code), c);
+        batch.set(doc(db, "coupons", c.code), c);
       }
+      await withTimeout(batch.commit());
     } catch (e) {
       console.error("Firestore coupon sync error: ", e);
     } finally {
-      setTimeout(() => { writeLockRef.current["coupons"] = false; }, 1500);
+      setTimeout(() => { writeLockRef.current["coupons"] = false; }, 1000);
     }
   };
 
@@ -1008,18 +1013,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setReviews(resolved);
     reviewsRef.current = resolved;
     try {
+      const batch = writeBatch(db);
       const currentIds = new Set(resolved.map(r => r.id));
       const deletedIds = previousReviews.filter(r => !currentIds.has(r.id)).map(r => r.id);
       for (const id of deletedIds) {
-        await deleteDoc(doc(db, "reviews", id));
+        batch.delete(doc(db, "reviews", id));
       }
       for (const r of resolved) {
-        await setDoc(doc(db, "reviews", r.id), r);
+        batch.set(doc(db, "reviews", r.id), r);
       }
+      await withTimeout(batch.commit());
     } catch (e) {
       console.error("Firestore reviews sync error: ", e);
     } finally {
-      setTimeout(() => { writeLockRef.current["reviews"] = false; }, 1500);
+      setTimeout(() => { writeLockRef.current["reviews"] = false; }, 1000);
     }
   };
 
@@ -1035,18 +1042,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setOrders(resolved);
     ordersRef.current = resolved;
     try {
+      const batch = writeBatch(db);
       const currentIds = new Set(resolved.map(o => o.id));
       const deletedIds = previousOrders.filter(o => !currentIds.has(o.id)).map(o => o.id);
       for (const id of deletedIds) {
-        await deleteDoc(doc(db, "orders", id));
+        batch.delete(doc(db, "orders", id));
       }
       for (const o of resolved) {
-        await setDoc(doc(db, "orders", o.id), o);
+        batch.set(doc(db, "orders", o.id), o);
       }
+      await withTimeout(batch.commit());
     } catch (e) {
       console.error("Firestore orders sync error: ", e);
     } finally {
-      setTimeout(() => { writeLockRef.current["orders"] = false; }, 1500);
+      setTimeout(() => { writeLockRef.current["orders"] = false; }, 1000);
     }
   };
 
