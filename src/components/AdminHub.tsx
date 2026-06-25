@@ -1550,18 +1550,92 @@ export default function AdminHub({
                           placeholder="e.g. Best Sellers"
                           value={siteSettings.bestsellerHeading || ""}
                           onChange={(e) => setSiteSettings({ ...siteSettings, bestsellerHeading: e.target.value })}
-                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none mb-2"
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none mb-3"
                         />
-                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Best Sellers Product IDs (Comma separated)</label>
-                        <p className="text-[9px] text-sand-500 mb-2">Leave blank to auto-select top rated products.</p>
-                        <input
-                          type="text"
-                          placeholder="prod_1, prod_2"
-                          value={siteSettings.bestsellerProductIds || ""}
-                          onChange={(e) => setSiteSettings({ ...siteSettings, bestsellerProductIds: e.target.value })}
-                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
-                        />
+
+                        {/* VISUAL PRODUCT PICKER for Selected Products Section */}
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">
+                          Select Products to Feature <span className="text-[#D4BC96]">({(() => { const ids = (siteSettings.bestsellerProductIds || "").split(",").map(s => s.trim()).filter(Boolean); return ids.length; })()}/{products.length} selected)</span>
+                        </label>
+                        <p className="text-[9px] text-sand-500 mb-3">Tick the products you want displayed in the homepage "Selected Products" section. Leave all unchecked to auto-show top-rated products.</p>
+                        
+                        {/* Select All / Clear All controls */}
+                        <div className="flex gap-2 mb-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const allIds = products.map(p => p.id).join(",");
+                              setSiteSettings({ ...siteSettings, bestsellerProductIds: allIds });
+                            }}
+                            className="px-2 py-1 text-[8px] uppercase tracking-wider font-mono bg-[#2D2926] text-white rounded hover:bg-[#D4BC96] transition-colors"
+                          >
+                            Select All
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSiteSettings({ ...siteSettings, bestsellerProductIds: "" })}
+                            className="px-2 py-1 text-[8px] uppercase tracking-wider font-mono bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100 transition-colors"
+                          >
+                            Clear All
+                          </button>
+                        </div>
+
+                        {/* Product Grid Picker */}
+                        <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1 border border-sand-100 rounded-lg p-2 bg-sand-50">
+                          {products.map((prod) => {
+                            const currentIds = (siteSettings.bestsellerProductIds || "").split(",").map(s => s.trim()).filter(Boolean);
+                            const isChecked = currentIds.includes(prod.id);
+                            return (
+                              <button
+                                key={prod.id}
+                                type="button"
+                                onClick={() => {
+                                  const currentIdList = (siteSettings.bestsellerProductIds || "").split(",").map(s => s.trim()).filter(Boolean);
+                                  let newIds: string[];
+                                  if (isChecked) {
+                                    newIds = currentIdList.filter(id => id !== prod.id);
+                                  } else {
+                                    newIds = [...currentIdList, prod.id];
+                                  }
+                                  setSiteSettings({ ...siteSettings, bestsellerProductIds: newIds.join(",") });
+                                }}
+                                className={`relative flex items-center gap-2 p-2 rounded-lg border-2 transition-all text-left cursor-pointer ${
+                                  isChecked
+                                    ? "border-[#D4BC96] bg-amber-50 shadow-sm"
+                                    : "border-sand-200 bg-white hover:border-sand-300"
+                                }`}
+                              >
+                                {/* Checkbox indicator */}
+                                <div className={`absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                                  isChecked ? "bg-[#D4BC96]" : "bg-sand-200"
+                                }`}>
+                                  {isChecked && <Check className="w-2.5 h-2.5 text-white stroke-[3]" />}
+                                </div>
+                                {/* Product thumbnail */}
+                                <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0 bg-sand-100">
+                                  {prod.image ? (
+                                    <img
+                                      src={prod.image}
+                                      alt={prod.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-sand-400">
+                                      <Package className="w-4 h-4" />
+                                    </div>
+                                  )}
+                                </div>
+                                {/* Product name */}
+                                <div className="min-w-0 flex-1 pr-4">
+                                  <p className="text-[9px] font-semibold text-sand-900 font-mono truncate">{prod.name}</p>
+                                  <p className="text-[8px] text-sand-400 truncate">₹{prod.salePrice || prod.price}</p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
+
 
                       <div className="border-t border-sand-100 pt-4">
                         <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block mb-1">Press Logos (Comma separated image URLs)</label>
