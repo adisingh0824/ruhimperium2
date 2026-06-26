@@ -108,20 +108,16 @@ export default function CartDrawer({
     e.preventDefault();
     setCouponError("");
     const code = couponCode.trim().toUpperCase();
+    if (!code) return;
 
-    // Check dynamic coupons managed by admin first
+    // Only accept coupons created by admin
     const matchedCoupon = coupons.find(c => c.code.toUpperCase() === code);
 
     if (matchedCoupon) {
       setActiveDiscount({ code: matchedCoupon.code, percent: matchedCoupon.discountPercent });
-    } else if (code === "WAYFARER15") {
-      setActiveDiscount({ code: "WAYFARER15", percent: 15 });
-    } else if (code === "WAYFARER20") {
-      setActiveDiscount({ code: "WAYFARER20", percent: 20 });
-    } else if (code === "FREESHIP") {
-      setActiveDiscount({ code: "FREESHIP", percent: 0 }); // handled separately for shipping
+      setCouponError("");
     } else {
-      setCouponError("Invalid coupon token code.");
+      setCouponError("Invalid or expired coupon code.");
     }
   };
 
@@ -460,11 +456,48 @@ export default function CartDrawer({
             {cart.length > 0 && (
               <div className="border-t border-sand-100 pt-4 mt-4 bg-white">
 
-
-                {activeDiscount && (
+                {/* Coupon Code Input */}
+                {!activeDiscount ? (
+                  <form onSubmit={handleApplyCoupon} className="mb-4">
+                    <label className="text-[9px] uppercase tracking-[0.15em] text-sand-400 font-semibold block mb-1.5">Have a coupon code?</label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Ticket className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-sand-400" />
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code"
+                          value={couponCode}
+                          onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                          className="w-full bg-white border border-sand-200 rounded pl-8 pr-3 py-2.5 text-[11px] uppercase tracking-widest font-mono font-bold text-sand-800 placeholder:text-sand-300 placeholder:font-normal placeholder:tracking-wider focus:ring-1 focus:ring-[#D4BC96] focus:border-[#D4BC96] focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="px-4 py-2.5 bg-[#2D2926] hover:bg-black text-white text-[10px] uppercase tracking-[0.12em] font-bold rounded transition-colors cursor-pointer shrink-0"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-[10px] text-red-500 mt-1.5 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        {couponError}
+                      </p>
+                    )}
+                  </form>
+                ) : (
                   <div className="bg-gold-50 border border-gold-200 rounded p-2.5 mb-4 flex justify-between items-center text-[10.5px] text-gold-900">
-                    <span className="font-semibold">Discount Code: '{activeDiscount.code}'</span>
-                    <span>-{activeDiscount.percent}% Saved!</span>
+                    <div className="flex items-center gap-1.5">
+                      <Ticket className="w-3.5 h-3.5 text-[#D4BC96]" />
+                      <span className="font-semibold">'{activeDiscount.code}' applied — {activeDiscount.percent}% off!</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setActiveDiscount(null); setCouponCode(""); setCouponError(""); }}
+                      className="text-[9px] uppercase tracking-wider text-red-500 hover:text-red-700 font-bold cursor-pointer transition-colors"
+                    >
+                      Remove
+                    </button>
                   </div>
                 )}
 
