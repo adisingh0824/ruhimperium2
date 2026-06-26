@@ -1,4 +1,5 @@
 import { X, Printer, Download } from "lucide-react";
+import { createPortal } from "react-dom";
 import { Order, SiteSettings } from "../types";
 
 interface InvoiceBillProps {
@@ -32,20 +33,24 @@ export default function InvoiceBill({ order, siteSettings, onClose }: InvoiceBil
     window.print();
   };
 
-  return (
+  return createPortal(
     <>
-      {/* Print-specific styles */}
       <style>{`
         @media print {
-          body > *:not(.invoice-print-root) {
+          /* Hide everything in the page */
+          body > * {
             display: none !important;
           }
-          .invoice-print-root {
-            position: fixed !important;
-            inset: 0 !important;
-            z-index: 999999 !important;
-            background: white !important;
+          /* Show only the invoice portal */
+          body > .invoice-print-root {
             display: block !important;
+            position: static !important;
+            width: 100% !important;
+          }
+          .invoice-print-root {
+            position: static !important;
+            padding: 0 !important;
+            background: white !important;
           }
           .invoice-print-root .invoice-modal-backdrop {
             display: none !important;
@@ -347,6 +352,7 @@ export default function InvoiceBill({ order, siteSettings, onClose }: InvoiceBil
           }
         }
       `}</style>
-    </>
+    </>,
+    document.body
   );
 }
