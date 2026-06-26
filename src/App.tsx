@@ -1907,9 +1907,63 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
               // If filtering by specific search or category, show raw layout query
               if (selectedCategory !== "All" || searchQuery !== "") {
+                const collectionName = selectedCategory !== "All" 
+                  ? (collections.find(c => c.id === selectedCategory)?.name || selectedCategory)
+                  : null;
                 return (
-                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
-                    {filteredList.map((prod) => renderProductCard(prod))}
+                  <div>
+                    {/* Collection Header — Back nav + title */}
+                    <div
+                      id={`collection-grid-header-${selectedCategory}`}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sand-200 pb-4 mb-8 scroll-mt-24"
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Back button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCategory("All");
+                            setSearchQuery("");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-sand-500 hover:text-[#2D2926] font-semibold border border-sand-200 hover:border-[#2D2926] px-3 py-2 rounded-full transition-all cursor-pointer shrink-0"
+                        >
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                          </svg>
+                          All Collections
+                        </button>
+                        <span className="text-sand-300 hidden sm:block">|</span>
+                        {/* Collection title */}
+                        {collectionName && (
+                          <div>
+                            <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide uppercase leading-tight">
+                              {collectionName}
+                            </h3>
+                            <p className="text-[10px] text-sand-400 font-mono mt-0.5">{filteredList.length} fragrance{filteredList.length !== 1 ? "s" : ""}</p>
+                          </div>
+                        )}
+                        {searchQuery && (
+                          <div>
+                            <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide">
+                              Results for "{searchQuery}"
+                            </h3>
+                            <p className="text-[10px] text-sand-400 font-mono mt-0.5">{filteredList.length} found</p>
+                          </div>
+                        )}
+                      </div>
+                      {/* Clear filter chip */}
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedCategory("All"); setSearchQuery(""); }}
+                        className="self-start sm:self-auto text-[9px] uppercase tracking-widest text-sand-400 hover:text-red-500 transition-colors cursor-pointer font-mono"
+                      >
+                        ✕ Clear Filter
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
+                      {filteredList.map((prod) => renderProductCard(prod))}
+                    </div>
                   </div>
                 );
               }
