@@ -481,6 +481,31 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
+  // Browser back button support for collection filtering
+  // When a collection is selected, push a history entry so phone's back button
+  // resets the filter instead of leaving the website
+  const handleSelectCategory = (category: string) => {
+    if (category !== "All" && selectedCategory === "All") {
+      // Entering a collection view — push history entry
+      window.history.pushState({ collection: category }, "", window.location.href);
+    }
+    setSelectedCategory(category);
+  };
+
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      // Phone back button pressed — if we're in a filtered collection, reset to All
+      if (selectedCategory !== "All") {
+        e.preventDefault?.();
+        setSelectedCategory("All");
+        setSearchQuery("");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [selectedCategory]);
+
   // Sync state helpers to localStorage
   useEffect(() => {
     localStorage.setItem("ruh-cart", JSON.stringify(cart));
@@ -1423,7 +1448,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         }}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        setSelectedCategory={setSelectedCategory}
+        setSelectedCategory={handleSelectCategory}
         onLoungeClick={() => setIsLoungeOpen(true)}
         currentUser={currentUser}
         siteSettings={siteSettings}
@@ -1705,7 +1730,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       <div 
                         key={col.id}
                         onClick={() => {
-                          setSelectedCategory(col.id);
+                          handleSelectCategory(col.id);
                           // Smooth scroll active category title to top viewport
                           setTimeout(() => {
                             const el = document.getElementById(`collection-grid-header-${col.id}`);
