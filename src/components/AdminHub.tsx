@@ -170,7 +170,6 @@ export default function AdminHub({
   // Coupon form inputs
   const [newCouponCode, setNewCouponCode] = useState("");
   const [newCouponPercent, setNewCouponPercent] = useState(15);
-  const [newCouponUPIOnly, setNewCouponUPIOnly] = useState(false); // New flag to restrict COD
   const [couponErrorMsg, setCouponErrorMsg] = useState("");
 
   // Product management state
@@ -506,8 +505,7 @@ export default function AdminHub({
 
     const newCp: Coupon = {
       code: cleanedCode,
-      discountPercent: Number(newCouponPercent),
-      upiOnly: newCouponUPIOnly // Include the upiOnly flag
+      discountPercent: Number(newCouponPercent)
     };
 
     setCoupons(prev => [newCp, ...prev]);

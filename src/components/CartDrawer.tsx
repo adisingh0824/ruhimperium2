@@ -50,13 +50,7 @@ export default function CartDrawer({
 }: CartDrawerProps) {
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "form" | "success">("cart");
   const [couponCode, setCouponCode] = useState("");
-  const [activeDiscount, setActiveDiscount] = useState<null | { code: string; percent: number; upiOnly?: boolean }>(null);
-  // Ensure payment mode respects upiOnly restrictions
-  useEffect(() => {
-    if (activeDiscount?.upiOnly && paymentMode === "COD") {
-      setPaymentMode("UPI");
-    }
-  }, [activeDiscount, paymentMode]);
+  const [activeDiscount, setActiveDiscount] = useState<{ code: string; percent: number } | null>(null);
   const [couponError, setCouponError] = useState("");
   const [currentTrackingCode, setCurrentTrackingCode] = useState("");
   
@@ -120,7 +114,7 @@ export default function CartDrawer({
     const matchedCoupon = coupons.find(c => c.code.toUpperCase() === code);
 
     if (matchedCoupon) {
-      setActiveDiscount({ code: matchedCoupon.code, percent: matchedCoupon.discountPercent, upiOnly: matchedCoupon.upiOnly });
+      setActiveDiscount({ code: matchedCoupon.code, percent: matchedCoupon.discountPercent });
       setCouponError("");
     } else {
       setCouponError("Invalid or expired coupon code.");
@@ -652,21 +646,18 @@ export default function CartDrawer({
                     <Landmark className="w-4 h-4" />
                     <span className="text-[10px] font-semibold tracking-wider">UPI / QR SCAN</span>
                   </button>
-                  {activeDiscount?.upiOnly ? null : (
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMode("COD")}
-                      disabled={activeDiscount?.upiOnly}
-                      className={`p-3.5 border rounded-xl flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
-                        paymentMode === "COD" 
-                          ? "border-[#D4BC96] bg-gold-50/20 text-[#D4BC96]" 
-                          : "border-sand-200 bg-white text-sand-500 hover:border-sand-400"
-                      } ${activeDiscount?.upiOnly ? "opacity-50 cursor-not-allowed" : ""}`}
-                    >
-                      <CreditCard className="w-4 h-4" />
-                      <span className="text-[10px] font-semibold tracking-wider">CASH ON DELIVERY (COD)</span>
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode("COD")}
+                    className={`p-3.5 border rounded-xl flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
+                      paymentMode === "COD" 
+                        ? "border-[#D4BC96] bg-gold-50/20 text-[#D4BC96]" 
+                        : "border-sand-200 bg-white text-sand-500 hover:border-sand-400"
+                    }`}
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span className="text-[10px] font-semibold tracking-wider">CASH ON DELIVERY (COD)</span>
+                  </button>
                 </div>
               </div>
             </div>

@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3003;
+  const PORT = 3000;
 
   // Support large base64 media uploads (up to 100MB) from the Admin Hub
   app.use(express.json({ limit: "100mb" }));

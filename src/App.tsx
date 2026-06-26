@@ -554,7 +554,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             whyChooseHeading: "Why Choose Ruh Imperium?",
             whyChooseSub: "By bypassing traditional middleman distribution, we hand-purchase pure botanical extracts and compound them at premium olfactory concentrations.",
             foundersHeading: "Our Story & Legacy",
-            foundersText: "Ruh Imperium was sparked by a shared vision to traverse India’s historic trade routes, distilling pristine biological extracts and crafting honest, high-concentration luxury fragrances.",
+            foundersText: "Ruh Imperium was sparked by a shared vision to traverse India's historic trade routes, distilling pristine biological extracts and crafting honest, high-concentration luxury fragrances.",
             heroTagline: "TRADITIONAL COPPER DISTILLED FRAGRANCES",
             heroHeadline: "Where Fragrance Meets Tradition",
             heroDescription: "Explore fine alcohol-free pure oils and elegant luxury Eau De Parfums hydro-distilled in 204-year-old copper stills of Kannauj.",
@@ -580,7 +580,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["site"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] site settings error (non-fatal):", err));
 
     // 2. PRODUCTS LIVE SYNC
     const unsubscribeProducts = onSnapshot(collection(db, "products"), async (snap) => {
@@ -626,7 +626,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["products"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] products error (non-fatal):", err));
 
     // 3. BLOG ARTICLES LIVE SYNC
     const unsubscribeBlogs = onSnapshot(collection(db, "blogArticles"), async (snap) => {
@@ -651,7 +651,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["blogs"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] blogs error (non-fatal):", err));
 
     // 4. COUPONS LIVE SYNC
     const unsubscribeCoupons = onSnapshot(collection(db, "coupons"), async (snap) => {
@@ -680,7 +680,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["coupons"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] coupons error (non-fatal):", err));
 
     // 5. REVIEWS LIVE SYNC
     const unsubscribeReviews = onSnapshot(collection(db, "reviews"), async (snap) => {
@@ -705,7 +705,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["reviews"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] reviews error (non-fatal):", err));
 
     // 6. ORDERS LIVE SYNC
     const unsubscribeOrders = onSnapshot(collection(db, "orders"), async (snap) => {
@@ -717,7 +717,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         });
         setOrders(list);
       }
-    });
+    }, (err) => console.warn("[Firestore] orders error (non-fatal):", err));
 
     // 7. FOUNDERS LIVE SYNC
     const unsubscribeFounders = onSnapshot(doc(db, "settings", "founders"), async (snap) => {
@@ -759,7 +759,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["founders"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] founders error (non-fatal):", err));
 
     // 8. COLLECTIONS LIVE SYNC
     const unsubscribeCollections = onSnapshot(doc(db, "settings", "collections"), async (snap) => {
@@ -784,7 +784,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["collections"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] collections error (non-fatal):", err));
 
     // 9. COVER & HERO VIDEO LIVE SYNC
     const unsubscribeCoverAndHero = onSnapshot(doc(db, "settings", "assets"), async (snap) => {
@@ -805,7 +805,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["assets"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] assets error (non-fatal):", err));
 
     // 10. USERS REGISTER LIVE SYNC
     const unsubscribeUsers = onSnapshot(collection(db, "users"), async (snap) => {
@@ -842,7 +842,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["users"] = false;
         }
       }
-    });
+    }, (err) => console.warn("[Firestore] users error (non-fatal):", err));
 
     return () => {
       unsubscribeSite();
