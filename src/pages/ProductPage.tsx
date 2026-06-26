@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck, ChevronLeft, ChevronRight, Home } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Product, Review } from '../types';
@@ -142,8 +142,12 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
       {/* Breadcrumbs */}
       <div className="bg-[#FAF5F2] border-b border-sand-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center text-[10px] sm:text-xs uppercase tracking-widest text-sand-500 font-mono">
-          <button onClick={() => navigate('/')} className="hover:text-sand-900 flex items-center gap-1 transition-colors">
-            <ArrowLeft className="w-3 h-3" /> Home
+          <button
+            onClick={() => navigate('/')}
+            className="hover:text-sand-900 flex items-center gap-1.5 transition-colors py-1 px-2 -ml-2 rounded hover:bg-sand-100"
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Home</span>
           </button>
           <span className="mx-2">/</span>
           <span className="text-sand-900 truncate">{product.name}</span>
@@ -510,6 +514,14 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
 
       {/* Sticky Mobile Cart Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-sand-200 p-3 sm:hidden z-40 flex items-center gap-3 shadow-2xl">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center gap-1.5 px-4 py-3.5 border border-sand-300 text-sand-700 hover:bg-sand-50 text-[10px] uppercase tracking-widest font-semibold rounded-sm cursor-pointer transition-colors shrink-0"
+          aria-label="Go to Home"
+        >
+          <Home className="w-4 h-4" />
+          <span>Home</span>
+        </button>
         <button 
           onClick={handleBuyItNow}
           className="flex-1 py-3.5 bg-[#2D2926] text-white font-semibold tracking-widest uppercase text-[11px] rounded-sm cursor-pointer"

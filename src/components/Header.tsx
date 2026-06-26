@@ -473,8 +473,8 @@ export default function Header({
 
       {/* MOBILE REACTION SIDEBAR */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[999] flex lg:hidden bg-stone-900/40 backdrop-blur-sm animate-fade-in">
-          <div className="w-[85%] max-w-sm bg-stone-50 h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto">
+        <div className="fixed inset-0 z-[999] flex lg:hidden bg-stone-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setMobileMenuOpen(false)}>
+          <div className="w-[85%] max-w-sm bg-stone-50 h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div>
               <div className="flex items-center justify-between mb-8 border-b border-stone-200/50 pb-4">
                 <Logo variant="header" showSubtitle={true} className="!items-start" customLogoUrl={siteSettings?.customLogoUrl} />
