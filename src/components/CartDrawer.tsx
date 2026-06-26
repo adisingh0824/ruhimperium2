@@ -249,11 +249,16 @@ export default function CartDrawer({
 
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    // Ensure user is logged in before proceeding
+    if (!currentUser) {
+      alert("Please sign in to complete your purchase.");
+      return;
+    }
     if (!fullName || !email || !phone || !address || !pincode) return;
 
     // Check if Razorpay is enabled and key is supplied, or falls back to simulation
     const isRazorpayActive = siteSettings?.razorpayEnabled && siteSettings?.razorpayKeyId;
-    
+
     // Generate actual Order payload for persistence
     const generatedTracking = `RP-${Math.floor(Math.random() * 89999 + 10000)}-IN`;
     const orderId = `ORD-${Date.now()}`;
