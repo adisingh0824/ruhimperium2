@@ -1,7 +1,8 @@
 import { useState, FormEvent, useEffect } from "react";
-import { X, Trash2, ShoppingBag, Percent, ArrowLeft, ShieldCheck, Ticket, Landmark, CreditCard, ChevronRight, CheckCircle, Sparkles, Award, ScrollText, AlertTriangle } from "lucide-react";
+import { X, Trash2, ShoppingBag, Percent, ArrowLeft, ShieldCheck, Ticket, Landmark, CreditCard, ChevronRight, CheckCircle, Sparkles, Award, ScrollText, AlertTriangle, FileText } from "lucide-react";
 import { CartItem, Product, Order, Coupon, SiteSettings } from "../types";
 import emailjs from '@emailjs/browser';
+import InvoiceBill from "./InvoiceBill";
 
 // Helper script loader to connect dynamically with the official indian razorpay secure checkout system
 const loadRazorpayScript = (): Promise<boolean> => {
@@ -64,6 +65,8 @@ export default function CartDrawer({
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [pendingOrderPayload, setPendingOrderPayload] = useState<Order | null>(null);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     if (currentUser && checkoutStep === "form") {
@@ -200,6 +203,7 @@ export default function CartDrawer({
           if (onPlaceOrder) {
             onPlaceOrder(successOrder);
           }
+          setPlacedOrder(successOrder);
           sendAdminNotificationEmail(successOrder); // Send email notification
 
           setCheckoutStep("success");
@@ -238,6 +242,7 @@ export default function CartDrawer({
         if (onPlaceOrder) {
           onPlaceOrder(newOrder);
         }
+        setPlacedOrder(newOrder);
         sendAdminNotificationEmail(newOrder); // Send email notification
 
         setCheckoutStep("success");
@@ -270,7 +275,11 @@ export default function CartDrawer({
       total: calculatedTotal,
       date: new Date().toISOString().split("T")[0],
       status: "Processing",
-      trackingCode: generatedTracking
+      trackingCode: generatedTracking,
+      subtotal: cartSubtotal,
+      shippingFee: shippingFee,
+      discountAmount: discountAmount,
+      couponCode: activeDiscount?.code || undefined
     };
 
     if (siteSettings?.checkoutPolicyEnabled && !policyAccepted) {
@@ -678,11 +687,29 @@ export default function CartDrawer({
 
             <button
               type="button"
+              onClick={() => setShowInvoice(true)}
+              className="w-full py-3.5 bg-[#D4BC96] hover:bg-[#c5a97f] text-white text-xs uppercase tracking-[0.2em] font-medium rounded shadow cursor-pointer focus:outline-none flex items-center justify-center gap-2 mb-3 transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              DOWNLOAD INVOICE
+            </button>
+
+            <button
+              type="button"
               onClick={handleCompleteSuccess}
-              className="w-full py-4 bg-[#0D0B0A] hover:bg-[#D4BC96] text-[#FAFAFA] text-xs uppercase tracking-[0.2em] font-medium rounded shadow cursor-pointer focus:outline-none"
+              className="w-full py-4 bg-[#0D0B0A] hover:bg-[#D4BC96] text-[#FAFAFA] text-xs uppercase tracking-[0.2em] font-medium rounded shadow cursor-pointer focus:outline-none transition-colors"
             >
               RETURN TO GALERIE
             </button>
+
+            {/* Invoice Modal */}
+            {showInvoice && placedOrder && (
+              <InvoiceBill
+                order={placedOrder}
+                siteSettings={siteSettings}
+                onClose={() => setShowInvoice(false)}
+              />
+            )}
           </div>
         )}
 

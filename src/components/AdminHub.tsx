@@ -25,6 +25,7 @@ import {
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import InvoiceBill from "./InvoiceBill";
 
 interface AdminHubProps {
   isOpen: boolean;
@@ -95,6 +96,7 @@ export default function AdminHub({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [reviewSearchQuery, setReviewSearchQuery] = useState("");
   const [selectedProductFilter, setSelectedProductFilter] = useState("all");
+  const [billOrder, setBillOrder] = useState<Order | null>(null);
 
   // Sync back if parent changes from outside and we don't have unsaved draft
   useEffect(() => {
@@ -1338,6 +1340,17 @@ export default function AdminHub({
                                 <span className="text-xs font-mono font-bold text-sand-900">₹{o.total}</span>
                               </div>
 
+                              {/* Generate Bill Button */}
+                              <button
+                                type="button"
+                                onClick={() => setBillOrder(o)}
+                                className="flex items-center gap-1.5 px-3 py-2 bg-[#2D2926] hover:bg-black text-white text-[9px] uppercase tracking-[0.12em] font-semibold rounded-lg transition-all cursor-pointer shadow-sm hover:shadow-md"
+                                title="Generate Invoice"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>Bill</span>
+                              </button>
+
                             </div>
                           </div>
 
@@ -1411,6 +1424,15 @@ export default function AdminHub({
                   )}
 
                 </div>
+              )}
+
+              {/* Invoice Bill Modal */}
+              {billOrder && (
+                <InvoiceBill
+                  order={billOrder}
+                  siteSettings={parentSiteSettings}
+                  onClose={() => setBillOrder(null)}
+                />
               )}
 
               {/* TAB 3: BRAND PROFILE, FOUNDERS BIO & COVER PORTRAITS */}

@@ -82,6 +82,10 @@ export interface Order {
   status: "Processing" | "Dispatched" | "In Transit" | "Out for Delivery" | "Delivered" | "Cancelled";
   trackingCode: string;
   courierService?: string;
+  subtotal?: number;
+  shippingFee?: number;
+  discountAmount?: number;
+  couponCode?: string;
 }
 
 export interface Coupon {
