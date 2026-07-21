@@ -306,6 +306,26 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     localStorage.setItem("ruh-site-settings", JSON.stringify(siteSettings));
   }, [siteSettings]);
 
+  // Purge any legacy cached keys or old logo URLs from browser localStorage
+  useEffect(() => {
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.toLowerCase().includes("raahi")) {
+          localStorage.removeItem(key);
+        }
+      });
+      const cached = localStorage.getItem("ruh-site-settings");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.customLogoUrl && parsed.customLogoUrl.toLowerCase().includes("raahi")) {
+          delete parsed.customLogoUrl;
+          localStorage.setItem("ruh-site-settings", JSON.stringify(parsed));
+          setSiteSettings(parsed);
+        }
+      }
+    } catch (e) {}
+  }, []);
+
   // Handle splash screen timer
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -373,7 +393,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Security and overlay states
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
-    const cached = localStorage.getItem("ruh-admin-logged-in") || localStorage.getItem("raahi-admin-logged-in");
+    const cached = localStorage.getItem("ruh-admin-logged-in");
     return cached === "true";
   });
 
@@ -430,7 +450,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Cart state loaded from localStorage for persistent travel logs!
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const cached = localStorage.getItem("ruh-cart") || localStorage.getItem("raahi-cart");
+    const cached = localStorage.getItem("ruh-cart");
     return cached ? JSON.parse(cached) : [];
   });
 
@@ -541,6 +561,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       if (snap.exists()) {
         if (writeLockRef.current["site"]) return;
         const data = snap.data() as SiteSettings;
+        if (data.customLogoUrl) {
+          delete data.customLogoUrl;
+          try {
+            await setDoc(doc(db, "settings", "site"), data);
+          } catch (e) {}
+        }
         setSiteSettings(data);
       } else {
         if (initPendingRef.current["site"]) return;
@@ -3188,7 +3214,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <div>
                   <h4 className="font-semibold text-stone-950 mb-1.5 uppercase text-[10.5px] tracking-wide text-[#D4BC96]">3. Transit Damage Security</h4>
                   <p>
-                    In the extremely rare event of transport leakages or breakages, we issue a brand-new replacement within 24 hours of coordinate landing. Simply supply a brief unboxing video within 48 hours of transit touchdown to support@ruhimperium.com or thevimalbyte@gmail.com and we will immediately take action.
+                    In the extremely rare event of transport leakages or breakages, we issue a brand-new replacement within 24 hours of coordinate landing. Simply supply a brief unboxing video within 48 hours of transit touchdown to support@ruhimperium.com and we will immediately take action.
                   </p>
                 </div>
               </div>

@@ -200,11 +200,7 @@ export default function Header({
               onClick={() => onNavigate("hero")}
               className="cursor-pointer focus:outline-none py-1 group"
             >
-              {siteSettings?.customLogoUrl ? (
-                <img src={siteSettings.customLogoUrl} alt="Logo" className="h-8 md:h-12 object-contain" />
-              ) : (
-                <span className="text-2xl md:text-3xl font-serif font-bold tracking-widest uppercase">Raahi</span>
-              )}
+              <Logo variant="header" showSubtitle={false} customLogoUrl={siteSettings?.customLogoUrl} />
             </button>
           </div>
 
