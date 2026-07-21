@@ -1,8 +1,27 @@
+# Dependencies
 node_modules/
+
+# Build & Production Output
 build/
 dist/
-coverage/
-.DS_Store
-*.log
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
 .env*
 !.env.example
+
+# Vercel & Deployment
+.vercel/
+
+# Logs & Temporary/Test files
+*.log
+diff.txt
+extract-text.js
+test-*.js
+.DS_Store
+

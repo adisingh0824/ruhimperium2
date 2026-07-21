@@ -138,7 +138,7 @@ export default function UserLoungeModal({
 
     const matched = users.find(
       u => u.email.toLowerCase() === loginEmail.trim().toLowerCase() && 
-      (u.password === loginPassword || loginPassword === "password123") // flexible preseeded password bypass
+      u.password === loginPassword
     );
 
     if (matched) {
@@ -374,10 +374,6 @@ export default function UserLoungeModal({
                       onChange={(e) => setLoginPassword(e.target.value)}
                       className="w-full border border-stone-200 focus:border-[#D4BC96] rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#D4BC96]/30 font-light"
                     />
-                  </div>
-                  <div className="mt-1 flex justify-between">
-                    <span className="text-[10px] text-stone-400">Hint: Preseeded demo email is <strong className="text-stone-500">guest@ruh-imperium.com</strong></span>
-                    <span className="text-[10px] text-stone-400">Password: <strong className="text-stone-500">password123</strong></span>
                   </div>
                 </div>
 

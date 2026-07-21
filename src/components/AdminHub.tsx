@@ -154,10 +154,13 @@ export default function AdminHub({
     const cached = localStorage.getItem("ruh-admin-users");
     if (cached) {
       try {
-        return JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) {}
     }
-    return [{ username: "saditya7990@gmail.com", password: "Adi19983@" }];
+    const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "admin@ruhimperium.com";
+    const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "";
+    return defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
   });
 
   useEffect(() => {
@@ -1514,7 +1517,7 @@ export default function AdminHub({
                     </div>
                   </div>
 
-                  {/* MODERN STOREFRONT EXTRAS (Raahi Style) */}
+                  {/* MODERN STOREFRONT EXTRAS (Ruh Imperium Style) */}
                   <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
                     <div className="flex items-center gap-2 text-[#D4BC96]">
                       <span className="text-sm">🌟</span>

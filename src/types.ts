@@ -90,6 +90,7 @@ export interface Order {
 
 export interface Coupon {
   code: string;
+  discountPercent?: number;
   upiOnly?: boolean; // If true, COD is not allowed when this coupon is applied
 }
 
@@ -169,7 +170,7 @@ export interface SiteSettings {
   statsCard7Title?: string;
   statsCard7Desc?: string;
   
-  // Raahi Parfums / Modern Storefront Extras
+  // Ruh Imperium / Modern Storefront Extras
   marqueeText?: string;
   marqueeEnabled?: boolean;
   bestsellerHeading?: string;

@@ -12,26 +12,41 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Support large base64 media uploads (up to 100MB) from the Admin Hub
-  app.use(express.json({ limit: "100mb" }));
-  app.use(express.urlencoded({ limit: "100mb", extended: true }));
+  // Security Headers Middleware
+  app.use((_req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    next();
+  });
 
-  // API endpoint to handle uploaded admin video loop
+  // Support JSON payloads for admin media uploads
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  const uploadDir = path.resolve(process.cwd(), "public", "uploads");
+  await fs.mkdir(uploadDir, { recursive: true });
+
+  // API endpoint to handle uploaded admin video loop safely
   app.post("/api/upload-video", async (req, res) => {
     try {
       const { videoData, filename } = req.body;
-      if (!videoData) {
-        return res.status(400).json({ error: "Missing videoData" });
+      if (!videoData || typeof videoData !== "string") {
+        return res.status(400).json({ error: "Invalid or missing videoData" });
       }
 
-      // Check if it's a data url / base64 string
       const matches = videoData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
       let buffer: Buffer;
       let ext = "mp4";
+      const allowedMimes = ["video/mp4", "video/webm", "video/quicktime", "video/ogg"];
 
       if (matches && matches.length === 3) {
+        const mimeType = matches[1].toLowerCase();
+        if (!allowedMimes.includes(mimeType)) {
+          return res.status(400).json({ error: "Unsupported media format" });
+        }
         buffer = Buffer.from(matches[2], "base64");
-        const mimeType = matches[1];
         if (mimeType.includes("webm")) ext = "webm";
         else if (mimeType.includes("ogg")) ext = "ogg";
         else if (mimeType.includes("quicktime")) ext = "mov";
@@ -39,63 +54,71 @@ async function startServer() {
         buffer = Buffer.from(videoData, "base64");
       }
 
-      // We determine final safe filename
-      const cleanFilename = filename 
-        ? filename.replace(/[^a-zA-Z0-9.\-_]/g, "_") 
-        : `imported-scent-film-${Date.now()}.${ext}`;
+      // Enforce maximum 50MB size limit
+      if (buffer.length > 50 * 1024 * 1024) {
+        return res.status(413).json({ error: "File exceeds 50MB size limit" });
+      }
+
+      const safeBaseName = filename ? path.basename(filename).replace(/[^a-zA-Z0-9.\-_]/g, "_") : "";
+      const cleanFilename = safeBaseName ? `${Date.now()}_${safeBaseName}` : `imported-scent-film-${Date.now()}.${ext}`;
       
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadDir, { recursive: true });
+      const filePath = path.resolve(uploadDir, cleanFilename);
+      if (!filePath.startsWith(uploadDir)) {
+        return res.status(403).json({ error: "Invalid file path traversal attempt" });
+      }
 
-      const filePath = path.join(uploadDir, cleanFilename);
       await fs.writeFile(filePath, buffer);
-
       console.log(`Successfully stored uploaded video on server disk: ${filePath}`);
 
-      // Return local server absolute routing URL
       res.json({
         success: true,
         url: `/uploads/${cleanFilename}`,
       });
     } catch (err: any) {
       console.error("Video upload handler exception:", err);
-      res.status(500).json({ error: err.message || "Failed to process film file upload" });
+      res.status(500).json({ error: "Failed to process film file upload" });
     }
   });
 
-  // API endpoint to handle uploaded admin custom collection cover photos and products images
+  // API endpoint to handle uploaded admin custom collection cover photos and products images safely
   app.post("/api/upload-image", async (req, res) => {
     try {
       const { imageData, filename } = req.body;
-      if (!imageData) {
-        return res.status(400).json({ error: "Missing imageData" });
+      if (!imageData || typeof imageData !== "string") {
+        return res.status(400).json({ error: "Invalid or missing imageData" });
       }
 
       const matches = imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
       let buffer: Buffer;
       let ext = "jpg";
+      const allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
       if (matches && matches.length === 3) {
+        const mimeType = matches[1].toLowerCase();
+        if (!allowedMimes.includes(mimeType)) {
+          return res.status(400).json({ error: "Unsupported image format" });
+        }
         buffer = Buffer.from(matches[2], "base64");
-        const mimeType = matches[1];
         if (mimeType.includes("png")) ext = "png";
         else if (mimeType.includes("webp")) ext = "webp";
-        else if (mimeType.includes("gif")) ext = "gif";
-        else if (mimeType.includes("svg")) ext = "svg";
       } else {
         buffer = Buffer.from(imageData, "base64");
       }
 
-      const cleanFilename = filename 
-        ? filename.replace(/[^a-zA-Z0-9.\-_]/g, "_") 
-        : `collection-cover-${Date.now()}.${ext}`;
+      // Enforce maximum 10MB size limit for images
+      if (buffer.length > 10 * 1024 * 1024) {
+        return res.status(413).json({ error: "Image exceeds 10MB size limit" });
+      }
 
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadDir, { recursive: true });
+      const safeBaseName = filename ? path.basename(filename).replace(/[^a-zA-Z0-9.\-_]/g, "_") : "";
+      const cleanFilename = safeBaseName ? `${Date.now()}_${safeBaseName}` : `collection-cover-${Date.now()}.${ext}`;
 
-      const filePath = path.join(uploadDir, cleanFilename);
+      const filePath = path.resolve(uploadDir, cleanFilename);
+      if (!filePath.startsWith(uploadDir)) {
+        return res.status(403).json({ error: "Invalid file path traversal attempt" });
+      }
+
       await fs.writeFile(filePath, buffer);
-
       console.log(`Successfully stored uploaded image on server disk: ${filePath}`);
 
       res.json({
@@ -104,13 +127,11 @@ async function startServer() {
       });
     } catch (err: any) {
       console.error("Image upload handler exception:", err);
-      res.status(500).json({ error: err.message || "Failed to process image file upload" });
+      res.status(500).json({ error: "Failed to process image file upload" });
     }
   });
 
   // Explicitly serve uploaded film files publicly
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(uploadDir, { recursive: true });
   app.use("/uploads", express.static(uploadDir));
 
   // Connect Vite development server or production assets
@@ -123,11 +144,11 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     console.log("Starting full-stack integration in PRODUCTION mode...");
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.resolve(process.cwd(), "dist");
     app.use(express.static(distPath));
     // SPA Fallback
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+    app.get("*", (_req, res) => {
+      res.sendFile(path.resolve(distPath, "index.html"));
     });
   }
 

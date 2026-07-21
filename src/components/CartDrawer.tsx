@@ -143,10 +143,7 @@ export default function CartDrawer({
         shipping_address: `${order.address}, ${order.pincode}`,
         payment_mode: order.paymentMode,
         tracking_code: order.trackingCode,
-        order_date: order.date,
-        admin_email_1: "ruhimperium9@gmail.com",
-        admin_email_2: "saditya7990@gmail.com",
-        admin_email_3: "ruhimperiun9@gmail.com"
+        admin_email_1: siteSettings.contactEmail || "orders@ruhimperium.com"
       };
 
       const { emailjsServiceId, emailjsTemplateId, emailjsPublicKey } = siteSettings;
