@@ -20,7 +20,7 @@ The application is now fully prepared for **Google Safe Browsing review**, **Goo
 ### Issue 1.1: Hardcoded Administrative Credentials in Source & Documentation
 - **Location:** `src/components/AdminHub.tsx` (Line 160) & `README.md` (Lines 44–46)
 - **Risk Level:** 🔴 **CRITICAL**
-- **Why it was risky:** Plaintext passwords (`Adi19983@`, personal email references) were hardcoded into frontend client bundles and documented in plaintext. Anyone inspecting the client source or public repository could obtain administrative access.
+- **Why it was risky:** Plaintext passwords (such as `[REDACTED_ADMIN_PASSWORD]`, personal email references) were hardcoded into frontend client bundles and documented in plaintext. Anyone inspecting the client source or public repository could obtain administrative access.
 - **What was fixed:** 
   - Completely removed hardcoded cleartext password initializations.
   - Implemented environment-driven credential resolution (`VITE_ADMIN_EMAIL` / `VITE_ADMIN_PASSWORD`) with secure fallback handling.
