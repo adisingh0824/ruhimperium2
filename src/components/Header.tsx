@@ -207,6 +207,13 @@ export default function Header({
 
           {/* TOP RIGHT: Account & Bag */}
           <div className="flex items-center justify-end gap-4 sm:gap-6">
+            <button
+              type="button"
+              onClick={onLoungeClick}
+              className="text-sand-900 hover:text-stone-300 transition-colors"
+            >
+              <User className="w-5 h-5" />
+            </button>
 
             <button
               type="button"

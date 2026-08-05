@@ -991,9 +991,7 @@ export function ClerkUserLoungeModal(props: UserLoungeModalProps) {
               <h2 className="text-3xl font-light font-serif tracking-wide text-white leading-tight">
                 The Royal <br />Lounge
               </h2>
-              <p className="text-xs text-stone-400 font-light leading-relaxed font-sans">
-                Connect with secure, decentralized authentication powered by Clerk. Track your custom formulation logs, unlock scent coins, and verify transaction receipts seamlessly.
-              </p>
+
             </div>
             <div className="text-[9px] uppercase tracking-widest text-[#D4BC96]/60 font-mono">
               RUH IMPERIUM PRIVILEGED HQ
