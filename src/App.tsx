@@ -1891,12 +1891,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 return (
                   <div 
                     key={prod.id} 
-                    className="group flex flex-col justify-between transition-all duration-300 relative border border-sand-200"
+                    className="group flex flex-col justify-between transition-all duration-300 relative bg-white p-4 rounded-2xl border border-stone-100 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)]"
                     id={`product-card-${prod.id}`}
                   >
                     {/* Image visual wrapper */}
                     <div 
-                      className="relative w-full aspect-[4/5] bg-[#F8F8F8] overflow-hidden mb-4 cursor-pointer"
+                      className="relative w-full aspect-[4/5] bg-stone-50 overflow-hidden mb-4 rounded-xl cursor-pointer"
                       onClick={() => navigate(`/product/${prod.id}`)}
                     >
                       <img 
@@ -1915,8 +1915,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       )}
                       {/* Sale Badge */}
                       {prod.price > prod.salePrice && (
-                        <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2 py-1 leading-none shadow-sm">
-                          SALE
+                        <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2.5 py-1 leading-none shadow-sm rounded">
+                           SALE
                         </div>
                       )}
                     </div>
@@ -1948,12 +1948,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         {prod.name}
                       </button>
                       
-                      <p className="text-[10px] text-sand-500 uppercase tracking-widest font-semibold mb-3">
+                      <p className="text-[10px] text-sand-400 uppercase tracking-widest font-semibold mb-3">
                         {prod.size}
                       </p>
 
                       <div className="flex items-center justify-center gap-2 mb-5">
-                        <span className="text-sm font-sans text-sand-900 font-medium">₹{prod.salePrice}</span>
+                        <span className="text-sm font-sans text-sand-950 font-medium">₹{prod.salePrice}</span>
                         {prod.price > prod.salePrice && (
                           <span className="text-sm text-sand-400 line-through">₹{prod.price}</span>
                         )}
@@ -1970,7 +1970,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         handleAddToCart(prod, defaultVariant);
                         setIsCartOpen(true);
                       }}
-                      className="w-full py-3.5 bg-white border border-[#2D2926] text-[#2D2926] hover:bg-[#2D2926] hover:text-white transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none"
+                      className="w-full py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-white transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl mt-2 cursor-pointer"
                     >
                       ADD TO CART
                     </button>
