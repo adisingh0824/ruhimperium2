@@ -92,10 +92,11 @@ export default function Header({
   const cartTotalItems = cart.reduce((sums, item) => sums + item.quantity, 0);
 
   const categories = [
-    { id: "All", name: "All Scent Houses" },
-    { id: "Eau De Parfum", name: "Imperial Eau De Parfums" },
-    { id: "Attar Blend", name: "Bespoke Botanical Attars" },
-    { id: "Discovery Set", name: "Curated Discovery Boxes" }
+    { id: "All", name: "Shop All" },
+    { id: "Gourmand", name: "Gourmand" },
+    { id: "Oriental", name: "Oriental" },
+    { id: "Wellness", name: "Wellness" },
+    { id: "Discovery Set", name: "Discovery Sets" }
   ];
 
   const handleCategorySelect = (categoryId: string) => {

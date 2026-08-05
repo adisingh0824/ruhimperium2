@@ -1828,7 +1828,29 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             {(() => {
               // Internal logic to filter products
               const filteredList = products.filter((p) => {
-                const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+                const matchesCategory = selectedCategory === "All" || 
+                  p.category === selectedCategory ||
+                  (selectedCategory === "Gourmand" && (
+                    p.description.toLowerCase().includes("vanilla") || 
+                    p.description.toLowerCase().includes("chocolate") || 
+                    p.description.toLowerCase().includes("spic") || 
+                    p.description.toLowerCase().includes("sweet") || 
+                    p.ingredients.some(i => i.toLowerCase().includes("spice") || i.toLowerCase().includes("vanilla"))
+                  )) ||
+                  (selectedCategory === "Oriental" && (
+                    p.description.toLowerCase().includes("oud") || 
+                    p.description.toLowerCase().includes("sandalwood") || 
+                    p.description.toLowerCase().includes("amber") || 
+                    p.description.toLowerCase().includes("woody") ||
+                    p.ingredients.some(i => i.toLowerCase().includes("oud") || i.toLowerCase().includes("sandalwood") || i.toLowerCase().includes("amber"))
+                  )) ||
+                  (selectedCategory === "Wellness" && (
+                    p.category.toLowerCase().includes("attar") || 
+                    p.description.toLowerCase().includes("botanical") || 
+                    p.description.toLowerCase().includes("sooth") || 
+                    p.description.toLowerCase().includes("relax") ||
+                    p.ingredients.some(i => i.toLowerCase().includes("rose") || i.toLowerCase().includes("sandalwood") || i.toLowerCase().includes("mitti"))
+                  ));
                 const matchesKeyword = searchQuery === "" || 
                   p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   p.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
