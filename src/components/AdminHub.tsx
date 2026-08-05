@@ -23,8 +23,9 @@ import {
   Star
 } from "lucide-react";
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
-import { storage } from "../firebase";
+import { storage, db, withTimeout } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import InvoiceBill from "./InvoiceBill";
 
 async function sha256(message: string): Promise<string> {
@@ -170,8 +171,36 @@ export default function AdminHub({
     return defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
   });
 
+  const syncAdminsRef = useRef(false);
+
+  // Load admins from Firestore on mount
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, "settings", "admins"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data && Array.isArray(data.list) && data.list.length > 0) {
+          syncAdminsRef.current = true;
+          setAdminUsers(data.list);
+          setTimeout(() => { syncAdminsRef.current = false; }, 200);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Sync to local storage & Firestore on changes
   useEffect(() => {
     localStorage.setItem("ruh-admin-users", JSON.stringify(adminUsers));
+    
+    if (adminUsers.length > 0) {
+      if (syncAdminsRef.current) return;
+      syncAdminsRef.current = true;
+      withTimeout(setDoc(doc(db, "settings", "admins"), { list: adminUsers }))
+        .catch(err => console.error("Error saving admins to Firestore: ", err))
+        .finally(() => {
+          setTimeout(() => { syncAdminsRef.current = false; }, 200);
+        });
+    }
   }, [adminUsers]);
 
   // Product deletion state
