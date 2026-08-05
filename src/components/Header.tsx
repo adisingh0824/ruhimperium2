@@ -148,7 +148,7 @@ export default function Header({
             {/* Mobile Menu Trigger */}
             <button
               type="button"
-              className="lg:hidden p-2 -ml-2 text-stone-600 hover:text-stone-900 transition-colors"
+              className="lg:hidden p-2 -ml-2 text-sand-900 hover:text-stone-300 transition-colors"
               onClick={() => setMobileMenuOpen(true)}
               id="mobile-menu-trigger"
             >
@@ -160,7 +160,7 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 text-stone-600 hover:text-gold-600 transition-all duration-300 transform hover:scale-105"
+                className="p-2 text-sand-900 hover:text-[#D4BC96] transition-all duration-300 transform hover:scale-105"
                 title="Search the olfactory logs"
               >
                 <Search className="w-[18px] h-[18px] stroke-[1.5]" />
@@ -210,7 +210,7 @@ export default function Header({
             <button
               type="button"
               onClick={onLoungeClick}
-              className="text-black hover:text-gray-500 transition-colors"
+              className="text-sand-900 hover:text-stone-300 transition-colors"
             >
               <User className="w-5 h-5" />
             </button>
@@ -218,7 +218,7 @@ export default function Header({
             <button
               type="button"
               onClick={onAdminClick}
-              className="text-black hover:text-gray-500 transition-colors"
+              className="text-sand-900 hover:text-stone-300 transition-colors"
             >
               <LockKeyhole className="w-4 h-4" />
             </button>
@@ -226,11 +226,11 @@ export default function Header({
             <button
               type="button"
               onClick={onOpenCart}
-              className="relative text-black hover:text-gray-500 transition-colors"
+              className="relative text-sand-900 hover:text-stone-300 transition-colors"
             >
               <ShoppingBag className="w-5 h-5" />
               {cartTotalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#D4BC96] text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartTotalItems}
                 </span>
               )}
@@ -248,9 +248,8 @@ export default function Header({
           </div>
         </div>
 
-        {/* BOTTOM ROW: Minimalist Navigation Links */}
-        <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-stone-100">
-          <ul className="flex items-center space-x-8 text-[11px] tracking-widest uppercase font-sans text-[#221F1C] font-semibold">
+        <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-sand-200">
+          <ul className="flex items-center space-x-8 text-[11px] tracking-widest uppercase font-sans text-sand-900 font-semibold">
             
             {/* 1. Shop All */}
             <li className="relative py-3">

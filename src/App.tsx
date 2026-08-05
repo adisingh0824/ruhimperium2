@@ -1891,12 +1891,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 return (
                   <div 
                     key={prod.id} 
-                    className="group flex flex-col justify-between transition-all duration-300 relative bg-white p-4 rounded-2xl border border-stone-100 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)]"
+                    className="group flex flex-col justify-between transition-all duration-300 relative bg-sand-100 p-4 rounded-2xl border border-sand-200 hover:border-[#D4BC96]/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] animate-fade-in"
                     id={`product-card-${prod.id}`}
                   >
                     {/* Image visual wrapper */}
                     <div 
-                      className="relative w-full aspect-[4/5] bg-stone-50 overflow-hidden mb-4 rounded-xl cursor-pointer"
+                      className="relative w-full aspect-[4/5] bg-stone-900/60 overflow-hidden mb-4 rounded-xl cursor-pointer"
                       onClick={() => navigate(`/product/${prod.id}`)}
                     >
                       <img 
@@ -1915,7 +1915,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       )}
                       {/* Sale Badge */}
                       {prod.price > prod.salePrice && (
-                        <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2.5 py-1 leading-none shadow-sm rounded">
+                        <div className="absolute top-3 left-3 bg-[#D4BC96] text-black text-[10px] uppercase tracking-widest font-sans font-bold px-2.5 py-1 leading-none shadow-sm rounded">
                            SALE
                         </div>
                       )}
@@ -1931,19 +1931,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             <Star 
                               key={i} 
                               className={`w-3.5 h-3.5 ${
-                                i < Math.floor(overallRating) ? "fill-[#D4BC96]" : "text-sand-200"
+                                i < Math.floor(overallRating) ? "fill-[#D4BC96]" : "text-sand-200/20"
                               }`} 
                             />
                           ))}
                         </div>
-                        <span className="text-[11px] text-sand-500 font-mono mt-0.5">
+                        <span className="text-[11px] text-sand-400 font-mono mt-0.5">
                           ({totalItemReviews.length})
                         </span>
                       </div>
 
                       <button 
                         onClick={() => navigate(`/product/${prod.id}`)}
-                        className="text-[18px] sm:text-[20px] font-serif text-[#2D2926] tracking-wide mb-1 hover:text-[#D4BC96] transition-colors focus:outline-none"
+                        className="text-[18px] sm:text-[20px] font-serif text-sand-900 tracking-wide mb-1 hover:text-[#D4BC96] transition-colors focus:outline-none"
                       >
                         {prod.name}
                       </button>
@@ -1953,7 +1953,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       </p>
 
                       <div className="flex items-center justify-center gap-2 mb-5">
-                        <span className="text-sm font-sans text-sand-950 font-medium">₹{prod.salePrice}</span>
+                        <span className="text-sm font-sans text-[#D4BC96] font-medium">₹{prod.salePrice}</span>
                         {prod.price > prod.salePrice && (
                           <span className="text-sm text-sand-400 line-through">₹{prod.price}</span>
                         )}
@@ -1970,7 +1970,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         handleAddToCart(prod, defaultVariant);
                         setIsCartOpen(true);
                       }}
-                      className="w-full py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-white transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl mt-2 cursor-pointer"
+                      className="w-full py-3.5 bg-[#D4BC96] hover:bg-white text-black hover:text-black transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl mt-2 cursor-pointer"
                     >
                       ADD TO CART
                     </button>
