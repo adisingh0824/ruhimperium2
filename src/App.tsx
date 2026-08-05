@@ -1624,7 +1624,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         </section>
 
         {/* PRESTIGE EDITORIAL PRESS COVERAGE */}
-        <section className="bg-[#FAF5F2] py-10 border-b border-sand-200/60 select-none" id="press-section">
+        <section className="bg-sand-100 py-10 border-b border-sand-200/60 select-none" id="press-section">
           <div className="mx-auto max-w-7xl px-2">
             <p className="text-[9px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold text-center mb-6">
               AS FEATURED IN PRINCIPAL EDITORIALS
@@ -1673,7 +1673,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* SHOP / COLLECTION DIVISION */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="shop-section">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="shop-section">
           <div className="mx-auto max-w-7xl px-0 sm:px-6 lg:px-8">
             
             {/* Header */}
@@ -2241,7 +2241,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* STORY CARDS GRID SECTION (THREE ROWS EXACTLY LIKE MOBILE/DESKTOP RAHI PARFUMS DESIGN) */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="story-cards-section">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="story-cards-section">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
             
             {/* Row Header */}
@@ -2323,7 +2323,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* DISTILLERY VIDEO SECTION */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="distillery-video-section">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="distillery-video-section">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
             
             <h2 className="text-2xl sm:text-4xl font-light font-display text-sand-900 tracking-wide mb-4">
@@ -2348,7 +2348,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* THE BRAND STORY & USP GRID (BENTO CARD OVERVIEW) */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             
             {/* Header */}
@@ -2420,7 +2420,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* FEATURING SANDALWOOD STICK & RUBBING STONE */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="sandalwood-stick-section">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="sandalwood-stick-section">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
               
@@ -2645,7 +2645,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* TRAVEL JOURNAL / DIARY ARTICLES */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="journal-section">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="journal-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             
             {/* Header */}
@@ -2715,7 +2715,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* OUR FOUNDERS SECTION */}
-        <section className="bg-[#FAF5F2] py-16 sm:py-24 border-b border-sand-200" id="founders-section">
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="founders-section">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="text-center max-w-xl mx-auto mb-16">

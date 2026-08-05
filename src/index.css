@@ -17,13 +17,13 @@
   --color-gold-800: #000000;
   --color-gold-900: #000000;
 
-  --color-sand-50: #FFFFFF;  /* Pure white background */
-  --color-sand-100: #F9F9F9; /* Very light gray */
-  --color-sand-200: #EEEEEE; /* Light gray border */
-  --color-sand-300: #DDDDDD; /* Gray label */
-  --color-sand-400: #999999; /* Text gray */
-  --color-sand-500: #555555; /* Body text dark */
-  --color-sand-900: #121212; /* Primary text black */
+  --color-sand-50: #FCFAF7;  /* Luxury soft warm off-white */
+  --color-sand-100: #F7F4EB; /* Soft warm linen cream */
+  --color-sand-200: #EAE5D9; /* Soft sand border */
+  --color-sand-300: #D8D2C4; /* Darker sand label */
+  --color-sand-400: #8C8476; /* Muted brown-gray text */
+  --color-sand-500: #5C554A; /* Body text charcoal-brown */
+  --color-sand-900: #221F1C; /* Premium dark text */
 }
 
 @layer base {
