@@ -250,7 +250,7 @@ export default function Header({
 
         {/* BOTTOM ROW: Minimalist Navigation Links */}
         <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-stone-100">
-          <ul className="flex items-center space-x-12 text-[12px] tracking-widest uppercase font-sans text-stone-800 font-medium">
+          <ul className="flex items-center space-x-8 text-[11px] tracking-widest uppercase font-sans text-[#221F1C] font-semibold">
             
             {/* 1. Shop All */}
             <li className="relative py-3">
@@ -260,13 +260,55 @@ export default function Header({
                   if (setSelectedCategory) setSelectedCategory("All");
                   onNavigate("shop");
                 }}
-                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
               >
                 Shop All
               </button>
             </li>
 
-            {/* 2. Collections */}
+            {/* 2. Gourmand */}
+            <li className="relative py-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (setSelectedCategory) setSelectedCategory("Gourmand");
+                  onNavigate("shop");
+                }}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
+              >
+                Gourmand
+              </button>
+            </li>
+
+            {/* 3. Oriental */}
+            <li className="relative py-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (setSelectedCategory) setSelectedCategory("Oriental");
+                  onNavigate("shop");
+                }}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
+              >
+                Oriental
+              </button>
+            </li>
+
+            {/* 4. Wellness */}
+            <li className="relative py-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (setSelectedCategory) setSelectedCategory("Wellness");
+                  onNavigate("shop");
+                }}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
+              >
+                Wellness
+              </button>
+            </li>
+
+            {/* 5. Discovery Sets */}
             <li className="relative py-3">
               <button
                 type="button"
@@ -274,40 +316,40 @@ export default function Header({
                   if (setSelectedCategory) setSelectedCategory("Discovery Set");
                   onNavigate("shop");
                 }}
-                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
               >
-                Collections
+                Discovery Sets
               </button>
             </li>
 
-            {/* 3. Gifting */}
+            {/* 6. Gifting */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={() => setBulkEnquiryOpen(true)}
-                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
               >
                 Gifting
               </button>
             </li>
 
-            {/* 4. Our Story */}
+            {/* 7. Our Story */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("journal")}
-                className={`hover:text-gray-500 transition-colors cursor-pointer relative group`}
+                className="hover:text-stone-500 transition-colors cursor-pointer"
               >
                 Our Story
               </button>
             </li>
 
-            {/* 5. Track Order */}
+            {/* 8. Track Order */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={onTrackOrderClick}
-                className="hover:text-gray-500 transition-colors cursor-pointer relative group"
+                className="hover:text-stone-500 transition-colors cursor-pointer"
               >
                 Track Order
               </button>
