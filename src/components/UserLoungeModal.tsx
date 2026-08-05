@@ -21,6 +21,7 @@ import {
   UserCheck 
 } from "lucide-react";
 import { UserAccount, Order, Product } from "../types";
+import { useUser, SignIn, useClerk } from "@clerk/clerk-react";
 
 interface UserLoungeModalProps {
   isOpen: boolean;
@@ -36,9 +37,10 @@ interface UserLoungeModalProps {
   onLogoutAdmin: () => void;
   onSelectProduct: (p: Product) => void;
   onAddCustomToCart: (customProduct: Product) => void;
+  customLogoutAction?: () => void;
 }
 
-export default function UserLoungeModal({
+export function TraditionalUserLoungeModal({
   isOpen,
   onClose,
   users,
@@ -51,7 +53,8 @@ export default function UserLoungeModal({
   isAdminLoggedIn,
   onLogoutAdmin,
   onSelectProduct,
-  onAddCustomToCart
+  onAddCustomToCart,
+  customLogoutAction
 }: UserLoungeModalProps) {
   // Modal view states: "login" | "register" | "dashboard"
   const [view, setView] = useState<"login" | "register" | "dashboard">("login");
@@ -125,6 +128,9 @@ export default function UserLoungeModal({
 
   // Handle Log out
   const handleUserLogout = () => {
+    if (customLogoutAction) {
+      customLogoutAction();
+    }
     setCurrentUser(null);
     setLoginEmail("");
     setLoginPassword("");
@@ -934,4 +940,95 @@ export default function UserLoungeModal({
       </div>
     </div>
   );
+}
+
+export function ClerkUserLoungeModal(props: UserLoungeModalProps) {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user) {
+      const email = user.primaryEmailAddress?.emailAddress || "";
+      const fullName = user.fullName || "Member Explorer";
+      const matched = props.users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
+
+      if (matched) {
+        if (!props.currentUser || props.currentUser.email !== email) {
+          props.setCurrentUser(matched);
+        }
+      } else {
+        const newLocalUser: UserAccount = {
+          email,
+          fullName,
+          phone: "+91 99999 99999",
+          address: "123 Scent Garden Way",
+          pincode: "110001",
+          password: "clerk-auth-provider",
+          savedBlends: [],
+          orderIds: []
+        };
+        props.setUsers((prev: any) => [...prev, newLocalUser]);
+        props.setCurrentUser(newLocalUser);
+      }
+    } else if (isLoaded && !isSignedIn) {
+      if (props.currentUser) {
+        props.setCurrentUser(null);
+      }
+    }
+  }, [isLoaded, isSignedIn, user]);
+
+  if (!props.isOpen) return null;
+
+  if (!isSignedIn) {
+    return (
+      <div className="fixed inset-0 bg-[#1C1917]/75 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white max-w-4xl w-full rounded-2xl shadow-2xl border border-stone-100 overflow-hidden flex flex-col md:flex-row max-h-[92vh] md:max-h-[90vh]">
+          {/* Left Side: Editorial Banner Accent */}
+          <div className="hidden md:flex md:w-1/3 bg-[#1C1917] p-8 text-[#FAFAFA] flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4BC96]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="space-y-6 relative z-10">
+              <div className="w-10 h-[1px] bg-[#D4BC96] mb-8" />
+              <h2 className="text-3xl font-light font-serif tracking-wide text-white leading-tight">
+                The Royal <br />Lounge
+              </h2>
+              <p className="text-xs text-stone-400 font-light leading-relaxed font-sans">
+                Connect with secure, decentralized authentication powered by Clerk. Track your custom formulation logs, unlock scent coins, and verify transaction receipts seamlessly.
+              </p>
+            </div>
+            <div className="text-[9px] uppercase tracking-widest text-[#D4BC96]/60 font-mono">
+              RUH IMPERIUM PRIVILEGED HQ
+            </div>
+          </div>
+
+          {/* Right Side: Clerk Sign-In Form */}
+          <div className="flex-1 p-6 md:p-10 flex flex-col justify-center relative bg-[#FAFAFA] items-center">
+            <button
+              onClick={props.onClose}
+              className="absolute top-5 right-5 p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition-colors focus:outline-none cursor-pointer"
+            >
+              <X className="w-5.5 h-5.5" />
+            </button>
+            <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center overflow-y-auto">
+              <SignIn routing="hash" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <TraditionalUserLoungeModal
+      {...props}
+      customLogoutAction={() => signOut()}
+    />
+  );
+}
+
+export default function UserLoungeModal(props: UserLoungeModalProps) {
+  const isClerkEnabled = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  if (isClerkEnabled) {
+    return <ClerkUserLoungeModal {...props} />;
+  }
+  return <TraditionalUserLoungeModal {...props} />;
 }

@@ -27,6 +27,13 @@ import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import InvoiceBill from "./InvoiceBill";
 
+async function sha256(message: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 interface AdminHubProps {
   isOpen: boolean;
   onClose: () => void;
@@ -209,19 +216,41 @@ export default function AdminHub({
   const founderVimalInputRef = useRef<HTMLInputElement>(null);
   const founderAdityaInputRef = useRef<HTMLInputElement>(null);
   const prodImgInputRef = useRef<HTMLInputElement>(null);
-  const logoInputRef = useRef<HTMLInputElement>(null);
+  const [setupConfirmPassword, setSetupConfirmPassword] = useState("");
 
   if (!isOpen) return null;
 
-  // Handles standard secure credentials matching from dynamic registered admins
-  const handleLoginSubmit = (e: FormEvent) => {
+  const handleSetupSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoginError("");
 
+    if (!email.trim() || !password.trim()) {
+      setLoginError("Please enter both email and password.");
+      return;
+    }
+
+    if (password !== setupConfirmPassword) {
+      setLoginError("Cipher passwords do not match.");
+      return;
+    }
+
+    const hashedPassword = await sha256(password);
+    const newAdmin = { username: email.trim().toLowerCase(), password: hashedPassword };
+    setAdminUsers([newAdmin]);
+    setIsAdminLoggedIn(true);
+    localStorage.setItem("ruh-admin-logged-in", "true");
+  };
+
+  // Handles standard secure credentials matching from dynamic registered admins
+  const handleLoginSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+
+    const hashedInput = await sha256(password);
     const matchFound = adminUsers.some(
       (user) =>
         user.username.trim().toLowerCase() === email.trim().toLowerCase() &&
-        user.password === password
+        user.password === hashedInput
     );
 
     if (matchFound) {
@@ -551,58 +580,125 @@ export default function AdminHub({
         {/* NOT LOGGED IN TRIGGER - LOGIN ENTRY FORM */}
         {!isAdminLoggedIn ? (
           <div className="flex-1 flex flex-col justify-center items-center py-16 px-6 bg-white">
-            <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-sand-200 p-8 shadow-md">
-              <div className="text-center mb-8">
-                <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
-                  <ShieldCheck className="w-7 h-7" />
+            {adminUsers.length === 0 ? (
+              <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-stone-300 p-8 shadow-md">
+                <div className="text-center mb-8">
+                  <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
+                    <ShieldCheck className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
+                    Initialize HQ Access
+                  </h3>
+                  <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
+                    Establish secure administrative master credentials. Since no local keys exist, generate your credentials below.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
-                  Executive Headquarters
-                </h3>
-                <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
-                  Please authenticate with legal administrative credentials to authorize full database read and write actions.
-                </p>
+
+                {loginError && (
+                  <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
+                    ⚠️ {loginError}
+                  </div>
+                )}
+
+                <form onSubmit={handleSetupSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Set Master Email</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. admin@ruhimperium.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Set Master Cipher Password</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Create security digits"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Confirm Cipher Password</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Repeat security digits"
+                      value={setupConfirmPassword}
+                      onChange={(e) => setSetupConfirmPassword(e.target.value)}
+                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full mt-6 py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
+                  >
+                    GENERATE KEYS AND ACTIVATE HQ
+                  </button>
+                </form>
               </div>
-
-              {loginError && (
-                <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
-                  ⚠️ {loginError}
-                </div>
-              )}
-
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="E.g. administrator@ruhimperium.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
-                  />
+            ) : (
+              <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-sand-200 p-8 shadow-md">
+                <div className="text-center mb-8">
+                  <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
+                    <ShieldCheck className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
+                    Executive Headquarters
+                  </h3>
+                  <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
+                    Please authenticate with legal administrative credentials to authorize full database read and write actions.
+                  </p>
                 </div>
 
-                <div>
-                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Cipher Password</label>
-                  <input
-                    type="password"
-                    required
-                    placeholder="Enter security digits"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                  />
-                </div>
+                {loginError && (
+                  <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
+                    ⚠️ {loginError}
+                  </div>
+                )}
 
-                <button
-                  type="submit"
-                  className="w-full mt-6 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
-                >
-                  DE-ENCRYPT AND UNLOCK HQ
-                </button>
-              </form>
-            </div>
+                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="E.g. administrator@ruhimperium.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Cipher Password</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Enter security digits"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full mt-6 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
+                  >
+                    DE-ENCRYPT AND UNLOCK HQ
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         ) : (
           /* AUTHORIZED EXECUTIVE CONSOLE MODULES */
@@ -614,7 +710,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("products"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "products"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -627,7 +723,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("collections"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "collections"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -640,7 +736,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("orders"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "orders"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -653,7 +749,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("brand"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "brand"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -666,7 +762,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("content"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "content"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -679,7 +775,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("coupons"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "coupons"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -692,7 +788,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("reviews"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "reviews"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -705,7 +801,7 @@ export default function AdminHub({
               <button
                 type="button"
                 onClick={() => { setActiveTab("admin-credentials"); setIsEditingProduct(null); }}
-                className={`w-full text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
+                className={`md:w-full w-auto flex-grow sm:flex-grow-0 text-left flex items-center space-x-2.5 px-3.5 py-3 rounded-xl text-xs uppercase tracking-widest font-mono border transition-all cursor-pointer ${
                   activeTab === "admin-credentials"
                     ? "bg-[#2D2926] text-white border-sand-900 shadow-xs"
                     : "bg-transparent text-sand-600 hover:bg-sand-200/65 border-transparent"
@@ -3469,9 +3565,9 @@ export default function AdminHub({
                                   {/* Product info banner */}
                                   <div className="flex items-center gap-2 border-b border-sand-100 pb-2">
                                     {matchedProd?.image ? (
-                                      <img src={matchedProd.image} alt={matchedProd.name} className="w-8 h-8 object-cover rounded border border-sand-250 bg-sand-50" />
+                                      <img src={matchedProd.image} alt={matchedProd.name} className="w-8 h-8 object-cover rounded border border-sand-200 bg-sand-50" />
                                     ) : (
-                                      <div className="w-8 h-8 rounded border border-sand-250 bg-sand-100 flex items-center justify-center text-xs font-serif italic text-sand-500">P</div>
+                                      <div className="w-8 h-8 rounded border border-sand-200 bg-sand-100 flex items-center justify-center text-xs font-serif italic text-sand-500">P</div>
                                     )}
                                     <div className="min-w-0">
                                       <div className="text-[10px] font-mono text-sand-400 uppercase tracking-wider">Product Link</div>
@@ -3495,7 +3591,7 @@ export default function AdminHub({
                                     <div className="flex items-center gap-0.5">
                                       {Array.from({ length: 5 }).map((_, i) => (
                                         <span key={i}>
-                                          <Star className={`w-3 h-3 ${i < rev.rating ? "text-amber-550 fill-amber-400" : "text-sand-250"}`} />
+                                          <Star className={`w-3 h-3 ${i < rev.rating ? "text-amber-500 fill-amber-400" : "text-sand-200"}`} />
                                         </span>
                                       ))}
                                     </div>
@@ -3567,7 +3663,7 @@ export default function AdminHub({
                             }}
                             className="sr-only peer" 
                           />
-                          <div className="w-11 h-6 bg-sand-250 opacity-80 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-650"></div>
+                          <div className="w-11 h-6 bg-stone-300 opacity-80 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                         </label>
                         <span className={`text-[10px] uppercase font-bold font-mono tracking-widest ${siteSettings.razorpayEnabled ? "text-emerald-700 font-semibold" : "text-sand-400"}`}>
                           {siteSettings.razorpayEnabled ? "LIVE GATEWAY ACTIVE" : "SIMULATION SANDBOX"}
@@ -3701,7 +3797,7 @@ export default function AdminHub({
                       </div>
                       
                       <form 
-                        onSubmit={(e) => {
+                        onSubmit={async (e) => {
                           e.preventDefault();
                           const form = e.currentTarget;
                           const usernameInput = form.elements.namedItem("adminEmail") as HTMLInputElement;
@@ -3723,7 +3819,8 @@ export default function AdminHub({
                             return;
                           }
 
-                          const newAdmin = { username, password };
+                          const hashedPassword = await sha256(password);
+                          const newAdmin = { username, password: hashedPassword };
                           setAdminUsers(prev => [...prev, newAdmin]);
                           form.reset();
                         }} 

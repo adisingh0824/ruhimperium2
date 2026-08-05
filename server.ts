@@ -28,8 +28,29 @@ async function startServer() {
   const uploadDir = path.resolve(process.cwd(), "public", "uploads");
   await fs.mkdir(uploadDir, { recursive: true });
 
+  // Lightweight rate limiter to prevent API spamming & Denial of Service (DoS)
+  const rateLimitWindow = 15 * 60 * 1000; // 15 mins window
+  const maxRequests = 100; // limit each IP to 100 requests per window
+  const requestHistory = new Map<string, { count: number; resetTime: number }>();
+
+  const rateLimiter = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const ip = req.ip || req.socket.remoteAddress || "unknown-ip";
+    const now = Date.now();
+    const clientData = requestHistory.get(ip);
+
+    if (!clientData || now > clientData.resetTime) {
+      requestHistory.set(ip, { count: 1, resetTime: now + rateLimitWindow });
+    } else {
+      clientData.count++;
+      if (clientData.count > maxRequests) {
+        return res.status(429).json({ error: "Too many requests from this IP. Access throttled to prevent DoS." });
+      }
+    }
+    next();
+  };
+
   // API endpoint to handle uploaded admin video loop safely
-  app.post("/api/upload-video", async (req, res) => {
+  app.post("/api/upload-video", rateLimiter, async (req, res) => {
     try {
       const { videoData, filename } = req.body;
       if (!videoData || typeof videoData !== "string") {
@@ -81,7 +102,7 @@ async function startServer() {
   });
 
   // API endpoint to handle uploaded admin custom collection cover photos and products images safely
-  app.post("/api/upload-image", async (req, res) => {
+  app.post("/api/upload-image", rateLimiter, async (req, res) => {
     try {
       const { imageData, filename } = req.body;
       if (!imageData || typeof imageData !== "string") {
