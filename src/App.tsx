@@ -2588,31 +2588,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       />
 
 
-      {/* CUSTOMER ROYAL SCENT LOUNGE MODAL OVERLAY */}
-      <UserLoungeModal
-        isOpen={isLoungeOpen}
-        onClose={() => setIsLoungeOpen(false)}
-        users={users}
-        setUsers={updateUsers}
-        currentUser={currentUser}
-        setCurrentUser={setCurrentUser}
-        orders={orders}
-        products={products}
-        onAdminClick={() => {
-          setIsLoungeOpen(false);
-          setIsAdminHubOpen(true);
-        }}
-        isAdminLoggedIn={isAdminLoggedIn}
-        onLogoutAdmin={() => {
-          setIsAdminLoggedIn(false);
-          localStorage.removeItem("ruh-admin-logged-in");
-        }}
-        onSelectProduct={(p) => {
-          setSelectedProduct(p);
-          setIsModalOpen(true);
-        }}
-        onAddCustomToCart={handleAddCustomToCart}
-      />
 
 
       {/* PRIVACY CHARTER MODAL OVERLAY */}
