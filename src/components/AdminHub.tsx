@@ -1918,22 +1918,35 @@ export default function AdminHub({
                               const file = e.target.files?.[0];
                               if (file) {
                                 setIsUploadingVideo(true);
-                                try {
-                                  const storageRef = ref(storage, `videos/hero-video-${Date.now()}-${file.name}`);
-                                  await uploadBytes(storageRef, file);
-                                  const downloadUrl = await getDownloadURL(storageRef);
-                                  setHeroVideoUrl(downloadUrl);
-                                  alert(`Scent film file "${file.name}" uploaded to server and broadcasting successfully! All customers will now see this video live in the ambient background.`);
-                                } catch (err: any) {
-                                  console.error("Upload error:", err);
-                                  if (err.message.includes("permission") || err.message.includes("does not exist")) {
-                                    alert(`Failed to upload: You must enable "Storage" in your Firebase Console first! Click "Storage" on the left menu in Firebase, then click "Get Started" and choose "Start in test mode".`);
-                                  } else {
-                                    alert(`Failed to upload scent film: ${err.message}`);
+                                const reader = new FileReader();
+                                reader.onload = async () => {
+                                  const base64 = reader.result as string;
+                                  try {
+                                    const response = await fetch("/api/upload-video", {
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json"
+                                      },
+                                      body: JSON.stringify({
+                                        videoData: base64,
+                                        filename: file.name
+                                      })
+                                    });
+                                    if (!response.ok) {
+                                      const errData = await response.json();
+                                      throw new Error(errData.error || "Upload failed");
+                                    }
+                                    const resData = await response.json();
+                                    setHeroVideoUrl(resData.url);
+                                    alert(`Scent film file "${file.name}" uploaded to server and broadcasting successfully! All customers will now see this video live in the ambient background.`);
+                                  } catch (err: any) {
+                                    console.error("Local video upload error:", err);
+                                    alert(`Failed to upload video: ${err.message}`);
+                                  } finally {
+                                    setIsUploadingVideo(false);
                                   }
-                                } finally {
-                                  setIsUploadingVideo(false);
-                                }
+                                };
+                                reader.readAsDataURL(file);
                               }
                             }}
                           />
