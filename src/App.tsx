@@ -2294,67 +2294,50 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
 
-        {/* TRAVEL JOURNAL / DIARY ARTICLES */}
-        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="journal-section">
+        {/* TRAVEL JOURNAL / DIARY ARTICLES (INSIGHTS RAAHI STYLE) */}
+        <section className="bg-white py-16 sm:py-24 border-b border-sand-200" id="journal-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             
             {/* Header */}
-            <div className="text-center max-w-xl mx-auto mb-16">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold block mb-2">
-                Travel Journals
-              </span>
-              <h2 className="text-3xl sm:text-5xl font-light font-display text-sand-900 tracking-wide mb-3">
-                Wanderlust Diary
+            <div className="text-left mb-12 sm:mb-16">
+              <h2 className="text-4xl font-serif text-stone-900 tracking-tight mb-2 select-none" style={{ fontFamily: "Georgia, serif" }}>
+                Insights
               </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96] mx-auto mt-4 mb-4"></div>
-              <p className="text-sm text-sand-500 font-light">
-                Insights and field narratives written by our sourcing experts trekking down the historical scent routes of South Asia.
-              </p>
+              <span className="text-emerald-700 text-sm font-sans tracking-wide font-medium block">
+                Handcrafted Indian Attar
+              </span>
             </div>
 
             {/* List */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {blogArticles.map((article) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+              {blogArticles.slice(0, 3).map((article) => (
                 <article 
-                   key={article.id} 
-                  className="bg-white rounded-2xl border border-sand-200 overflow-hidden flex flex-col justify-between shadow-xs hover:scale-101 transition-all duration-300"
+                  key={article.id} 
+                  onClick={() => setSelectedArticle(article)}
+                  className="flex flex-col cursor-pointer group space-y-4"
                   id={`diary-article-${article.id}`}
                 >
-                  <div className="h-52 overflow-hidden relative">
+                  {/* Image container */}
+                  <div className="aspect-[16/10] w-full overflow-hidden rounded-[1.5rem] bg-stone-100 border border-stone-100 shadow-sm relative transition-all duration-500 group-hover:shadow-md">
                     <img 
                       src={article.image} 
                       alt={article.title} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103 select-none pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute top-4 left-4 bg-[#2D2926]/90 text-white text-[9px] uppercase tracking-widest px-2.5 py-1.5 rounded flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#D4BC96]" />
-                      <span>{article.location}</span>
-                    </div>
                   </div>
 
-                  <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-center text-[10px] uppercase text-sand-400 font-mono mb-3">
-                        <span>{article.date}</span>
-                        <span>{article.readTime}</span>
-                      </div>
-                      <h3 className="text-xl font-light font-serif text-sand-900 tracking-wide mb-3 line-clamp-2">
-                        {article.title}
-                      </h3>
-                      <p className="text-xs text-sand-500 font-light leading-relaxed line-clamp-3 mb-6">
-                        {article.excerpt}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setSelectedArticle(article)}
-                      className="text-[10px] tracking-[0.2em] uppercase font-bold text-sand-800 hover:text-[#D4BC96] text-left border-b border-[#D4BC96]/40 w-fit pb-1 transition-all duration-350 focus:outline-none cursor-pointer"
-                      id={`read-article-btn-${article.id}`}
-                    >
-                      READ CONTEXTLOG →
-                    </button>
+                  {/* Text meta */}
+                  <div className="flex flex-col space-y-2 text-left">
+                    <h3 className="text-lg font-serif font-semibold text-stone-900 leading-snug group-hover:text-[#D4BC96] transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <span className="text-[10px] tracking-widest text-stone-400 font-bold uppercase block mt-1">
+                      {article.date}
+                    </span>
+                    <p className="text-xs sm:text-[13px] text-stone-500 font-light leading-relaxed line-clamp-3">
+                      {article.excerpt}
+                    </p>
                   </div>
                 </article>
               ))}
