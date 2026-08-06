@@ -45,6 +45,7 @@ async function startServer() {
       if (clientData.count > maxRequests) {
         return res.status(429).json({ error: "Too many requests from this IP. Access throttled to prevent DoS." });
       }
+    }
     next();
   };
 

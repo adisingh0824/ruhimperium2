@@ -22,7 +22,8 @@ import {
   Linkedin,
   Twitter,
   Flower2,
-  Trees
+  Trees,
+  Play
 } from 'lucide-react';
 import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
 import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
@@ -470,12 +471,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Mobile menu and utility state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
   const [isShippingOpen, setIsShippingOpen] = useState(false);
+  const [isDistilleryVideoOpen, setIsDistilleryVideoOpen] = useState(false);
 
   // Expanded Blog Article state
   const [selectedArticle, setSelectedArticle] = useState<BlogArticle | null>(null);
@@ -2185,14 +2186,23 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our distillery. Watch the video of our 204 years old distillery in Kannauj, India."}
             </p>
             
-            <div className="w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl bg-black relative">
-              <iframe
-                src={getEmbedVideoUrl(siteSettings.distilleryVideoUrl || "https://www.youtube.com/embed/Tscv0R6q13Y", false)}
-                title="Ruh Imperium Distillery Video"
-                className="absolute inset-0 w-full h-full border-0 select-none animate-fade-in"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+            <div 
+              onClick={() => setIsDistilleryVideoOpen(true)}
+              className="group relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl bg-stone-900 cursor-pointer"
+            >
+              <img 
+                src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200" 
+                alt="Ruh Imperium Distillery" 
+                className="w-full h-full object-cover opacity-75 group-hover:scale-103 transition-transform duration-700 select-none pointer-events-none"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors duration-300" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/30 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-[#D4BC96] group-hover:text-black transition-all duration-500 shadow-xl relative">
+                  <span className="absolute inset-0 rounded-full border border-[#D4BC96] animate-ping opacity-75 pointer-events-none group-hover:animate-none"></span>
+                  <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-current ml-1" />
+                </div>
+              </div>
             </div>
 
           </div>
@@ -2775,6 +2785,27 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      {/* DISTILLERY VIDEO POPUP LIGHTBOX MODAL */}
+      {isDistilleryVideoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 sm:p-6 animate-fade-in">
+          <button 
+            onClick={() => setIsDistilleryVideoOpen(false)}
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full transition-colors cursor-pointer"
+            title="Close video player"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div className="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black relative">
+            <iframe
+              src={getEmbedVideoUrl(siteSettings.distilleryVideoUrl || "https://www.youtube.com/embed/Tscv0R6q13Y", true)}
+              title="Ruh Imperium Distillery Video"
+              className="absolute inset-0 w-full h-full border-0 select-none"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
       )}
