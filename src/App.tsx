@@ -2536,7 +2536,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     if (el) el.scrollIntoView({ behavior: "smooth" });
                   }} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
                   <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
-                  <li><button type="button" onClick={onTrackOrderClick} className="hover:text-white cursor-pointer transition-colors block">Track your order</button></li>
+                  <li><button type="button" onClick={() => setIsOrderTrackerOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Track your order</button></li>
                 </ul>
               </div>
 
