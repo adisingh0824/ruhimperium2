@@ -291,7 +291,7 @@ export function TraditionalUserLoungeModal({
               Imperial Scent Lounge
             </h3>
             <p className="text-xs text-stone-300 font-light leading-relaxed">
-              Welcome to the inner sanctum of the fragrance house. Create your royal ledger to track bespoke distillations, review historical travel summaries, and unlock private formulations.
+              Welcome to the inner sanctum of the fragrance house. Create your member profile to track bespoke distillations, review historical travel summaries, and unlock private formulations.
             </p>
           </div>
 
@@ -311,7 +311,7 @@ export function TraditionalUserLoungeModal({
           </div>
 
           <div className="text-[8.5px] font-mono tracking-widest text-[#D4BC96]/60 uppercase pt-6">
-            SECURE LEDGER ACCESS PROTOCOL v4
+            SECURE MEMBER ACCESS SYSTEM v4
           </div>
         </div>
 
@@ -343,7 +343,7 @@ export function TraditionalUserLoungeModal({
             <div className="space-y-6 flex-1 flex flex-col justify-center animate-fade-in">
               <div className="space-y-1">
                 <h4 className="text-lg font-serif font-semibold text-stone-900">Unlock your Member Vault</h4>
-                <p className="text-xs text-stone-500 font-light">Input your registered email ledger to synchronize order receipts and compounding records.</p>
+                <p className="text-xs text-stone-500 font-light">Input your registered email address to synchronize order receipts and compounding records.</p>
               </div>
 
               {loginError && (
@@ -416,7 +416,7 @@ export function TraditionalUserLoungeModal({
           {view === "register" && (
             <div className="space-y-5 flex-1 flex flex-col justify-center animate-fade-in">
               <div className="space-y-1">
-                <h4 className="text-lg font-serif font-semibold text-stone-900">Initiate Olfactory Ledger</h4>
+                 <h4 className="text-lg font-serif font-semibold text-stone-900">Initiate Member Account</h4>
                 <p className="text-xs text-stone-500 font-light">Join the fragrance house to preserve your formulations, track bespoke parcel deliveries, and log scents.</p>
               </div>
 
@@ -429,7 +429,7 @@ export function TraditionalUserLoungeModal({
               {regSuccess && (
                 <div className="bg-emerald-50 text-emerald-800 text-xs p-3.5 rounded-lg border border-emerald-100 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-emerald-500 animate-spin" />
-                  <span>Ledger successfully synchronized! Redirecting into Lounge...</span>
+                  <span>Account successfully created! Redirecting into Lounge...</span>
                 </div>
               )}
 
@@ -452,7 +452,7 @@ export function TraditionalUserLoungeModal({
                     </div>
 
                     <div>
-                      <label className="block text-[9px] uppercase tracking-widest text-stone-400 mb-0.5 font-semibold font-mono">Email Ledger *</label>
+                      <label className="block text-[9px] uppercase tracking-widest text-stone-400 mb-0.5 font-semibold font-mono">Email Address *</label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" />
                         <input
@@ -510,7 +510,7 @@ export function TraditionalUserLoungeModal({
                     </div>
 
                     <div>
-                      <label className="block text-[9px] uppercase tracking-widest text-stone-400 mb-0.5 font-semibold font-mono">ZIP / Pincode Ledger</label>
+                      <label className="block text-[9px] uppercase tracking-widest text-stone-400 mb-0.5 font-semibold font-mono">ZIP / Pincode</label>
                       <div className="relative">
                         <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" />
                         <input
@@ -529,7 +529,7 @@ export function TraditionalUserLoungeModal({
                     type="submit"
                     className="w-full py-3 mt-4 bg-[#1C1917] hover:bg-gold-600 text-white font-serif text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-md font-medium cursor-pointer"
                   >
-                    Establish Account ledger →
+                    Create Account →
                   </button>
                 </form>
               )}
@@ -550,7 +550,7 @@ export function TraditionalUserLoungeModal({
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-[8.5px] uppercase tracking-[0.25em] text-stone-400 font-mono">
                     <Compass className="w-3.5 h-3.5 text-[#D4BC96]" />
-                    <span>Lounge Logged Ledger // Client</span>
+                    <span>Lounge Member Profile</span>
                   </div>
                   <h4 className="text-base font-serif font-semibold text-stone-900">{currentUser.fullName}</h4>
                   <p className="text-[10px] text-stone-400 font-mono tracking-tight">{currentUser.email} • Verified Account</p>
@@ -602,7 +602,7 @@ export function TraditionalUserLoungeModal({
                       <form onSubmit={handleSaveProfile} className="space-y-4 max-w-2xl bg-stone-50/50 p-5 rounded-2xl border border-stone-200">
                         <div className="text-xs font-bold font-mono tracking-widest text-stone-400 uppercase border-b border-stone-150 pb-1 flex justify-between mb-4">
                           <span>Modify Member Credentials</span>
-                          <span className="text-[#D4BC96]">LEDGER SAVE PROTOCOL</span>
+                          <span className="text-[#D4BC96]">ACCOUNT SECURITY SYNC</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
@@ -690,7 +690,7 @@ export function TraditionalUserLoungeModal({
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                             <div>
-                              <span className="text-[9.5px] uppercase tracking-widest text-stone-400 block font-mono">Full Ledger Name</span>
+                              <span className="text-[9.5px] uppercase tracking-widest text-stone-400 block font-mono">Full Name</span>
                               <p className="font-serif font-medium text-stone-900 text-sm">{currentUser.fullName}</p>
                             </div>
                             <div>
@@ -751,7 +751,7 @@ export function TraditionalUserLoungeModal({
                     {userOrders.length === 0 ? (
                       <div className="text-center p-12 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
                         <ShoppingBag className="w-10 h-10 text-stone-300 mx-auto mb-3" />
-                        <h5 className="text-sm font-serif font-semibold text-stone-850">No orders registered under your ledger</h5>
+                        <h5 className="text-sm font-serif font-semibold text-stone-850">No orders registered under your account</h5>
                         <p className="text-xs text-stone-500 font-light mt-1 max-w-sm mx-auto">Place an order at checkout under your verified email to automatically sync your logistics here.</p>
                       </div>
                     ) : (
