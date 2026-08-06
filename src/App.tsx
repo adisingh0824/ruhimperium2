@@ -2413,6 +2413,83 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           );
         })()}
 
+        {/* LEADERSHIP & FOUNDERS LEGACY SECTION */}
+        <section className="bg-sand-100 py-20 sm:py-28 border-b border-sand-200" id="founders-section">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            
+            {/* Section Header */}
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-bold block mb-2.5">
+                HEIRS & ARCHITECTS
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-light font-display text-sand-900 tracking-wide">
+                {siteSettings.foundersHeading || "Our Story & Legacy"}
+              </h2>
+              <div className="h-[1px] w-12 bg-[#D4BC96] mx-auto mt-5 mb-5"></div>
+              <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed">
+                {siteSettings.foundersText || "Ruh Imperium was sparked by a shared vision to traverse India's historic trade routes, distilling pristine biological extracts and crafting honest, high-concentration luxury fragrances."}
+              </p>
+            </div>
+
+            {/* Founders Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+              {founders.map((fnd) => (
+                <div key={fnd.id} className="bg-white rounded-3xl border border-sand-200 overflow-hidden shadow-md flex flex-col group hover:shadow-xl transition-all duration-500">
+                  {/* Photo container */}
+                  <div className="aspect-[4/3] w-full overflow-hidden relative bg-stone-100">
+                    <img 
+                      src={fnd.image} 
+                      alt={fnd.name} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103 select-none pointer-events-none"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      {fnd.linkedin && (
+                        <a 
+                          href={fnd.linkedin} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-[#D4BC96] hover:text-black transition-colors"
+                          title="LinkedIn Profile"
+                        >
+                          <Linkedin className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {fnd.instagram && (
+                        <a 
+                          href={fnd.instagram} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-[#D4BC96] hover:text-black transition-colors"
+                          title="Instagram Profile"
+                        >
+                          <Instagram className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bio container */}
+                  <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <span className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold font-mono block">
+                        {fnd.role}
+                      </span>
+                      <h4 className="text-xl font-serif font-bold text-sand-900">
+                        {fnd.name}
+                      </h4>
+                      <p className="text-xs text-sand-500 font-light leading-relaxed">
+                        {fnd.bio}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </section>
+
             </>
           } />
           <Route path="/product/:id" element={
