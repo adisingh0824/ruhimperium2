@@ -1773,6 +1773,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                           alt={cardTitle} 
                           className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103"
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            const nameLower = col.name.toLowerCase();
+                            let fallback = "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800";
+                            if (nameLower.includes("authentic") || nameLower.includes("traditional") || nameLower.includes("attar")) {
+                              fallback = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800";
+                            } else if (nameLower.includes("next gen") || nameLower.includes("modern")) {
+                              fallback = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800";
+                            } else if (nameLower.includes("best") || nameLower.includes("artisanal") || nameLower.includes("signature")) {
+                              fallback = "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800";
+                            } else if (nameLower.includes("parfum") || nameLower.includes("edp")) {
+                              fallback = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
+                            }
+                            e.currentTarget.src = fallback;
+                          }}
                         />
                         {/* Elegant dark fade overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
