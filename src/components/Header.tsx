@@ -128,11 +128,24 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-stone-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] transition-all duration-300">
 
-      {/* Luxury Minimalist Announcement Bar */}
-      <div className="bg-black text-white py-2 px-4 relative overflow-hidden select-none">
-        <div className="max-w-7xl mx-auto flex items-center justify-center">
-          <div className="flex items-center gap-2 text-xs font-sans font-medium uppercase tracking-widest text-white text-center">
-            <span>{announcements[currentAnnouncementIdx]}</span>
+      {/* Luxury Minimalist Announcement Ticker Bar */}
+      <div className="bg-black text-white py-2.5 relative overflow-hidden select-none w-full border-b border-stone-900 flex items-center">
+        <div className="flex whitespace-nowrap overflow-hidden w-full">
+          <div className="animate-marquee inline-flex shrink-0 items-center gap-8 pr-8 text-[10px] sm:text-[11px] font-sans font-bold uppercase tracking-[0.25em] text-white">
+            <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
+            <span>•</span>
+            <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
+            <span>•</span>
+            <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
+            <span>•</span>
+          </div>
+          <div className="animate-marquee inline-flex shrink-0 items-center gap-8 pr-8 text-[10px] sm:text-[11px] font-sans font-bold uppercase tracking-[0.25em] text-white" aria-hidden="true">
+            <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
+            <span>•</span>
+            <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
+            <span>•</span>
+            <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
+            <span>•</span>
           </div>
         </div>
       </div>
