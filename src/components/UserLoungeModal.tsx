@@ -989,7 +989,7 @@ export function ClerkUserLoungeModal(props: UserLoungeModalProps) {
             <div className="space-y-6 relative z-10">
               <div className="w-10 h-[1px] bg-[#D4BC96] mb-8" />
               <h2 className="text-3xl font-light font-serif tracking-wide text-white leading-tight">
-                The Royal <br />Lounge
+                Ruh <br />Imperium
               </h2>
               <p className="text-xs text-stone-400 font-light leading-relaxed font-sans mt-4">
                 Enter the sanctuary of Ruh Imperium. Discover rare, alcohol-free pure oils hydro-distilled in traditional Kannauj copper stills. Track your custom formulation logs and explore our multi-generational scent heritage.
