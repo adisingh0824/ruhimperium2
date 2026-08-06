@@ -1757,7 +1757,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         key={col.id}
                         onClick={() => {
                           handleSelectCategory(col.id);
-                          // Smooth scroll active category title to top viewport
                           setTimeout(() => {
                             const el = document.getElementById(`collection-grid-header-${col.id}`);
                             if (el) {
@@ -1765,44 +1764,40 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             }
                           }, 100);
                         }}
-                        className="group bg-white rounded-[2rem] hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-500 relative aspect-4/3 sm:aspect-[4/3] w-[270px] sm:w-[330px] flex-shrink-0 cursor-pointer overflow-hidden snap-start border border-sand-200/50 shadow-md"
+                        className="group flex flex-col items-center w-[220px] sm:w-[260px] flex-shrink-0 cursor-pointer snap-start"
                       >
-                        {/* Image element */}
-                        <img 
-                          src={cardImg} 
-                          alt={cardTitle} 
-                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            const nameLower = col.name.toLowerCase();
-                            let fallback = "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800";
-                            if (nameLower.includes("authentic") || nameLower.includes("traditional") || nameLower.includes("attar")) {
-                              fallback = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800";
-                            } else if (nameLower.includes("next gen") || nameLower.includes("modern")) {
-                              fallback = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800";
-                            } else if (nameLower.includes("best") || nameLower.includes("artisanal") || nameLower.includes("signature")) {
-                              fallback = "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800";
-                            } else if (nameLower.includes("parfum") || nameLower.includes("edp")) {
-                              fallback = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
-                            }
-                            e.currentTarget.src = fallback;
-                          }}
-                        />
-                        {/* Elegant dark fade overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
-                        
-                        {/* Collection Category Title (Bottom Left) */}
-                        <div className="absolute bottom-6 left-6 right-16 z-10 text-left">
-                          <h3 className="font-sans font-bold text-lg sm:text-2xl text-white tracking-tight leading-tight uppercase drop-shadow-xs">
-                            {cardTitle}
-                          </h3>
+                        {/* Image element container */}
+                        <div className="w-full aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-sand-100 border border-sand-200/50 shadow-sm relative transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
+                          <img 
+                            src={cardImg} 
+                            alt={cardTitle} 
+                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              const nameLower = col.name.toLowerCase();
+                              let fallback = "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800";
+                              if (nameLower.includes("authentic") || nameLower.includes("traditional") || nameLower.includes("attar")) {
+                                fallback = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800";
+                              } else if (nameLower.includes("next gen") || nameLower.includes("modern")) {
+                                fallback = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800";
+                              } else if (nameLower.includes("best") || nameLower.includes("artisanal") || nameLower.includes("signature")) {
+                                fallback = "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800";
+                              } else if (nameLower.includes("parfum") || nameLower.includes("edp")) {
+                                fallback = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
+                              }
+                              e.currentTarget.src = fallback;
+                            }}
+                          />
                         </div>
-
-                        {/* Translucent premium arrow container */}
-                        <div className="absolute bottom-6 right-6 w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/30 bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300 group-hover:scale-115 group-hover:border-white/95 z-10">
-                          <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                          </svg>
+                        
+                        {/* Collection Category Title & Description Below Image */}
+                        <div className="flex flex-col items-center text-center mt-4">
+                          <h4 className="text-[12px] sm:text-[13px] font-mono font-bold text-sand-900 tracking-[0.2em] uppercase transition-colors group-hover:text-[#D4BC96]">
+                            {cardTitle}
+                          </h4>
+                          <span className="text-[10px] text-sand-400 font-light mt-1 max-w-[90%] leading-relaxed">
+                            {col.tag}
+                          </span>
                         </div>
                       </div>
                     );
