@@ -349,7 +349,7 @@ export default function Header({
             <li className="relative py-3">
               <button
                 type="button"
-                onClick={() => onNavigate("journal")}
+                onClick={() => onNavigate("our-story")}
                 className="hover:text-stone-500 transition-colors cursor-pointer"
               >
                 Our Story
@@ -605,11 +605,11 @@ export default function Header({
                 <button
                   type="button"
                   onClick={() => {
-                    onNavigate("journal");
+                    onNavigate("our-story");
                     setMobileMenuOpen(false);
                   }}
                   className={`text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif ${
-                    activeSection === "journal" ? "text-gold-600 font-semibold" : "text-stone-600"
+                    activeSection === "our-story" ? "text-gold-600 font-semibold" : "text-stone-600"
                   }`}
                 >
                   Our Story

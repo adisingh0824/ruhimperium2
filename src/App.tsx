@@ -30,6 +30,7 @@ import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, Us
 import Header from "./components/Header";
 import ProductDetailsModal from "./components/ProductDetailsModal";
 import ProductPage from "./pages/ProductPage";
+import OurStoryPage from "./pages/OurStoryPage";
 import CartDrawer from "./components/CartDrawer";
 import AdminHub from "./components/AdminHub";
 import OrderTracker from "./components/OrderTracker";
@@ -1262,6 +1263,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const handleSectionNavigate = (sectionId: string) => {
     setActiveSection(sectionId);
     
+    if (sectionId === "our-story") {
+      navigate('/our-story');
+      return;
+    }
+
     // If not on homepage, navigate to homepage and pass state
     if (location.pathname !== '/') {
       navigate('/', { state: { scrollTo: sectionId } });
@@ -2498,6 +2504,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               reviews={reviews}
             />
           } />
+          <Route path="/our-story" element={<OurStoryPage />} />
         </Routes>
       </main>
 
@@ -2531,10 +2538,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Wellness</button></li>
                   <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Gifting</button></li>
                   <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">For Bulk Enquiry</button></li>
-                  <li><button type="button" onClick={() => {
-                    const el = document.getElementById("story-cards-section");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
+                  <li><button type="button" onClick={() => handleSectionNavigate("our-story")} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
                   <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
                   <li><button type="button" onClick={() => setIsOrderTrackerOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Track your order</button></li>
                 </ul>
