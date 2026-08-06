@@ -1511,7 +1511,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   key={heroVideoUrl}
                   src={getEmbedVideoUrl(heroVideoUrl, true)}
                   title="Hero Ambient Video"
-                  className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-35 scale-110 pointer-events-none select-none"
+                  className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-80 scale-110 pointer-events-none select-none"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
@@ -1524,7 +1524,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   muted
                   loop
                   playsInline
-                  className="w-full h-full object-cover opacity-35 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
+                  className="w-full h-full object-cover opacity-80 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
                   poster={coverPhoto}
                 />
               )
@@ -1532,16 +1532,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               <img 
                 src={coverPhoto} 
                 alt="Luxury Sand Scent Banner background"
-                className="w-full h-full object-cover opacity-60 scale-100 transition-all duration-300 select-none pointer-events-none"
+                className="w-full h-full object-cover opacity-85 scale-100 transition-all duration-300 select-none pointer-events-none"
                 referrerPolicy="no-referrer"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/80"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/85"></div>
           </div>
 
-          <div className="relative z-10 mx-auto max-w-5xl px-4 text-center flex flex-col items-center">
+          <div className="relative z-10 mx-auto max-w-5xl px-4 text-center flex flex-col items-center animate-float">
             
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif text-white tracking-widest leading-tight mb-8 max-w-4xl uppercase">
+            <h1 
+              className="text-4xl sm:text-6xl md:text-7xl font-serif text-white tracking-widest leading-tight mb-8 max-w-4xl uppercase select-none"
+              style={{ textShadow: "0 4px 24px rgba(0, 0, 0, 0.75)" }}
+            >
               {siteSettings.heroHeadline || "FRAGRANCE"}
             </h1>
             
@@ -1549,7 +1552,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               <button
                 type="button"
                 onClick={() => handleSectionNavigate("shop")}
-                className="px-12 py-3.5 bg-white hover:bg-stone-200 text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer"
+                className="px-12 py-3.5 bg-white hover:bg-stone-200 text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-103"
               >
                 SHOP NOW
               </button>
