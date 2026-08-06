@@ -45,12 +45,22 @@ async function startServer() {
       if (clientData.count > maxRequests) {
         return res.status(429).json({ error: "Too many requests from this IP. Access throttled to prevent DoS." });
       }
+    next();
+  };
+
+  const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const adminPassword = process.env.VITE_ADMIN_PASSWORD || "";
+    if (adminPassword) {
+      const authHeader = req.headers["x-admin-token"];
+      if (authHeader !== adminPassword) {
+        return res.status(401).json({ error: "Unauthorized: Invalid administration credentials" });
+      }
     }
     next();
   };
 
   // API endpoint to handle uploaded admin video loop safely
-  app.post("/api/upload-video", rateLimiter, async (req, res) => {
+  app.post("/api/upload-video", rateLimiter, adminAuth, async (req, res) => {
     try {
       const { videoData, filename } = req.body;
       if (!videoData || typeof videoData !== "string") {
@@ -102,7 +112,7 @@ async function startServer() {
   });
 
   // API endpoint to handle uploaded admin custom collection cover photos and products images safely
-  app.post("/api/upload-image", rateLimiter, async (req, res) => {
+  app.post("/api/upload-image", rateLimiter, adminAuth, async (req, res) => {
     try {
       const { imageData, filename } = req.body;
       if (!imageData || typeof imageData !== "string") {
