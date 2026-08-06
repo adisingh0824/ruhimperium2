@@ -24,7 +24,7 @@ import {
   Flower2,
   Trees
 } from 'lucide-react';
-import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data';
+import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
 import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
 import Header from "./components/Header";
 import ProductDetailsModal from "./components/ProductDetailsModal";
@@ -35,7 +35,7 @@ import OrderTracker from "./components/OrderTracker";
 import UserLoungeModal from "./components/UserLoungeModal";
 import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
-import { db, withTimeout } from './firebase';
+import { db, withTimeout } from './config/firebase';
 import { doc, setDoc, onSnapshot, collection, deleteDoc, writeBatch } from 'firebase/firestore';
 
 const isEmbedIframe = (url: string): boolean => {

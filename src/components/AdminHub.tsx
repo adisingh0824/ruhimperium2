@@ -23,7 +23,7 @@ import {
   Star
 } from "lucide-react";
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
-import { storage, db, withTimeout } from "../firebase";
+import { storage, db, withTimeout } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import InvoiceBill from "./InvoiceBill";

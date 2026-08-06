@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, initializeFirestore, doc, getDocFromServer } from "firebase/firestore";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import defaultConfig from "../firebase-applet-config.json";
+import defaultConfig from "../../firebase-applet-config.json";
 
 // Allow runtime override via Vite environment variables
 const config = {

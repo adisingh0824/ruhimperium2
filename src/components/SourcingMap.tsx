@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MapPin, Sparkles, BookOpen, Compass, Info, ArrowUpRight } from "lucide-react";
-import { MAP_SPOTS } from "../data";
+import { MAP_SPOTS } from "../data/mockData";
 import { MapSpot, Product } from "../types";
 
 interface SourcingMapProps {
