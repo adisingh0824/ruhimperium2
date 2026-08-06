@@ -2513,111 +2513,118 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         </Routes>
       </main>
 
-      {/* LUXURY BRANDS FOOTER */}
-      <footer className="bg-black text-[#FAFAFA] py-16 sm:py-20">
+      {/* LUXURY BRANDS FOOTER (RAAHI STYLE) */}
+      <footer className="bg-[#0A0A0A] text-[#FAFAFA] pt-20 pb-12 rounded-t-[3.5rem] sm:rounded-t-[4.5rem] mt-16 border-t border-white/5">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+          {/* Main Footer Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-16">
             
-            {/* Newsletter capture (LHS - 4 cols) */}
-            <div className="md:col-span-4 space-y-6">
-              <h4 className="text-sm font-serif tracking-widest text-white uppercase">
-                JOIN THE WAYFARER CLUB
-              </h4>
-              <p className="text-[11px] text-stone-400 font-sans leading-relaxed max-w-sm">
-                Subscribe to coordinate alerts. Get early access to new seasonal scent logs and private pre-launch reservations.
-              </p>
+            {/* Left Column: Khus Attar Image Card */}
+            <div className="lg:col-span-3 h-[360px] rounded-3xl overflow-hidden relative border border-white/10 group shadow-lg">
+              <img 
+                src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600" 
+                alt="Khus Botanical Attar Sourcing" 
+                className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105 select-none pointer-events-none"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-black/15 group-hover:bg-black/30 transition-colors duration-500" />
+            </div>
 
-              {newsSuccess && (
-                <div className="text-emerald-400 text-xs flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Welcome to the registry log! 10% code dispatched.</span>
-                </div>
-              )}
+            {/* Middle Column: Menu & Connect Lists */}
+            <div className="lg:col-span-6 grid grid-cols-2 gap-8 lg:pl-8">
+              {/* Menu List */}
+              <div className="space-y-5">
+                <h4 className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C47265] font-bold">Menu</h4>
+                <ul className="space-y-3.5 text-xs text-stone-400 font-light font-sans">
+                  <li><button type="button" onClick={() => handleSectionNavigate("hero")} className="hover:text-white cursor-pointer transition-colors block">Home</button></li>
+                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop</button></li>
+                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop All</button></li>
+                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Wellness</button></li>
+                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Gifting</button></li>
+                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">For Bulk Enquiry</button></li>
+                  <li><button type="button" onClick={() => {
+                    const el = document.getElementById("story-cards-section");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
+                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
+                  <li><button type="button" onClick={onTrackOrderClick} className="hover:text-white cursor-pointer transition-colors block">Track your order</button></li>
+                </ul>
+              </div>
 
-              <form onSubmit={handleSubscribe} className="flex gap-0 border-b border-stone-700 pb-1 max-w-sm">
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter email address"
-                  value={newsEmail}
-                  onChange={(e) => setNewsEmail(e.target.value)}
-                  className="bg-transparent border-0 px-0 py-2 text-xs text-white w-full focus:ring-0 outline-none placeholder-stone-500"
-                />
-                <button
-                  type="submit"
-                  className="px-2 py-2 text-stone-300 hover:text-white text-[10px] uppercase tracking-widest font-semibold transition-all cursor-pointer"
-                >
-                  JOIN
-                </button>
-              </form>
-
-              <div className="flex space-x-6 pt-4 text-stone-400">
-                <button type="button" className="hover:text-white cursor-pointer transition-colors"><Instagram className="w-4 h-4" /></button>
-                <button type="button" className="hover:text-white cursor-pointer transition-colors"><Twitter className="w-4 h-4" /></button>
+              {/* Connect List */}
+              <div className="space-y-5">
+                <h4 className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C47265] font-bold">Connect</h4>
+                <ul className="space-y-3.5 text-xs text-stone-400 font-light font-sans">
+                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact</button></li>
+                  <li><button type="button" onClick={() => setIsPrivacyOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Terms of Service</button></li>
+                  <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Refund policy</button></li>
+                  <li><button type="button" onClick={() => setIsPrivacyOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Privacy Policy</button></li>
+                  <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Shipping Policy</button></li>
+                </ul>
               </div>
             </div>
 
-            {/* Quick sections links (Right aligned - 2 cols each) */}
-            <div className="md:col-span-2 space-y-6">
-              <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">SHOP</h4>
-              <ul className="space-y-4 text-xs font-light text-stone-300">
-                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop All</button></li>
-                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Best Sellers</button></li>
-                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Discovery Set</button></li>
-                <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Gifting</button></li>
-              </ul>
-            </div>
-
-            <div className="md:col-span-2 space-y-6">
-              <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">ABOUT</h4>
-              <ul className="space-y-4 text-xs font-light text-stone-300">
-                <li><button type="button" onClick={() => {
-                  const el = document.getElementById("story-cards-section");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
-                }} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
-                <li><button type="button" onClick={() => handleSectionNavigate("journal")} className="hover:text-white cursor-pointer transition-colors block">Journal</button></li>
-                <li><button type="button" className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
-                <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">FAQ</button></li>
-              </ul>
-            </div>
-
-            {/* Brand contact details (RHS - 4 cols) */}
-            <div className="md:col-span-4 space-y-6">
-              <h4 className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">CONTACT & ATELIER</h4>
-              <div className="space-y-4 text-xs font-light text-stone-300">
-                <div>
-                  <span className="text-[9px] uppercase tracking-widest text-stone-500 block mb-1 font-mono">Atelier Address</span>
-                  <p className="leading-relaxed font-sans">{siteSettings.contactAddress}</p>
-                </div>
-                <div>
-                  <span className="text-[9px] uppercase tracking-widest text-stone-500 block mb-1 font-mono">Olfactory Assistance (WhatsApp)</span>
-                  <p className="font-sans">
-                    <a 
-                      href={`https://wa.me/${siteSettings.contactPhone.replace(/\D/g, '')}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="hover:text-white transition-colors underline decoration-stone-500 hover:decoration-white underline-offset-4 font-mono font-medium"
-                    >
-                      {siteSettings.contactPhone}
-                    </a>
-                  </p>
-                </div>
-                <div>
-                  <span className="text-[9px] uppercase tracking-widest text-stone-500 block mb-1 font-mono">General Enquiries</span>
-                  <p className="font-sans"><a href={`mailto:${siteSettings.contactEmail}`} className="hover:text-white transition-colors">{siteSettings.contactEmail}</a></p>
-                </div>
+            {/* Right Column: Large Brand Header */}
+            <div className="lg:col-span-3 flex justify-start lg:justify-end items-center">
+              <div className="text-left lg:text-right space-y-1">
+                <h3 className="text-xl sm:text-2xl font-serif text-white tracking-[0.25em] uppercase font-bold" style={{ fontFamily: "Cinzel, Georgia, serif" }}>
+                  RUH IMPERIUM
+                </h3>
+                <span className="text-[8.5px] text-stone-500 font-mono tracking-[0.45em] uppercase block">
+                  BOTANICAL PERFUMERY
+                </span>
               </div>
             </div>
 
           </div>
 
-          <div className="border-t border-sand-900/40 pt-8 mt-8 flex flex-col sm:flex-row justify-between items-center text-[10.5px] text-sand-500 font-light">
-            <p>© 2026 Ruh Imperium Private Limited. Inspired in India, crafted for the globetrotter.</p>
-            <div className="flex space-x-6 mt-4 sm:mt-0 font-mono text-[9px] uppercase tracking-widest">
-              <button type="button" onClick={() => setIsPrivacyOpen(true)} className="hover:text-white cursor-pointer transition-colors bg-transparent border-0 outline-none p-0">Privacy Charter</button>
-              <button type="button" onClick={() => setIsSafetyOpen(true)} className="hover:text-white cursor-pointer transition-colors bg-transparent border-0 outline-none p-0">Formulations safety checklist</button>
-              <button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors bg-transparent border-0 outline-none p-0">Shipping rules</button>
+          {/* Horizontal Newsletter Card Wrapper */}
+          <div className="bg-stone-900/40 rounded-[1.5rem] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/5 mb-10">
+            <div className="space-y-1.5 text-left">
+              <h4 className="text-sm font-serif font-semibold tracking-wider text-white uppercase">Journey with us.</h4>
+              <p className="text-[11px] text-stone-400 font-light max-w-md">
+                Be the first to know about new launches, stories from Kannauj, and exclusive offers.
+              </p>
+            </div>
+            <div className="w-full md:max-w-md flex flex-col items-stretch">
+              <form onSubmit={handleSubscribe} className="relative w-full">
+                <input 
+                  type="email" 
+                  required 
+                  placeholder="Enter your email" 
+                  value={newsEmail}
+                  onChange={(e) => setNewsEmail(e.target.value)}
+                  className="w-full bg-white border border-white/10 rounded-full px-5 py-3 text-xs text-stone-900 focus:outline-none pr-14"
+                />
+                <button 
+                  type="submit" 
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#C47265] text-white flex items-center justify-center hover:bg-gold-600 transition-colors cursor-pointer"
+                  title="Subscribe to updates"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+              {newsSuccess && (
+                <span className="text-emerald-400 text-[10px] mt-2 block text-left">
+                  ✓ Welcome to the registry log! 10% code dispatched.
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Brand Narrative */}
+          <p className="text-[11px] text-stone-500 font-light leading-relaxed text-left border-t border-white/5 pt-8 mb-8">
+            Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin.
+          </p>
+
+          {/* Footer Copyright & Social Row */}
+          <div className="flex flex-col sm:flex-row justify-between items-center text-[10px] text-stone-600 font-light gap-4">
+            <p>© 2026 Ruh Imperium. All rights reserved.</p>
+            <div className="flex space-x-6 text-stone-500">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Instagram"><Instagram className="w-4.5 h-4.5" /></a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Facebook"><Linkedin className="w-4.5 h-4.5" /></a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="YouTube"><Twitter className="w-4.5 h-4.5" /></a>
             </div>
           </div>
 
