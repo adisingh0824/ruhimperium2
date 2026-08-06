@@ -2093,82 +2093,93 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
 
-        {/* STORY CARDS GRID SECTION (THREE ROWS EXACTLY LIKE MOBILE/DESKTOP RAHI PARFUMS DESIGN) */}
-        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="story-cards-section">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
+        {/* STORY CARDS GRID SECTION (STICKY SPLIT TIMELINE RAHI PARFUMS STYLE) */}
+        <section className="bg-sand-50 py-16 sm:py-24 border-b border-sand-200" id="story-cards-section">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             
-            {/* Row Header */}
-            <div className="text-center max-w-xl mx-auto mb-12 sm:mb-16">
-              <h2 className="text-2xl sm:text-4xl font-light font-display text-sand-900 tracking-wide leading-tight">
-                Handcrafted Fragrances made with functioning plant-based ingredients, straight from India's perfume capital Kannauj
-              </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96] mx-auto mt-6"></div>
-            </div>
+            {/* Split layout wrapper */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start relative">
+              
+              {/* Left Column: Sticky Story Tag */}
+              <div className="lg:col-span-3 lg:sticky lg:top-28 z-10 py-2">
+                <button
+                  type="button"
+                  onClick={() => handleSectionNavigate("journal")}
+                  className="px-5 py-2.5 rounded-full border border-[#C47265] text-[#C47265] bg-transparent hover:bg-[#C47265] hover:text-white transition-all duration-300 text-[10px] uppercase tracking-widest font-mono font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xs hover:shadow-md"
+                >
+                  <span>Our Story</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-            {/* Row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-14 items-center">
-              <div className="order-2 md:order-1 space-y-4">
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-sand-950">
-                  {siteSettings.aboutUsHeading || siteSettings.story01Title || "01 The Art Of Perfume Making"}
-                </h3>
-                <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
-                  {siteSettings.aboutUsText || siteSettings.story01Text || "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions."}
-                </p>
-              </div>
-              <div className="order-1 md:order-2">
-                <div className="aspect-video sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border border-sand-200">
-                  <img
-                    src={siteSettings.aboutUsImage || siteSettings.story01Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600"}
-                    alt="The Art Of Perfume Making"
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+              {/* Right Column: Scrolling Cards Timeline */}
+              <div className="lg:col-span-9 space-y-10 sm:space-y-14">
+                
+                {/* Step 01 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 rounded-[2rem] overflow-hidden border border-sand-200/60 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
+                    <span className="text-3xl sm:text-4xl font-sans font-extrabold text-[#D4BC96] tracking-tight font-mono">01</span>
+                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-sand-900 leading-snug">
+                      {siteSettings.aboutUsHeading || siteSettings.story01Title || "The Art Of Perfume Making"}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
+                      {siteSettings.aboutUsText || siteSettings.story01Text || "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions."}
+                    </p>
+                  </div>
+                  <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
+                    <img 
+                      src={siteSettings.aboutUsImage || siteSettings.story01Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800"} 
+                      alt="The Art Of Perfume Making" 
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Row 2 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-14 items-center">
-              <div>
-                <div className="aspect-video sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border border-sand-200">
-                  <img
-                    src={siteSettings.story02Image || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=600"}
-                    alt="Experience True Botanical Luxury"
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+                {/* Step 02 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 rounded-[2rem] overflow-hidden border border-sand-200/60 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
+                    <span className="text-3xl sm:text-4xl font-sans font-extrabold text-[#D4BC96] tracking-tight font-mono">02</span>
+                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-sand-900 leading-snug">
+                      {siteSettings.story02Title || "Experience True Botanical Luxury and Alcohol-Free Perfume Oils"}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
+                      {siteSettings.story02Text || "Rooted in tradition, Ruh Imperium transforms heritage into experience. We bring you precious alcohol-free pure oils hydro-distilled in Kannauj copper stills."}
+                    </p>
+                  </div>
+                  <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
+                    <img 
+                      src={siteSettings.story02Image || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800"} 
+                      alt="Experience True Botanical Luxury" 
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-sand-950">
-                  {siteSettings.story02Title || "02 Experience True Botanical Luxury and Alcohol-Free Perfume Oils"}
-                </h3>
-                <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed">
-                  {siteSettings.story02Text || "Rooted in tradition, Ruh Imperium transforms heritage into experience. We bring you precious alcohol-free pure oils hydro-distilled in Kannauj copper stills."}
-                </p>
-              </div>
-            </div>
 
-            {/* Row 3 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-14 items-center">
-              <div className="order-2 md:order-1 space-y-4">
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-sand-950">
-                  {siteSettings.story03Title || "03 Our Story"}
-                </h3>
-                <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed">
-                  {siteSettings.story03Text || "At Ruh Imperium, we don't just create scents; we preserve a multi-generational legacy. We work block-by-block with farmers in the flower belts to ensure pristine purity."}
-                </p>
-              </div>
-              <div className="order-1 md:order-2">
-                <div className="aspect-video sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border border-sand-200">
-                  <img
-                    src={siteSettings.story03Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=600"}
-                    alt="Our Story"
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+                {/* Step 03 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 rounded-[2rem] overflow-hidden border border-sand-200/60 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
+                    <span className="text-3xl sm:text-4xl font-sans font-extrabold text-[#D4BC96] tracking-tight font-mono">03</span>
+                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-sand-900 leading-snug">
+                      {siteSettings.story03Title || "Our Sourcing Heritage"}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
+                      {siteSettings.story03Text || "At Ruh Imperium, we don't just create scents; we preserve a multi-generational legacy. We work block-by-block with farmers in the flower belts to ensure pristine purity."}
+                    </p>
+                  </div>
+                  <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
+                    <img 
+                      src={siteSettings.story03Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"} 
+                      alt="Our Sourcing Heritage" 
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </div>
+
               </div>
+
             </div>
 
           </div>
