@@ -92,6 +92,8 @@ export interface Coupon {
   code: string;
   discountPercent?: number;
   upiOnly?: boolean; // If true, COD is not allowed when this coupon is applied
+  scope?: "all" | "category";
+  categoryScope?: string;
 }
 
 export interface SiteSettings {

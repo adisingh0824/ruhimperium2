@@ -209,6 +209,8 @@ export default function AdminHub({
   // Coupon form inputs
   const [newCouponCode, setNewCouponCode] = useState("");
   const [newCouponPercent, setNewCouponPercent] = useState(15);
+  const [newCouponScope, setNewCouponScope] = useState<"all" | "category">("all");
+  const [newCouponCategory, setNewCouponCategory] = useState("");
   const [couponErrorMsg, setCouponErrorMsg] = useState("");
 
   // Product management state
@@ -564,13 +566,22 @@ export default function AdminHub({
       return;
     }
 
+    if (newCouponScope === "category" && !newCouponCategory) {
+      setCouponErrorMsg("Please select a specific category target.");
+      return;
+    }
+
     const newCp: Coupon = {
       code: cleanedCode,
-      discountPercent: Number(newCouponPercent)
+      discountPercent: Number(newCouponPercent),
+      scope: newCouponScope,
+      categoryScope: newCouponScope === "category" ? newCouponCategory : undefined
     };
 
     setCoupons(prev => [newCp, ...prev]);
     setNewCouponCode("");
+    setNewCouponScope("all");
+    setNewCouponCategory("");
   };
 
   // Helper to remove discount coupon
@@ -3201,6 +3212,36 @@ export default function AdminHub({
                           />
                         </div>
 
+                        <div>
+                          <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Coupon Scope</label>
+                          <select
+                            value={newCouponScope}
+                            onChange={(e) => setNewCouponScope(e.target.value as "all" | "category")}
+                            className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                          >
+                            <option value="all">Valid for All Products</option>
+                            <option value="category">Valid for Specific Category</option>
+                          </select>
+                        </div>
+
+                        {newCouponScope === "category" && (
+                          <div>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Target Category</label>
+                            <select
+                              value={newCouponCategory}
+                              onChange={(e) => setNewCouponCategory(e.target.value)}
+                              className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                            >
+                              <option value="">-- Select Category --</option>
+                              {collections.map((col) => (
+                                <option key={col.id} value={col.name}>
+                                  {col.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
                         <button
                           type="submit"
                           className="w-full py-2.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-colors cursor-pointer shadow-md flex items-center justify-center gap-1.5"
@@ -3228,7 +3269,7 @@ export default function AdminHub({
                                   {cp.code}
                                 </span>
                                 <span className="text-[10px] font-medium text-emerald-600 block bg-emerald-50 w-fit px-2 py-0.5 rounded-full mt-1.5 font-mono">
-                                  {cp.discountPercent}% OFF Cart
+                                  {cp.discountPercent}% OFF {cp.scope === "category" ? `on ${cp.categoryScope}` : "Cart"}
                                 </span>
                               </div>
 
