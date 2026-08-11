@@ -2139,7 +2139,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                   <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
                     <img 
-                      src={siteSettings.aboutUsImage || siteSettings.story01Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800"} 
+                      src={siteSettings.aboutUsImage || siteSettings.story01Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"} 
                       alt="The Art Of Perfume Making" 
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
                       referrerPolicy="no-referrer"
@@ -2160,7 +2160,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                   <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
                     <img 
-                      src={siteSettings.story02Image || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800"} 
+                      src={siteSettings.story02Image || "https://images.unsplash.com/photo-1562690868-60bbe7293e94?auto=format&fit=crop&q=80&w=800"} 
                       alt="Experience True Botanical Luxury" 
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
                       referrerPolicy="no-referrer"
@@ -2181,7 +2181,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                   <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
                     <img 
-                      src={siteSettings.story03Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"} 
+                      src={siteSettings.story03Image || "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=80&w=800"} 
                       alt="Our Sourcing Heritage" 
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
                       referrerPolicy="no-referrer"
