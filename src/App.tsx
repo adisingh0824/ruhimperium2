@@ -2240,74 +2240,261 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         </section>
 
 
-        {/* THE BRAND STORY & USP GRID (BENTO CARD OVERVIEW) */}
-        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* THE BRAND STORY & USP LIST (RAAHI STYLE) */}
+        <section className="bg-white py-20 sm:py-28 border-b border-sand-200">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-16">
             
-            {/* Header */}
-            <div className="text-center max-w-xl mx-auto mb-16">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold block mb-2">
-                Crafted for Wayfarers
-              </span>
-              <h2 className="text-3xl font-light font-display text-sand-900 tracking-wide">
-                {siteSettings.whyChooseHeading}
+            {/* Header with double underline under Kannauj */}
+            <div className="text-center max-w-4xl mx-auto">
+              <h2 className="text-3xl sm:text-5xl font-serif text-sand-900 tracking-wide leading-tight font-light">
+                Handcrafted Fragrances made with functioning plant-based ingredients, straight from India’s perfume capital <span className="relative inline-block font-semibold">Kannauj<span className="absolute bottom-1 left-0 w-full h-[3px] border-b-2 border-double border-emerald-700"></span></span>
               </h2>
-              <div className="h-[1px] w-10 bg-[#D4BC96] mx-auto mt-4 mb-4"></div>
-              <p className="text-xs text-sand-500 font-light leading-relaxed">
-                {siteSettings.whyChooseSub}
-              </p>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* 3 Columns USP List with flask/beaker icons */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-6">
               
               {/* USP 1 */}
-              <div className="bg-white rounded-2xl border border-sand-200 p-8 shadow-sm flex flex-col justify-between items-start hover:scale-101 border-b-2 hover:border-b-[#D4BC96] transition-all duration-300">
-                <div className="w-12 h-12 bg-[#2D2926] rounded-xl flex items-center justify-center text-white mb-6">
-                  <Compass className="w-5 h-5 text-[#D4BC96]" />
+              <div className="space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
+                <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-850">
+                  <Compass className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-serif font-semibold text-sand-900 tracking-wide mb-2.5">
-                    1. Travel-Inspired Postcards
-                  </h3>
-                  <p className="text-xs text-sand-500 font-light leading-relaxed">
-                    Each fragrance captures the raw material and sensory aesthetic of a physical geographical journey coordinates. No abstract concepts, just real travels.
-                  </p>
-                </div>
+                <h3 className="text-base font-serif font-bold text-sand-900 tracking-wide">
+                  Effortless Elegance
+                </h3>
+                <p className="text-xs text-sand-500 font-light leading-relaxed max-w-xs">
+                  Apply in seconds and carry your signature scent wherever you go — no complexity, just pure indulgence.
+                </p>
               </div>
 
               {/* USP 2 */}
-              <div className="bg-white rounded-2xl border border-sand-200 p-8 shadow-sm flex flex-col justify-between items-start hover:scale-101 border-b-2 hover:border-b-[#D4BC96] transition-all duration-300">
-                <div className="w-12 h-12 bg-[#2D2926] rounded-xl flex items-center justify-center text-white mb-6">
-                  <Droplet className="w-5 h-5 text-[#D4BC96]" />
+              <div className="space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
+                <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-850">
+                  <Droplet className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-serif font-semibold text-sand-900 tracking-wide mb-2.5">
-                    2. 22% Extrait Concentration
-                  </h3>
-                  <p className="text-xs text-sand-500 font-light leading-relaxed">
-                    Most traditional brands market 8-12% Eau de Toilette. We formulate at a heavy Extrait-level concentration, guaranteeing 8 to 12 hours of projection sillage on skin.
-                  </p>
-                </div>
+                <h3 className="text-base font-serif font-bold text-sand-900 tracking-wide">
+                  Long-Lasting Impression
+                </h3>
+                <p className="text-xs text-sand-500 font-light leading-relaxed max-w-xs">
+                  Crafted with rich, natural oils that stay with you all day, evolving beautifully on your skin.
+                </p>
               </div>
 
               {/* USP 3 */}
-              <div className="bg-white rounded-2xl border border-sand-200 p-8 shadow-sm flex flex-col justify-between items-start hover:scale-101 border-b-2 hover:border-b-[#D4BC96] transition-all duration-300">
-                <div className="w-12 h-12 bg-[#2D2926] rounded-xl flex items-center justify-center text-white mb-6">
-                  <ShieldCheck className="w-5 h-5 text-[#D4BC96]" />
+              <div className="space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
+                <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-850">
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-serif font-semibold text-sand-900 tracking-wide mb-2.5">
-                    3. Sustainable Hydro-distillation
-                  </h3>
-                  <p className="text-xs text-sand-500 font-light leading-relaxed">
-                    From Mysore Sandalwood to Kannauj Rose water petals, we collaborate with family cooperatives practice traditional water still extraction.
-                  </p>
-                </div>
+                <h3 className="text-base font-serif font-bold text-sand-900 tracking-wide">
+                  Pure & Skin-Friendly
+                </h3>
+                <p className="text-xs text-sand-500 font-light leading-relaxed max-w-xs">
+                  Alcohol-free formulations made with traditional methods — gentle, authentic, and timeless.
+                </p>
               </div>
 
             </div>
 
+          </div>
+        </section>
+
+        {/* DARK STATS SECTION & BADGES ROW (RAAHI STYLE) */}
+        <section className="bg-[#0A0A0A] text-white py-20 sm:py-28 border-b border-white/5">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+            
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              {/* Stat 1: Image Card */}
+              <div className="aspect-[4/3] lg:aspect-auto rounded-3xl overflow-hidden relative border border-white/10 group shadow-lg min-h-[260px]">
+                <img 
+                  src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800" 
+                  alt="Traditional distillation stills" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-700 select-none pointer-events-none"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+
+              {/* Stat 2: 75+ Signature Blends */}
+              <div className="bg-[#121212] border border-white/5 p-10 rounded-3xl flex flex-col justify-center space-y-4 hover:border-white/10 transition-colors duration-300">
+                <div className="text-5xl sm:text-6xl font-sans font-extrabold tracking-tight text-white">75+</div>
+                <h4 className="text-xs uppercase tracking-widest text-[#C47265] font-bold font-mono">Signature Blends</h4>
+                <p className="text-xs text-stone-400 font-light leading-relaxed">
+                  A diverse collection of attars crafted for every mood and moment.
+                </p>
+              </div>
+
+              {/* Stat 3: 200+ Years of Expertise */}
+              <div className="bg-[#121212] border border-white/5 p-10 rounded-3xl flex flex-col justify-center space-y-4 hover:border-white/10 transition-colors duration-300">
+                <div className="text-5xl sm:text-6xl font-sans font-extrabold tracking-tight text-white">200+</div>
+                <h4 className="text-xs uppercase tracking-widest text-[#C47265] font-bold font-mono">Years of Expertise</h4>
+                <p className="text-xs text-stone-400 font-light leading-relaxed">
+                  Blending tradition and innovation in every bottle.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* 4 CERTIFICATION BADGES ROW */}
+        <section className="bg-white py-14 border-b border-sand-200/50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center justify-items-center">
+              
+              {/* Badge 1 */}
+              <div className="flex flex-col items-center space-y-2.5">
+                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 p-3 bg-stone-50/50">
+                  <span className="text-[7px] font-sans font-extrabold tracking-tighter uppercase text-center leading-none text-stone-600">MADE IN<br/><span className="text-[10px] text-stone-850">INDIA</span></span>
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Made In India</span>
+              </div>
+
+              {/* Badge 2 */}
+              <div className="flex flex-col items-center space-y-2.5">
+                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/50">
+                  <svg className="w-6 h-6 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm-3 0c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm6.5-6.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Cruelty Free</span>
+              </div>
+
+              {/* Badge 3 */}
+              <div className="flex flex-col items-center space-y-2.5">
+                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/50">
+                  <svg className="w-6 h-6 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 3v18M3 12h18M12 3a9 9 0 0 1 9 9M12 21a9 9 0 0 1-9-9" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Plant Based</span>
+              </div>
+
+              {/* Badge 4 */}
+              <div className="flex flex-col items-center space-y-2.5">
+                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/50">
+                  <Truck className="w-6 h-6 text-stone-600" />
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Free Shipping</span>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* SHOP BY USE SECTION (OCCASIONS GRID) */}
+        <section className="bg-sand-50 py-20 sm:py-28 border-b border-sand-200/50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+            
+            <div className="text-center max-w-xl mx-auto space-y-2">
+              <h2 className="text-3xl font-serif text-sand-900 tracking-wide">Shop By Use</h2>
+              <div className="h-[1px] w-12 bg-[#C47265] mx-auto"></div>
+            </div>
+
+            {/* Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-6xl mx-auto">
+              
+              {/* 1. Party Wear (Large Left Card) */}
+              <div className="md:col-span-6 aspect-[4/3] md:aspect-auto md:min-h-[460px] rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer" onClick={() => handleSectionNavigate("shop")}>
+                <img 
+                  src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" 
+                  alt="Party Wear Fragrances" 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
+                />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Party Wear</span>
+              </div>
+
+              {/* Middle Column (Daily Wear & Office Wear) */}
+              <div className="md:col-span-3 grid grid-rows-2 gap-6">
+                
+                {/* 2. Office Wear */}
+                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800" 
+                    alt="Office Wear Fragrances" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Office Wear</span>
+                </div>
+
+                {/* 3. Daily Wear */}
+                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=800" 
+                    alt="Daily Wear Fragrances" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Daily Wear</span>
+                </div>
+
+              </div>
+
+              {/* Right Column (Summer & Winter) */}
+              <div className="md:col-span-3 grid grid-rows-2 gap-6">
+                
+                {/* 4. Summer */}
+                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800" 
+                    alt="Summer Fragrances" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Summer</span>
+                </div>
+
+                {/* 5. Winter */}
+                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800" 
+                    alt="Winter Fragrances" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Winter</span>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* TIMELESS SCENT TAG CLOUD SECTION */}
+        <section className="bg-white py-20 sm:py-28 border-b border-sand-200/50">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              
+              {/* Left Column: Bold text with green arrow */}
+              <div className="lg:col-span-6 space-y-6">
+                <h2 className="text-4xl sm:text-5xl font-serif font-light text-sand-900 leading-tight tracking-wide relative">
+                  A single drop that <span className="text-emerald-800 font-semibold relative">reveals<span className="absolute -top-6 -right-6 hidden sm:block">
+                    <svg className="w-12 h-12 text-emerald-600 rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                  </span></span> a world of timeless fragrances.
+                </h2>
+              </div>
+
+              {/* Right Column: Scent Tag Grid */}
+              <div className="lg:col-span-6 flex flex-wrap gap-3 justify-center lg:justify-start">
+                {["ROSE", "SAFFRON", "FLORAL", "MUSK", "SANDALWOOD", "WOODY", "MOGRA", "OUD", "AMBER", "FRESH", "VETIVER (KHUS)", "SPICY"].map((tag, idx) => (
+                  <button 
+                    key={`${tag}-${idx}`}
+                    onClick={() => handleSectionNavigate("shop")}
+                    className="px-6 py-2.5 rounded-full border border-stone-250 text-stone-750 text-xs font-mono uppercase tracking-wider hover:bg-[#C47265] hover:text-white hover:border-[#C47265] transition-all duration-300 cursor-pointer shadow-xs"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+
+            </div>
           </div>
         </section>
 
