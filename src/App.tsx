@@ -2112,10 +2112,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start relative">
               
               {/* Left Column: Sticky Story Tag */}
-              <div className="lg:col-span-3 lg:sticky lg:top-28 z-10 py-2">
+              <div className="lg:col-span-3 lg:sticky lg:top-28 z-10 py-2 space-y-5">
+                <span className="text-[10px] uppercase tracking-[0.3em] text-[#C47265] font-bold block font-mono">
+                  OUR STORY
+                </span>
+                <h2 className="text-3xl font-serif text-sand-900 leading-tight">
+                  From Kannauj, With Love
+                </h2>
+                <p className="text-xs text-sand-500 font-light leading-relaxed">
+                  A legacy of over 200 years in the Indian perfume capital of Kannauj. We honor ancient traditions while crafting fragrances suitable for modern lifestyles.
+                </p>
                 <button
                   type="button"
-                  onClick={() => handleSectionNavigate("journal")}
+                  onClick={() => handleSectionNavigate("our-story")}
                   className="px-5 py-2.5 rounded-full border border-[#C47265] text-[#C47265] bg-transparent hover:bg-[#C47265] hover:text-white transition-all duration-300 text-[10px] uppercase tracking-widest font-mono font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xs hover:shadow-md"
                 >
                   <span>Our Story</span>
