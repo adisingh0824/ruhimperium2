@@ -49,11 +49,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           >
             REFRESH
           </button>
-          {import.meta.env.DEV && (
-            <pre style={{ marginTop: '2rem', color: 'red', fontSize: '0.75rem', textAlign: 'left', maxWidth: '600px', overflow: 'auto' }}>
-              {this.state.error?.toString()}
-            </pre>
-          )}
+          <pre style={{ marginTop: '2rem', color: 'red', fontSize: '0.75rem', textAlign: 'left', maxWidth: '600px', overflow: 'auto', whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: '1rem', borderRadius: '4px' }}>
+            {this.state.error?.toString()}
+            {"\n\nStack:\n"}
+            {this.state.error?.stack}
+          </pre>
         </div>
       );
     }
