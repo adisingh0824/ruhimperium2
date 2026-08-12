@@ -23,7 +23,8 @@ import {
   Twitter,
   Flower2,
   Trees,
-  Play
+  Play,
+  Truck
 } from 'lucide-react';
 import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
 import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
