@@ -301,7 +301,16 @@ Pure oils (Attars) contain zero synthetic carrier alcohols. They behave differen
 
 4. LOGISTICS & TRACKING
 We dispatch all premium monogrammed chests through tier-1 cargo partners (Bluedart, Delhivery). Delivery spans 3-5 business days depending on location. A secure tracking link is auto-transmitted via email/SMS immediately after transit handover.`,
-      checkoutPolicyEnabled: true
+      checkoutPolicyEnabled: true,
+      footerImage: "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600",
+      footerBrandName: "RUH IMPERIUM",
+      footerSubLabel: "BOTANICAL PERFUMERY",
+      footerNewsletterTitle: "Journey with us.",
+      footerNewsletterText: "Be the first to know about new launches, stories from Kannauj, and exclusive offers.",
+      footerBottomNarrative: "Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin.",
+      footerInstagramUrl: "https://instagram.com",
+      footerLinkedinUrl: "https://linkedin.com",
+      footerTwitterUrl: "https://twitter.com"
     };
   });
 
@@ -601,7 +610,16 @@ Pure oils (Attars) contain zero synthetic carrier alcohols. They behave differen
 
 4. LOGISTICS & TRACKING
 We dispatch all premium monogrammed chests through tier-1 cargo partners (Bluedart, Delhivery). Delivery spans 3-5 business days depending on location. A secure tracking link is auto-transmitted via email/SMS immediately after transit handover.`,
-            checkoutPolicyEnabled: true
+            checkoutPolicyEnabled: true,
+            footerImage: "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600",
+            footerBrandName: "RUH IMPERIUM",
+            footerSubLabel: "BOTANICAL PERFUMERY",
+            footerNewsletterTitle: "Journey with us.",
+            footerNewsletterText: "Be the first to know about new launches, stories from Kannauj, and exclusive offers.",
+            footerBottomNarrative: "Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin.",
+            footerInstagramUrl: "https://instagram.com",
+            footerLinkedinUrl: "https://linkedin.com",
+            footerTwitterUrl: "https://twitter.com"
           };
           await setDoc(doc(db, "settings", "site"), initialSettings);
         } catch (err) {
@@ -2715,7 +2733,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             {/* Left Column: Khus Attar Image Card */}
             <div className="lg:col-span-3 h-[360px] rounded-3xl overflow-hidden relative border border-white/10 group shadow-lg">
               <img 
-                src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600" 
+                src={siteSettings.footerImage || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600"} 
                 alt="Khus Botanical Attar Sourcing" 
                 className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105 select-none pointer-events-none"
                 referrerPolicy="no-referrer"
@@ -2758,10 +2776,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             <div className="lg:col-span-3 flex justify-start lg:justify-end items-center">
               <div className="text-left lg:text-right space-y-1">
                 <h3 className="text-xl sm:text-2xl font-serif text-white tracking-[0.25em] uppercase font-bold" style={{ fontFamily: "Cinzel, Georgia, serif" }}>
-                  RUH IMPERIUM
+                  {siteSettings.footerBrandName || "RUH IMPERIUM"}
                 </h3>
                 <span className="text-[8.5px] text-stone-500 font-mono tracking-[0.45em] uppercase block">
-                  BOTANICAL PERFUMERY
+                  {siteSettings.footerSubLabel || "BOTANICAL PERFUMERY"}
                 </span>
               </div>
             </div>
@@ -2771,9 +2789,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           {/* Horizontal Newsletter Card Wrapper */}
           <div className="bg-stone-900/40 rounded-[1.5rem] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/5 mb-10">
             <div className="space-y-1.5 text-left">
-              <h4 className="text-sm font-serif font-semibold tracking-wider text-white uppercase">Journey with us.</h4>
+              <h4 className="text-sm font-serif font-semibold tracking-wider text-white uppercase">{siteSettings.footerNewsletterTitle || "Journey with us."}</h4>
               <p className="text-[11px] text-stone-400 font-light max-w-md">
-                Be the first to know about new launches, stories from Kannauj, and exclusive offers.
+                {siteSettings.footerNewsletterText || "Be the first to know about new launches, stories from Kannauj, and exclusive offers."}
               </p>
             </div>
             <div className="w-full md:max-w-md flex flex-col items-stretch">
@@ -2804,16 +2822,16 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
           {/* Bottom Brand Narrative */}
           <p className="text-[11px] text-stone-500 font-light leading-relaxed text-left border-t border-white/5 pt-8 mb-8">
-            Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin.
+            {siteSettings.footerBottomNarrative || "Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin."}
           </p>
 
           {/* Footer Copyright & Social Row */}
           <div className="flex flex-col sm:flex-row justify-between items-center text-[10px] text-stone-600 font-light gap-4">
-            <p>© 2026 Ruh Imperium. All rights reserved.</p>
+            <p>© 2026 {siteSettings.footerBrandName || "Ruh Imperium"}. All rights reserved.</p>
             <div className="flex space-x-6 text-stone-500">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Instagram"><Instagram className="w-4.5 h-4.5" /></a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Facebook"><Linkedin className="w-4.5 h-4.5" /></a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="YouTube"><Twitter className="w-4.5 h-4.5" /></a>
+              <a href={siteSettings.footerInstagramUrl || "https://instagram.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Instagram"><Instagram className="w-4.5 h-4.5" /></a>
+              <a href={siteSettings.footerLinkedinUrl || "https://linkedin.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="LinkedIn"><Linkedin className="w-4.5 h-4.5" /></a>
+              <a href={siteSettings.footerTwitterUrl || "https://twitter.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Twitter"><Twitter className="w-4.5 h-4.5" /></a>
             </div>
           </div>
 

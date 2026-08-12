@@ -2045,6 +2045,142 @@ export default function AdminHub({
                     </div>
                   </div>
 
+                  {/* FOOTER CUSTOMIZATION */}
+                  <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-[#D4BC96]">
+                      <span className="text-sm">🗂️</span>
+                      <span className="text-xs font-bold font-mono uppercase tracking-widest">Footer & Socials Settings</span>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-4">
+                      
+                      {/* Left Column: Footer Image Upload */}
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block">Left Column: Khus Sourcing Image</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Footer Image URL"
+                            value={siteSettings.footerImage || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerImage: e.target.value })}
+                            className="flex-1 bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="footer-image-upload"
+                            onChange={(e) => {
+                              handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, footerImage: base64 })));
+                            }}
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById('footer-image-upload')?.click()}
+                            className="px-3 py-2 bg-sand-200 hover:bg-sand-300 text-sand-800 text-[10px] uppercase font-mono rounded cursor-pointer transition-colors"
+                          >
+                            Upload
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Brand name & Sublabel */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Brand Name</label>
+                          <input
+                            type="text"
+                            placeholder="RUH IMPERIUM"
+                            value={siteSettings.footerBrandName || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerBrandName: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Sub-Label</label>
+                          <input
+                            type="text"
+                            placeholder="BOTANICAL PERFUMERY"
+                            value={siteSettings.footerSubLabel || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerSubLabel: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Newsletter inputs */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Newsletter Title</label>
+                          <input
+                            type="text"
+                            placeholder="Journey with us."
+                            value={siteSettings.footerNewsletterTitle || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerNewsletterTitle: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Newsletter Subtext</label>
+                          <input
+                            type="text"
+                            placeholder="Be the first to know..."
+                            value={siteSettings.footerNewsletterText || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerNewsletterText: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Bottom narrative */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block">Bottom Brand Narrative / Description</label>
+                        <textarea
+                          placeholder="Narrative text..."
+                          value={siteSettings.footerBottomNarrative || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, footerBottomNarrative: e.target.value })}
+                          rows={3}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Socials Row */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Instagram URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://instagram.com/..."
+                            value={siteSettings.footerInstagramUrl || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerInstagramUrl: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">LinkedIn URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://linkedin.com/in/..."
+                            value={siteSettings.footerLinkedinUrl || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerLinkedinUrl: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Twitter/X URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://twitter.com/..."
+                            value={siteSettings.footerTwitterUrl || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerTwitterUrl: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
                   {/* FOUNDERS MANAGEMENT */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 text-[#D4BC96] border-b border-sand-200 pb-2">

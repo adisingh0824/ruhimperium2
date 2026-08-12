@@ -190,6 +190,17 @@ export interface SiteSettings {
   // Shipping Configuration
   freeShippingThreshold?: number;
   flatShippingRate?: number;
+
+  // Footer customization fields
+  footerImage?: string;
+  footerBrandName?: string;
+  footerSubLabel?: string;
+  footerNewsletterTitle?: string;
+  footerNewsletterText?: string;
+  footerBottomNarrative?: string;
+  footerInstagramUrl?: string;
+  footerLinkedinUrl?: string;
+  footerTwitterUrl?: string;
 }
 
 export interface UserAccount {
