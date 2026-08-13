@@ -166,9 +166,9 @@ export default function AdminHub({
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) {}
     }
-    const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "admin@ruhimperium.com";
-    const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "admin123";
-    return [{ username: defaultAdminEmail, password: defaultAdminPassword }];
+    const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "";
+    const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "";
+    return defaultAdminEmail && defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
   });
 
   const syncAdminsRef = useRef(false);
