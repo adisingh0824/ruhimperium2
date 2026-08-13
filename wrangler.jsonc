@@ -5,6 +5,9 @@
   "assets": {
     "directory": "./dist"
   },
+  "build": {
+    "command": "npm install && npm run build"
+  },
   "observability": {
     "enabled": false,
     "head_sampling_rate": 1,
