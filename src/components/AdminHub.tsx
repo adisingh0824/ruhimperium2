@@ -167,8 +167,8 @@ export default function AdminHub({
       } catch (e) {}
     }
     const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "admin@ruhimperium.com";
-    const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "";
-    return defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
+    const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "admin123";
+    return [{ username: defaultAdminEmail, password: defaultAdminPassword }];
   });
 
   const syncAdminsRef = useRef(false);
@@ -620,125 +620,58 @@ export default function AdminHub({
         {/* NOT LOGGED IN TRIGGER - LOGIN ENTRY FORM */}
         {!isAdminLoggedIn ? (
           <div className="flex-1 flex flex-col justify-center items-center py-16 px-6 bg-white">
-            {adminUsers.length === 0 ? (
-              <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-stone-300 p-8 shadow-md">
-                <div className="text-center mb-8">
-                  <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
-                    <ShieldCheck className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
-                    Initialize HQ Access
-                  </h3>
-                  <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
-                    Establish secure administrative master credentials. Since no local keys exist, generate your credentials below.
-                  </p>
+            <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-sand-200 p-8 shadow-md">
+              <div className="text-center mb-8">
+                <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
+                  <ShieldCheck className="w-7 h-7" />
+                </div>
+                <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
+                  Executive Headquarters
+                </h3>
+                <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
+                  Please authenticate with legal administrative credentials to authorize full database read and write actions.
+                </p>
+              </div>
+
+              {loginError && (
+                <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
+                  ⚠️ {loginError}
+                </div>
+              )}
+
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="E.g. administrator@ruhimperium.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
+                  />
                 </div>
 
-                {loginError && (
-                  <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
-                    ⚠️ {loginError}
-                  </div>
-                )}
-
-                <form onSubmit={handleSetupSubmit} className="space-y-4">
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Set Master Email</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. admin@ruhimperium.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Set Master Cipher Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Create security digits"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Confirm Cipher Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Repeat security digits"
-                      value={setupConfirmPassword}
-                      onChange={(e) => setSetupConfirmPassword(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full mt-6 py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
-                  >
-                    GENERATE KEYS AND ACTIVATE HQ
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-sand-200 p-8 shadow-md">
-                <div className="text-center mb-8">
-                  <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
-                    <ShieldCheck className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
-                    Executive Headquarters
-                  </h3>
-                  <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
-                    Please authenticate with legal administrative credentials to authorize full database read and write actions.
-                  </p>
+                <div>
+                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Cipher Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter security digits"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                  />
                 </div>
 
-                {loginError && (
-                  <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
-                    ⚠️ {loginError}
-                  </div>
-                )}
-
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="E.g. administrator@ruhimperium.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Cipher Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Enter security digits"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full mt-6 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
-                  >
-                    DE-ENCRYPT AND UNLOCK HQ
-                  </button>
-                </form>
-              </div>
-            )}
+                <button
+                  type="submit"
+                  className="w-full mt-6 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
+                >
+                  DE-ENCRYPT AND UNLOCK HQ
+                </button>
+              </form>
+            </div>
           </div>
         ) : (
           /* AUTHORIZED EXECUTIVE CONSOLE MODULES */
