@@ -5,6 +5,7 @@ service cloud.firestore {
     // For sandbox preview, allow read/write on everything to let admins modify objects.
     match /{document=**} {
       allow read, write: if true;
+
     }
   }
 }
