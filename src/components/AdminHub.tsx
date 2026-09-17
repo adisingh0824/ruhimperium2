@@ -166,9 +166,9 @@ export default function AdminHub({
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) {}
     }
-    const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "admin@ruhimperium.com";
+    const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "";
     const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "";
-    return defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
+    return defaultAdminEmail && defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
   });
 
   const syncAdminsRef = useRef(false);
@@ -209,6 +209,8 @@ export default function AdminHub({
   // Coupon form inputs
   const [newCouponCode, setNewCouponCode] = useState("");
   const [newCouponPercent, setNewCouponPercent] = useState(15);
+  const [newCouponScope, setNewCouponScope] = useState<"all" | "category">("all");
+  const [newCouponCategory, setNewCouponCategory] = useState("");
   const [couponErrorMsg, setCouponErrorMsg] = useState("");
 
   // Product management state
@@ -564,13 +566,22 @@ export default function AdminHub({
       return;
     }
 
+    if (newCouponScope === "category" && !newCouponCategory) {
+      setCouponErrorMsg("Please select a specific category target.");
+      return;
+    }
+
     const newCp: Coupon = {
       code: cleanedCode,
-      discountPercent: Number(newCouponPercent)
+      discountPercent: Number(newCouponPercent),
+      scope: newCouponScope,
+      categoryScope: newCouponScope === "category" ? newCouponCategory : undefined
     };
 
     setCoupons(prev => [newCp, ...prev]);
     setNewCouponCode("");
+    setNewCouponScope("all");
+    setNewCouponCategory("");
   };
 
   // Helper to remove discount coupon
@@ -609,125 +620,58 @@ export default function AdminHub({
         {/* NOT LOGGED IN TRIGGER - LOGIN ENTRY FORM */}
         {!isAdminLoggedIn ? (
           <div className="flex-1 flex flex-col justify-center items-center py-16 px-6 bg-white">
-            {adminUsers.length === 0 ? (
-              <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-stone-300 p-8 shadow-md">
-                <div className="text-center mb-8">
-                  <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
-                    <ShieldCheck className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
-                    Initialize HQ Access
-                  </h3>
-                  <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
-                    Establish secure administrative master credentials. Since no local keys exist, generate your credentials below.
-                  </p>
+            <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-sand-200 p-8 shadow-md">
+              <div className="text-center mb-8">
+                <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
+                  <ShieldCheck className="w-7 h-7" />
+                </div>
+                <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
+                  Executive Headquarters
+                </h3>
+                <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
+                  Please authenticate with legal administrative credentials to authorize full database read and write actions.
+                </p>
+              </div>
+
+              {loginError && (
+                <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
+                  ⚠️ {loginError}
+                </div>
+              )}
+
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="E.g. administrator@ruhimperium.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
+                  />
                 </div>
 
-                {loginError && (
-                  <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
-                    ⚠️ {loginError}
-                  </div>
-                )}
-
-                <form onSubmit={handleSetupSubmit} className="space-y-4">
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Set Master Email</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. admin@ruhimperium.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Set Master Cipher Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Create security digits"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Confirm Cipher Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Repeat security digits"
-                      value={setupConfirmPassword}
-                      onChange={(e) => setSetupConfirmPassword(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full mt-6 py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
-                  >
-                    GENERATE KEYS AND ACTIVATE HQ
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div className="max-w-md w-full bg-sand-50 rounded-2xl border border-sand-200 p-8 shadow-md">
-                <div className="text-center mb-8">
-                  <div className="w-14 h-14 bg-[#2D2926] text-[#D4BC96] rounded-xl flex items-center justify-center mx-auto mb-4 border border-sand-900">
-                    <ShieldCheck className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-light font-serif text-sand-900 tracking-wide">
-                    Executive Headquarters
-                  </h3>
-                  <p className="text-xs text-sand-400 mt-1.5 leading-relaxed font-light">
-                    Please authenticate with legal administrative credentials to authorize full database read and write actions.
-                  </p>
+                <div>
+                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Cipher Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter security digits"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                  />
                 </div>
 
-                {loginError && (
-                  <div className="mb-5 bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-lg font-medium text-center">
-                    ⚠️ {loginError}
-                  </div>
-                )}
-
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="E.g. administrator@ruhimperium.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Cipher Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Enter security digits"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full mt-6 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
-                  >
-                    DE-ENCRYPT AND UNLOCK HQ
-                  </button>
-                </form>
-              </div>
-            )}
+                <button
+                  type="submit"
+                  className="w-full mt-6 py-3.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-all cursor-pointer shadow-md"
+                >
+                  DE-ENCRYPT AND UNLOCK HQ
+                </button>
+              </form>
+            </div>
           </div>
         ) : (
           /* AUTHORIZED EXECUTIVE CONSOLE MODULES */
@@ -2034,6 +1978,142 @@ export default function AdminHub({
                     </div>
                   </div>
 
+                  {/* FOOTER CUSTOMIZATION */}
+                  <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-[#D4BC96]">
+                      <span className="text-sm">🗂️</span>
+                      <span className="text-xs font-bold font-mono uppercase tracking-widest">Footer & Socials Settings</span>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-4">
+                      
+                      {/* Left Column: Footer Image Upload */}
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block">Left Column: Khus Sourcing Image</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Footer Image URL"
+                            value={siteSettings.footerImage || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerImage: e.target.value })}
+                            className="flex-1 bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="footer-image-upload"
+                            onChange={(e) => {
+                              handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, footerImage: base64 })));
+                            }}
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById('footer-image-upload')?.click()}
+                            className="px-3 py-2 bg-sand-200 hover:bg-sand-300 text-sand-800 text-[10px] uppercase font-mono rounded cursor-pointer transition-colors"
+                          >
+                            Upload
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Brand name & Sublabel */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Brand Name</label>
+                          <input
+                            type="text"
+                            placeholder="RUH IMPERIUM"
+                            value={siteSettings.footerBrandName || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerBrandName: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Sub-Label</label>
+                          <input
+                            type="text"
+                            placeholder="BOTANICAL PERFUMERY"
+                            value={siteSettings.footerSubLabel || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerSubLabel: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Newsletter inputs */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Newsletter Title</label>
+                          <input
+                            type="text"
+                            placeholder="Journey with us."
+                            value={siteSettings.footerNewsletterTitle || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerNewsletterTitle: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Newsletter Subtext</label>
+                          <input
+                            type="text"
+                            placeholder="Be the first to know..."
+                            value={siteSettings.footerNewsletterText || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerNewsletterText: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Bottom narrative */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-widest text-sand-800 font-bold block">Bottom Brand Narrative / Description</label>
+                        <textarea
+                          placeholder="Narrative text..."
+                          value={siteSettings.footerBottomNarrative || ""}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, footerBottomNarrative: e.target.value })}
+                          rows={3}
+                          className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Socials Row */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Instagram URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://instagram.com/..."
+                            value={siteSettings.footerInstagramUrl || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerInstagramUrl: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">LinkedIn URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://linkedin.com/in/..."
+                            value={siteSettings.footerLinkedinUrl || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerLinkedinUrl: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] uppercase tracking-widest text-sand-500 font-bold block">Twitter/X URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://twitter.com/..."
+                            value={siteSettings.footerTwitterUrl || ""}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, footerTwitterUrl: e.target.value })}
+                            className="w-full bg-white border border-sand-200 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-[#D4BC96] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
                   {/* FOUNDERS MANAGEMENT */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 text-[#D4BC96] border-b border-sand-200 pb-2">
@@ -3201,6 +3281,36 @@ export default function AdminHub({
                           />
                         </div>
 
+                        <div>
+                          <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Coupon Scope</label>
+                          <select
+                            value={newCouponScope}
+                            onChange={(e) => setNewCouponScope(e.target.value as "all" | "category")}
+                            className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                          >
+                            <option value="all">Valid for All Products</option>
+                            <option value="category">Valid for Specific Category</option>
+                          </select>
+                        </div>
+
+                        {newCouponScope === "category" && (
+                          <div>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Target Category</label>
+                            <select
+                              value={newCouponCategory}
+                              onChange={(e) => setNewCouponCategory(e.target.value)}
+                              className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 focus:outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                            >
+                              <option value="">-- Select Category --</option>
+                              {collections.map((col) => (
+                                <option key={col.id} value={col.name}>
+                                  {col.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
                         <button
                           type="submit"
                           className="w-full py-2.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-colors cursor-pointer shadow-md flex items-center justify-center gap-1.5"
@@ -3228,7 +3338,7 @@ export default function AdminHub({
                                   {cp.code}
                                 </span>
                                 <span className="text-[10px] font-medium text-emerald-600 block bg-emerald-50 w-fit px-2 py-0.5 rounded-full mt-1.5 font-mono">
-                                  {cp.discountPercent}% OFF Cart
+                                  {cp.discountPercent}% OFF {cp.scope === "category" ? `on ${cp.categoryScope}` : "Cart"}
                                 </span>
                               </div>
 

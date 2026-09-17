@@ -93,9 +93,34 @@ export default function CartDrawer({
     return sums + (activePrice * item.quantity);
   }, 0);
 
+  // Find matching coupon from coupons database
+  const matchedCouponFromList = activeDiscount
+    ? coupons.find(c => c.code.toUpperCase() === activeDiscount.code.toUpperCase())
+    : null;
+
+  const discountableSubtotal = cart.reduce((sums, item) => {
+    const latestProduct = products.find(p => p.id === item.product.id) || item.product;
+    const selectedVariant = latestProduct.variants?.find(v => 
+      v.size === item.selectedSize ||
+      v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
+      (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
+      (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+    );
+    const activePrice = selectedVariant ? selectedVariant.salePrice : latestProduct.salePrice;
+
+    if (matchedCouponFromList) {
+      if (matchedCouponFromList.scope === "category") {
+        if (latestProduct.category !== matchedCouponFromList.categoryScope) {
+          return sums;
+        }
+      }
+    }
+    return sums + (activePrice * item.quantity);
+  }, 0);
+
   // Discount
   const discountAmount = activeDiscount 
-    ? Math.round(cartSubtotal * (activeDiscount.percent / 100)) 
+    ? Math.round(discountableSubtotal * (activeDiscount.percent / 100)) 
     : 0;
 
   const freeShippingThreshold = siteSettings?.freeShippingThreshold || 600;
@@ -114,7 +139,18 @@ export default function CartDrawer({
     const matchedCoupon = coupons.find(c => c.code.toUpperCase() === code);
 
     if (matchedCoupon) {
-      setActiveDiscount({ code: matchedCoupon.code, percent: matchedCoupon.discountPercent });
+      if (matchedCoupon.scope === "category") {
+        const hasQualifyingItem = cart.some(item => {
+          const latestProduct = products.find(p => p.id === item.product.id) || item.product;
+          return latestProduct.category === matchedCoupon.categoryScope;
+        });
+
+        if (!hasQualifyingItem) {
+          setCouponError(`This coupon is only valid for items in the "${matchedCoupon.categoryScope}" category.`);
+          return;
+        }
+      }
+      setActiveDiscount({ code: matchedCoupon.code, percent: matchedCoupon.discountPercent || 0 });
       setCouponError("");
     } else {
       setCouponError("Invalid or expired coupon code.");

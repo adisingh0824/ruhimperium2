@@ -92,6 +92,8 @@ export interface Coupon {
   code: string;
   discountPercent?: number;
   upiOnly?: boolean; // If true, COD is not allowed when this coupon is applied
+  scope?: "all" | "category";
+  categoryScope?: string;
 }
 
 export interface SiteSettings {
@@ -188,6 +190,17 @@ export interface SiteSettings {
   // Shipping Configuration
   freeShippingThreshold?: number;
   flatShippingRate?: number;
+
+  // Footer customization fields
+  footerImage?: string;
+  footerBrandName?: string;
+  footerSubLabel?: string;
+  footerNewsletterTitle?: string;
+  footerNewsletterText?: string;
+  footerBottomNarrative?: string;
+  footerInstagramUrl?: string;
+  footerLinkedinUrl?: string;
+  footerTwitterUrl?: string;
 }
 
 export interface UserAccount {
