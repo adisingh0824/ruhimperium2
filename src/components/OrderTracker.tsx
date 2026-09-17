@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { 
   X, 
   Search, 
@@ -24,6 +24,19 @@ export default function OrderTracker({ isOpen, onClose, orders }: OrderTrackerPr
   const [trackingCode, setTrackingCode] = useState("");
   const [searchResult, setSearchResult] = useState<Order | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Synchronize active tracking result with real-time orders updates from Firestore
+  useEffect(() => {
+    if (searchResult) {
+      const fresh = orders.find(
+        (o) => o.id.trim().toUpperCase() === searchResult.id.trim().toUpperCase() ||
+               o.trackingCode.trim().toUpperCase() === searchResult.trackingCode.trim().toUpperCase()
+      );
+      if (fresh && JSON.stringify(fresh) !== JSON.stringify(searchResult)) {
+        setSearchResult(fresh);
+      }
+    }
+  }, [orders, searchResult]);
 
   if (!isOpen) return null;
 

@@ -89,32 +89,12 @@ export function TraditionalUserLoungeModal({
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const [savedBlends, setSavedBlends] = useState<any[]>([]);
 
-  // Sync dashboard data whenever the currentUser changes
+  // Initialize view and edit states when currentUser changes or modal opens
   useEffect(() => {
     if (currentUser) {
-      setView("dashboard");
-      // Load user specifics
-      const matchingOrders = orders.filter(o => o.email.toLowerCase() === currentUser.email.toLowerCase());
-      setUserOrders(matchingOrders);
-
-      // Load Wishlist from localStorage
-      const cachedWishlist = localStorage.getItem(`ruh-wishlist-${currentUser.email}`);
-      if (cachedWishlist) {
-        const ids: string[] = JSON.parse(cachedWishlist);
-        setWishlistProducts(products.filter(p => ids.includes(p.id)));
-      } else {
-        setWishlistProducts([]);
+      if (isOpen) {
+        setView("dashboard");
       }
-
-      // Load Custom Blends from localStorage
-      const cachedBlends = localStorage.getItem(`ruh-blends-${currentUser.email}`);
-      if (cachedBlends) {
-        setSavedBlends(JSON.parse(cachedBlends));
-      } else {
-        setSavedBlends([]);
-      }
-
-      // Populate edit states
       setEditName(currentUser.fullName);
       setEditPhone(currentUser.phone);
       setEditAddress(currentUser.address);
@@ -122,7 +102,40 @@ export function TraditionalUserLoungeModal({
     } else {
       setView("login");
     }
-  }, [currentUser, orders, products, isOpen]);
+  }, [currentUser, isOpen]);
+
+  // Sync dashboard data (orders, wishlist, custom blends) live without resetting current active view
+  useEffect(() => {
+    if (currentUser) {
+      const matchingOrders = orders.filter(o => o.email.toLowerCase() === currentUser.email.toLowerCase());
+      setUserOrders(matchingOrders);
+
+      // Load Wishlist from localStorage
+      const cachedWishlist = localStorage.getItem(`ruh-wishlist-${currentUser.email}`);
+      if (cachedWishlist) {
+        try {
+          const ids: string[] = JSON.parse(cachedWishlist);
+          setWishlistProducts(products.filter(p => ids.includes(p.id)));
+        } catch (e) {
+          setWishlistProducts([]);
+        }
+      } else {
+        setWishlistProducts([]);
+      }
+
+      // Load Custom Blends from localStorage
+      const cachedBlends = localStorage.getItem(`ruh-blends-${currentUser.email}`);
+      if (cachedBlends) {
+        try {
+          setSavedBlends(JSON.parse(cachedBlends));
+        } catch (e) {
+          setSavedBlends([]);
+        }
+      } else {
+        setSavedBlends([]);
+      }
+    }
+  }, [currentUser, orders, products]);
 
   if (!isOpen) return null;
 

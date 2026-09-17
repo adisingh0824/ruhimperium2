@@ -488,6 +488,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
   const [isShippingOpen, setIsShippingOpen] = useState(false);
   const [isDistilleryVideoOpen, setIsDistilleryVideoOpen] = useState(false);
+  const [isBulkEnquiryOpen, setIsBulkEnquiryOpen] = useState(false);
+  const setBulkEnquiryOpen = setIsBulkEnquiryOpen;
 
   // Expanded Blog Article state
   const [selectedArticle, setSelectedArticle] = useState<BlogArticle | null>(null);
@@ -573,7 +575,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       if (snap.exists()) {
         if (writeLockRef.current["site"]) return;
         const data = snap.data() as SiteSettings;
-        if (data.customLogoUrl) {
+        if (data.customLogoUrl && data.customLogoUrl.toLowerCase().includes("raahi")) {
           delete data.customLogoUrl;
           try {
             await setDoc(doc(db, "settings", "site"), data);
@@ -1509,6 +1511,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         onLoungeClick={() => setIsLoungeOpen(true)}
         currentUser={currentUser}
         siteSettings={siteSettings}
+        bulkEnquiryOpen={isBulkEnquiryOpen}
+        setBulkEnquiryOpen={setIsBulkEnquiryOpen}
       />
 
       {/* Main Content Body */}
@@ -2717,9 +2721,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               onAddToCart={handleAddToCart}
               setIsCartOpen={setIsCartOpen}
               reviews={reviews}
+              onAddReview={handleAddReview}
+              products={products}
             />
           } />
-          <Route path="/our-story" element={<OurStoryPage />} />
+          <Route path="/our-story" element={<OurStoryPage founders={founders} />} />
         </Routes>
       </main>
 
@@ -2866,7 +2872,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onClearCart={handleClearCart}
-        onPlaceOrder={(newOrder) => updateOrders((prev) => [newOrder, ...prev])}
+        onPlaceOrder={(newOrder) => {
+          updateOrders((prev) => [newOrder, ...prev]);
+          if (currentUser) {
+            const updatedUser: UserAccount = {
+              ...currentUser,
+              orderIds: [newOrder.id, ...(currentUser.orderIds || [])]
+            };
+            updateUsers((prev) => prev.map(u => u.email.toLowerCase() === currentUser.email.toLowerCase() ? updatedUser : u));
+            setCurrentUser(updatedUser);
+          }
+        }}
         coupons={coupons}
         currentUser={currentUser}
         siteSettings={siteSettings}

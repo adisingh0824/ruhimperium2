@@ -9,13 +9,25 @@ interface ProductPageProps {
   onAddToCart: (product: Product, size: string) => void;
   setIsCartOpen: (open: boolean) => void;
   reviews: Review[];
+  onAddReview?: (review: Omit<Review, "id" | "date" | "verified">) => void;
+  products?: Product[];
 }
 
-export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: ProductPageProps) {
+export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAddReview, products = [] }: ProductPageProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<Product | null>(() => {
+    if (id && products && products.length > 0) {
+      return products.find(p => p.id === id) || null;
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (id && products && products.length > 0) {
+      return !products.some(p => p.id === id);
+    }
+    return true;
+  });
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
@@ -121,14 +133,34 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews }: Pro
     // For now, opening cart simulates the rapid checkout workflow.
   };
 
+  useEffect(() => {
+    if (id && products && products.length > 0) {
+      const live = products.find(p => p.id === id);
+      if (live) {
+        setProduct(live);
+        setLoading(false);
+      }
+    }
+  }, [id, products]);
+
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
   const handleReviewSubmit = () => {
     if (!reviewerName.trim() || !reviewText.trim()) return;
+    if (onAddReview && product) {
+      onAddReview({
+        productId: product.id,
+        productName: product.name,
+        author: reviewerName.trim(),
+        rating: ratingInput,
+        text: reviewText.trim()
+      });
+    }
     setFormSuccess(true);
     setReviewerName("");
+    setRatingInput(5);
     setReviewText("");
     setTimeout(() => setFormSuccess(false), 4000);
   };

@@ -36,6 +36,8 @@ interface HeaderProps {
   onLoungeClick: () => void;
   currentUser: any;
   siteSettings?: SiteSettings;
+  bulkEnquiryOpen?: boolean;
+  setBulkEnquiryOpen?: (open: boolean) => void;
 }
 
 export default function Header({ 
@@ -52,7 +54,9 @@ export default function Header({
   setSelectedCategory,
   onLoungeClick,
   currentUser,
-  siteSettings
+  siteSettings,
+  bulkEnquiryOpen: propBulkEnquiryOpen,
+  setBulkEnquiryOpen: propSetBulkEnquiryOpen
 }: HeaderProps) {
   const announcements = siteSettings?.announcementText
     ? [siteSettings.announcementText]
@@ -75,7 +79,9 @@ export default function Header({
   const [searchOpen, setSearchOpen] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [giftingOpen, setGiftingOpen] = useState(false);
-  const [bulkEnquiryOpen, setBulkEnquiryOpen] = useState(false);
+  const [internalBulkEnquiryOpen, setInternalBulkEnquiryOpen] = useState(false);
+  const bulkEnquiryOpen = propBulkEnquiryOpen !== undefined ? propBulkEnquiryOpen : internalBulkEnquiryOpen;
+  const setBulkEnquiryOpen = propSetBulkEnquiryOpen || setInternalBulkEnquiryOpen;
 
   // Bulk Enquiry Form States
   const [bulkForm, setBulkForm] = useState({

@@ -1,8 +1,13 @@
 import React, { useEffect } from "react";
 import { ArrowRight, Star, Heart, MapPin, Compass } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Founder } from "../types";
 
-export default function OurStoryPage() {
+interface OurStoryPageProps {
+  founders?: Founder[];
+}
+
+export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
   const navigate = useNavigate();
 
   // Scroll to top on page load
@@ -169,49 +174,43 @@ export default function OurStoryPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
-            {/* Vimal */}
-            <div className="bg-white rounded-3xl border border-sand-200/50 overflow-hidden shadow-sm flex flex-col">
-              <div className="aspect-[4/3] w-full overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600" 
-                  alt="Vimal Singh" 
-                  className="w-full h-full object-cover"
-                />
+            {(founders && founders.length > 0 ? founders : [
+              {
+                id: "vimal",
+                name: "Vimal Singh",
+                role: "FOUNDER & HEAD PERFUMER",
+                bio: "Deeply passionate about reviving traditional Indian hydro-distillation methods (Degh-Bhapka). Vimal spends months in the Kannauj flower belts ensuring our extracts remain uncompromised.",
+                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600"
+              },
+              {
+                id: "aditya",
+                name: "Aditya Singh",
+                role: "CO-FOUNDER & CHIEF EXPLORER",
+                bio: "Aditya spearheads our wilderness sourcing expeditions. From trekking into Assam's agarwood jungles to securing sustainable cardamom contracts with local co-operatives in Wayanad.",
+                image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600"
+              }
+            ]).map((fnd) => (
+              <div key={fnd.id} className="bg-white rounded-3xl border border-sand-200/50 overflow-hidden shadow-sm flex flex-col">
+                <div className="aspect-[4/3] w-full overflow-hidden">
+                  <img 
+                    src={fnd.image} 
+                    alt={fnd.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6 sm:p-8 space-y-3">
+                  <span className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold font-mono block">
+                    {fnd.role}
+                  </span>
+                  <h4 className="text-xl font-serif font-bold text-stone-900">
+                    {fnd.name}
+                  </h4>
+                  <p className="text-xs text-stone-500 font-light leading-relaxed">
+                    {fnd.bio}
+                  </p>
+                </div>
               </div>
-              <div className="p-6 sm:p-8 space-y-3">
-                <span className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold font-mono block">
-                  FOUNDER & HEAD PERFUMER
-                </span>
-                <h4 className="text-xl font-serif font-bold text-stone-900">
-                  Vimal Singh
-                </h4>
-                <p className="text-xs text-stone-500 font-light leading-relaxed">
-                  Deeply passionate about reviving traditional Indian hydro-distillation methods (Degh-Bhapka). Vimal spends months in the Kannauj flower belts ensuring our extracts remain uncompromised.
-                </p>
-              </div>
-            </div>
-
-            {/* Aditya */}
-            <div className="bg-white rounded-3xl border border-sand-200/50 overflow-hidden shadow-sm flex flex-col">
-              <div className="aspect-[4/3] w-full overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600" 
-                  alt="Aditya Singh" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6 sm:p-8 space-y-3">
-                <span className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold font-mono block">
-                  CO-FOUNDER & CHIEF EXPLORER
-                </span>
-                <h4 className="text-xl font-serif font-bold text-stone-900">
-                  Aditya Singh
-                </h4>
-                <p className="text-xs text-stone-500 font-light leading-relaxed">
-                  Aditya spearheads our wilderness sourcing expeditions. From trekking into Assam's agarwood jungles to securing sustainable cardamom contracts with local co-operatives in Wayanad.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

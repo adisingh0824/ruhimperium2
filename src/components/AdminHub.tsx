@@ -157,18 +157,28 @@ export default function AdminHub({
     setSaveSuccess(false);
   };
 
+  // Master fallback administrator credentials
+  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "adityasingh7990@gmail.com").trim().toLowerCase();
+  const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "AdityaSingh0824@";
+  // SHA-256 hash of "AdityaSingh0824@"
+  const defaultAdminHashed = "ffa98fe673203431ae8dc404f8a910cd09d2d5c2f7f99c24b3aa41acb2d48716";
+
   // Admin users state (with persistent fallback)
   const [adminUsers, setAdminUsers] = useState<{username: string; password: string}[]>(() => {
+    const masterAdmin = { username: defaultAdminEmail, password: defaultAdminHashed };
     const cached = localStorage.getItem("ruh-admin-users");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          if (!parsed.some(u => u.username.toLowerCase() === defaultAdminEmail)) {
+            return [masterAdmin, ...parsed];
+          }
+          return parsed;
+        }
       } catch (e) {}
     }
-    const defaultAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "";
-    const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "";
-    return defaultAdminEmail && defaultAdminPassword ? [{ username: defaultAdminEmail, password: defaultAdminPassword }] : [];
+    return [masterAdmin];
   });
 
   const syncAdminsRef = useRef(false);
@@ -247,6 +257,7 @@ export default function AdminHub({
   const founderVimalInputRef = useRef<HTMLInputElement>(null);
   const founderAdityaInputRef = useRef<HTMLInputElement>(null);
   const prodImgInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [setupConfirmPassword, setSetupConfirmPassword] = useState("");
 
   if (!isOpen) return null;
@@ -277,12 +288,20 @@ export default function AdminHub({
     e.preventDefault();
     setLoginError("");
 
+    const inputEmail = email.trim().toLowerCase();
     const hashedInput = await sha256(password);
-    const matchFound = adminUsers.some(
-      (user) =>
-        user.username.trim().toLowerCase() === email.trim().toLowerCase() &&
-        user.password === hashedInput
-    );
+
+    const isMasterMatch =
+      inputEmail === defaultAdminEmail &&
+      (password === defaultAdminPassword || hashedInput === defaultAdminHashed);
+
+    const matchFound =
+      isMasterMatch ||
+      adminUsers.some(
+        (user) =>
+          user.username.trim().toLowerCase() === inputEmail &&
+          (user.password === hashedInput || user.password === password)
+      );
 
     if (matchFound) {
       setIsAdminLoggedIn(true);
@@ -1869,7 +1888,8 @@ export default function AdminHub({
                                     const response = await fetch("/api/upload-video", {
                                       method: "POST",
                                       headers: {
-                                        "Content-Type": "application/json"
+                                        "Content-Type": "application/json",
+                                        "x-admin-token": defaultAdminPassword
                                       },
                                       body: JSON.stringify({
                                         videoData: base64,
