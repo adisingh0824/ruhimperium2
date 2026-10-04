@@ -158,27 +158,32 @@ export default function AdminHub({
   };
 
   // Master fallback administrator credentials
-  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "adityasingh7990@gmail.com").trim().toLowerCase();
-  const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "AdityaSingh0824@";
-  // SHA-256 hash of "AdityaSingh0824@"
-  const defaultAdminHashed = "ffa98fe673203431ae8dc404f8a910cd09d2d5c2f7f99c24b3aa41acb2d48716";
+  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "sadityasingh7990@gmail").trim().toLowerCase();
+  const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@";
+  // SHA-256 hash of "Adi19983@@"
+  const defaultAdminHashed = "c090835352d387a75a3f9f05fb0cfe47c834e952e26a032194ae99285cf27fbe";
 
   // Admin users state (with persistent fallback)
   const [adminUsers, setAdminUsers] = useState<{username: string; password: string}[]>(() => {
     const masterAdmin = { username: defaultAdminEmail, password: defaultAdminHashed };
+    const masterAdminCom = { username: "sadityasingh7990@gmail.com", password: defaultAdminHashed };
     const cached = localStorage.getItem("ruh-admin-users");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          if (!parsed.some(u => u.username.toLowerCase() === defaultAdminEmail)) {
-            return [masterAdmin, ...parsed];
+          const list = [...parsed];
+          if (!list.some(u => u.username.toLowerCase() === defaultAdminEmail)) {
+            list.unshift(masterAdmin);
           }
-          return parsed;
+          if (!list.some(u => u.username.toLowerCase() === "sadityasingh7990@gmail.com")) {
+            list.unshift(masterAdminCom);
+          }
+          return list;
         }
       } catch (e) {}
     }
-    return [masterAdmin];
+    return [masterAdmin, masterAdminCom];
   });
 
   const syncAdminsRef = useRef(false);
@@ -252,6 +257,21 @@ export default function AdminHub({
   const [newColImageUrl, setNewColImageUrl] = useState("");
   const [uploadingColId, setUploadingColId] = useState<string | null>(null);
 
+  const [prodTopNotes, setProdTopNotes] = useState("");
+  const [prodHeartNotes, setProdHeartNotes] = useState("");
+  const [prodBaseNotes, setProdBaseNotes] = useState("");
+
+  // Review creation state
+  const [isAddingReview, setIsAddingReview] = useState(false);
+  const [newReviewProdId, setNewReviewProdId] = useState("");
+  const [newReviewAuthor, setNewReviewAuthor] = useState("");
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewText, setNewReviewText] = useState("");
+  const [newReviewVerified, setNewReviewVerified] = useState(true);
+
+  // Coupon UPI Only
+  const [newCouponUpiOnly, setNewCouponUpiOnly] = useState(false);
+
   // Hidden file input references
   const mainCoverInputRef = useRef<HTMLInputElement>(null);
   const founderVimalInputRef = useRef<HTMLInputElement>(null);
@@ -291,16 +311,29 @@ export default function AdminHub({
     const inputEmail = email.trim().toLowerCase();
     const hashedInput = await sha256(password);
 
-    const isMasterMatch =
-      inputEmail === defaultAdminEmail &&
-      (password === defaultAdminPassword || hashedInput === defaultAdminHashed);
+    const isMasterEmailMatch =
+      inputEmail === defaultAdminEmail ||
+      inputEmail === "sadityasingh7990@gmail" ||
+      inputEmail === "sadityasingh7990@gmail.com";
+
+    const isMasterPasswordMatch =
+      password === defaultAdminPassword ||
+      password === "Adi19983@@" ||
+      hashedInput === defaultAdminHashed;
+
+    const isMasterMatch = isMasterEmailMatch && isMasterPasswordMatch;
 
     const matchFound =
       isMasterMatch ||
       adminUsers.some(
-        (user) =>
-          user.username.trim().toLowerCase() === inputEmail &&
-          (user.password === hashedInput || user.password === password)
+        (user) => {
+          const uName = user.username.trim().toLowerCase();
+          const usernameMatches =
+            uName === inputEmail ||
+            (inputEmail === "sadityasingh7990@gmail" && uName === "sadityasingh7990@gmail.com") ||
+            (inputEmail === "sadityasingh7990@gmail.com" && uName === "sadityasingh7990@gmail");
+          return usernameMatches && (user.password === hashedInput || user.password === password);
+        }
       );
 
     if (matchFound) {
@@ -370,6 +403,9 @@ export default function AdminHub({
       setProdImage("https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=600");
       setProdRating(5.0);
       setProdCategory(collections[0]?.id || "Next Gen fragrances");
+      setProdTopNotes("Bergamot, Sweet Orange, Cardamom");
+      setProdHeartNotes("Damask Rose, Jasmine Sambac, Saffron");
+      setProdBaseNotes("Mysore Sandalwood, Aged Oud, Amber");
       setProdGalleryImages(["", "", "", "", ""]);
       setProdGalleryTexts(Array.from({ length: 5 }, () => ({ title: "", desc: "" })));
       setProdProductImages(["", "", "", ""]);
@@ -385,6 +421,9 @@ export default function AdminHub({
       setProdDescription(prod.description);
       setProdStory(prod.story || "");
       setProdIngredients(prod.ingredients?.join(", ") || "");
+      setProdTopNotes(prod.notes?.top?.join(", ") || "");
+      setProdHeartNotes(prod.notes?.heart?.join(", ") || "");
+      setProdBaseNotes(prod.notes?.base?.join(", ") || "");
       setProdDestination(prod.destination || "");
       setProdDestinationState(prod.destinationState || "");
       setProdImage(prod.image);
@@ -442,9 +481,9 @@ export default function AdminHub({
         rating: Number(prodRating) || 5.0,
         reviewsCount: 0,
         notes: {
-          top: formattedIngredients.slice(0, 3),
-          heart: formattedIngredients.slice(2, 5),
-          base: formattedIngredients.slice(4, 7)
+          top: prodTopNotes ? prodTopNotes.split(",").map(i => i.trim()).filter(Boolean) : formattedIngredients.slice(0, 3),
+          heart: prodHeartNotes ? prodHeartNotes.split(",").map(i => i.trim()).filter(Boolean) : formattedIngredients.slice(2, 5),
+          base: prodBaseNotes ? prodBaseNotes.split(",").map(i => i.trim()).filter(Boolean) : formattedIngredients.slice(4, 7)
         },
         category: prodCategory,
         galleryImages: prodGalleryImages,
@@ -488,6 +527,11 @@ export default function AdminHub({
             description: prodDescription,
             story: prodStory,
             ingredients: formattedIngredients,
+            notes: {
+              top: prodTopNotes ? prodTopNotes.split(",").map(i => i.trim()).filter(Boolean) : (p.notes?.top || []),
+              heart: prodHeartNotes ? prodHeartNotes.split(",").map(i => i.trim()).filter(Boolean) : (p.notes?.heart || []),
+              base: prodBaseNotes ? prodBaseNotes.split(",").map(i => i.trim()).filter(Boolean) : (p.notes?.base || []),
+            },
             destination: prodDestination,
             destinationState: prodDestinationState,
             image: prodImage,
@@ -554,6 +598,72 @@ export default function AdminHub({
     }));
   };
 
+  // Delete order permanently
+  const handleDeleteOrder = (orderId: string) => {
+    if (window.confirm(`Permanently remove order #${orderId}?`)) {
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+    }
+  };
+
+  // Update order customer details (name, address, pincode)
+  const handleUpdateOrderCustomer = (orderId: string, updates: Partial<Order>) => {
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updates } : o));
+  };
+
+  // Add new travel story / blog article
+  const handleAddBlogArticle = () => {
+    const newArticle: BlogArticle = {
+      id: `story-${Date.now()}`,
+      title: "New Sourcing Expedition",
+      location: "Kannauj, Uttar Pradesh",
+      readTime: "4 min read",
+      excerpt: "A brief botanical excerpt on ancient harvesting techniques...",
+      content: "Full olfactory story and details of the expedition...",
+      image: "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800",
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      author: "Aditya & Vimal Singh"
+    };
+    setBlogArticles(prev => [newArticle, ...prev]);
+  };
+
+  // Delete travel story
+  const handleDeleteBlogArticle = (articleId: string) => {
+    if (window.confirm("Permanently delete this Wanderlust Diary story?")) {
+      setBlogArticles(prev => prev.filter(b => b.id !== articleId));
+    }
+  };
+
+  // Add review from admin
+  const handleAddCustomReview = (e: FormEvent) => {
+    e.preventDefault();
+    if (!newReviewAuthor.trim() || !newReviewText.trim()) return;
+    const targetProd = products.find(p => p.id === newReviewProdId) || products[0];
+    const newRev: Review = {
+      id: `rev-admin-${Date.now()}`,
+      productId: targetProd?.id || "prod-1",
+      productName: targetProd?.name || "Ruh Khus Imperial",
+      author: newReviewAuthor.trim(),
+      rating: Number(newReviewRating),
+      text: newReviewText.trim(),
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      verified: newReviewVerified
+    };
+    setReviews(prev => [newRev, ...prev]);
+    setNewReviewAuthor("");
+    setNewReviewText("");
+    setIsAddingReview(false);
+  };
+
+  // Toggle review verified status
+  const handleToggleReviewVerified = (reviewId: string) => {
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, verified: !r.verified } : r));
+  };
+
+  // Update review content or rating
+  const handleUpdateReview = (reviewId: string, updates: Partial<Review>) => {
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updates } : r));
+  };
+
   // Modify Founder's profile attributes
   const handleUpdateFounderDetails = (id: "vimal" | "aditya", fields: Partial<Founder>) => {
     setFounderDetails(prev => prev.map(f => {
@@ -594,13 +704,15 @@ export default function AdminHub({
       code: cleanedCode,
       discountPercent: Number(newCouponPercent),
       scope: newCouponScope,
-      categoryScope: newCouponScope === "category" ? newCouponCategory : undefined
+      categoryScope: newCouponScope === "category" ? newCouponCategory : undefined,
+      upiOnly: newCouponUpiOnly
     };
 
     setCoupons(prev => [newCp, ...prev]);
     setNewCouponCode("");
     setNewCouponScope("all");
     setNewCouponCategory("");
+    setNewCouponUpiOnly(false);
   };
 
   // Helper to remove discount coupon
@@ -626,14 +738,26 @@ export default function AdminHub({
             </div>
           </div>
           
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-sand-300 hover:text-white focus:outline-none"
-            id="hq-close-btn"
-          >
-            <X className="w-5.5 h-5.5" />
-          </button>
+          <div className="flex items-center gap-3">
+            {isAdminLoggedIn && isSiteDirty && (
+              <button
+                type="button"
+                onClick={handleSaveAllSiteChanges}
+                disabled={isSaving}
+                className="px-3.5 py-1.5 bg-[#D4BC96] hover:bg-[#c3aa83] text-stone-900 text-[10px] uppercase tracking-widest font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              >
+                {isSaving ? "Publishing..." : "Publish Live"}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-sand-300 hover:text-white focus:outline-none"
+              id="hq-close-btn"
+            >
+              <X className="w-5.5 h-5.5" />
+            </button>
+          </div>
         </div>
 
         {/* NOT LOGGED IN TRIGGER - LOGIN ENTRY FORM */}
@@ -660,11 +784,12 @@ export default function AdminHub({
 
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div>
-                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email</label>
+                  <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Administrative Email / Username</label>
                   <input
-                    type="email"
+                    type="text"
                     required
-                    placeholder="E.g. administrator@ruhimperium.com"
+                    autoComplete="username"
+                    placeholder="sadityasingh7990@gmail"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
@@ -1072,6 +1197,40 @@ export default function AdminHub({
                           />
                         </div>
 
+                        {/* Olfactory Notes Pyramid */}
+                        <div className="md:col-span-4">
+                          <label className="text-[9.5px] uppercase tracking-widest text-[#D4BC96] font-mono block mb-1 font-semibold">Top Notes (comma-separated)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Bergamot, Sweet Orange, Cardamom"
+                            value={prodTopNotes}
+                            onChange={(e) => setProdTopNotes(e.target.value)}
+                            className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                          />
+                        </div>
+
+                        <div className="md:col-span-4">
+                          <label className="text-[9.5px] uppercase tracking-widest text-[#D4BC96] font-mono block mb-1 font-semibold">Heart Notes (comma-separated)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Damask Rose, Jasmine Sambac, Saffron"
+                            value={prodHeartNotes}
+                            onChange={(e) => setProdHeartNotes(e.target.value)}
+                            className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                          />
+                        </div>
+
+                        <div className="md:col-span-4">
+                          <label className="text-[9.5px] uppercase tracking-widest text-[#D4BC96] font-mono block mb-1 font-semibold">Base Notes (comma-separated)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Mysore Sandalwood, Aged Oud, Amber"
+                            value={prodBaseNotes}
+                            onChange={(e) => setProdBaseNotes(e.target.value)}
+                            className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded focus:ring-1 focus:ring-[#D4BC96] outline-none"
+                          />
+                        </div>
+
                         {/* Description */}
                         <div className="md:col-span-12">
                           <label className="text-[9.5px] uppercase tracking-widest text-sand-500 font-mono block mb-1">Excursion Description</label>
@@ -1442,6 +1601,17 @@ export default function AdminHub({
                                 <span>Bill</span>
                               </button>
 
+                              {/* Delete Order Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteOrder(o.id)}
+                                className="flex items-center gap-1 px-2.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-[9px] uppercase font-mono tracking-wider rounded-lg transition-all cursor-pointer border border-red-200"
+                                title="Remove Order"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Delete</span>
+                              </button>
+
                             </div>
                           </div>
 
@@ -1467,10 +1637,34 @@ export default function AdminHub({
                               
                               <div className="border-t border-sand-100 pt-2.5 mt-2.5">
                                 <span className="text-[8px] uppercase tracking-widest text-sand-400 block mb-1">DELIVERY DESTINATION ADDRESS</span>
-                                <div className="bg-sand-100 p-2.5 rounded border border-sand-200">
-                                  <p className="text-xs font-semibold text-sand-900 mb-0.5">{o.fullName}</p>
-                                  <p className="text-[11px] font-light text-sand-700 font-sans leading-relaxed whitespace-pre-wrap">{o.address}</p>
-                                  <p className="text-xs font-bold text-sand-900 font-mono mt-1.5">PIN: {o.pincode}</p>
+                                <div className="bg-sand-100 p-2.5 rounded border border-sand-200 space-y-2">
+                                  <div>
+                                    <label className="text-[7.5px] uppercase tracking-widest text-sand-400 block font-mono mb-0.5">Recipient Full Name</label>
+                                    <input
+                                      type="text"
+                                      value={o.fullName}
+                                      onChange={(e) => handleUpdateOrderCustomer(o.id, { fullName: e.target.value })}
+                                      className="w-full bg-white border border-sand-200 px-2 py-1 text-xs font-semibold text-sand-900 rounded outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-[7.5px] uppercase tracking-widest text-sand-400 block font-mono mb-0.5">Delivery Street Address</label>
+                                    <textarea
+                                      rows={2}
+                                      value={o.address}
+                                      onChange={(e) => handleUpdateOrderCustomer(o.id, { address: e.target.value })}
+                                      className="w-full bg-white border border-sand-200 px-2 py-1 text-[11px] font-light text-sand-700 font-sans leading-relaxed rounded outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                                    />
+                                  </div>
+                                  <div className="w-32">
+                                    <label className="text-[7.5px] uppercase tracking-widest text-sand-400 block font-mono mb-0.5">Postal PIN</label>
+                                    <input
+                                      type="text"
+                                      value={o.pincode}
+                                      onChange={(e) => handleUpdateOrderCustomer(o.id, { pincode: e.target.value })}
+                                      className="w-full bg-white border border-sand-200 px-2 py-1 text-xs font-bold text-sand-900 font-mono rounded outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                                    />
+                                  </div>
                                 </div>
                                 <p className="text-xs font-light text-sand-600 font-sans leading-tight mt-2.5">Pay Mode: <span className="font-mono bg-sand-200 px-1 py-0.2 ml-1 text-[10px] rounded">{o.paymentMode}</span></p>
                               </div>
@@ -3102,8 +3296,18 @@ export default function AdminHub({
                     {/* Wanderlust Diary Stories Management */}
                     <div className="bg-sand-50/70 rounded-2xl border border-sand-200 p-5 space-y-4 md:col-span-2">
                       <div className="flex justify-between items-center border-b border-sand-100 pb-2">
-                        <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">5. Wanderlust Diary / Travel Stories</div>
-                        <span className="text-[10px] text-sand-400 font-mono">Real-time Sourcing Journal Editor</span>
+                        <div>
+                          <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">5. Wanderlust Diary / Travel Stories</div>
+                          <span className="text-[10px] text-sand-400 font-mono">Real-time Sourcing Journal Editor ({blogArticles.length} stories)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddBlogArticle}
+                          className="px-3.5 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white text-[10px] uppercase font-mono tracking-wider rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Travel Story</span>
+                        </button>
                       </div>
                       
                       <div className="space-y-6">
@@ -3113,9 +3317,20 @@ export default function AdminHub({
                               <span className="font-serif font-semibold text-sand-950 text-sm">
                                 {article.title || "Untitled Story"}
                               </span>
-                              <span className="text-[10px] font-mono text-sand-500 bg-sand-100 px-2 py-0.5 rounded">
-                                {article.location} • {article.readTime}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-mono text-sand-500 bg-sand-100 px-2 py-0.5 rounded">
+                                  {article.location} • {article.readTime}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteBlogArticle(article.id)}
+                                  className="p-1 px-2 text-sand-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors text-[10px] font-mono uppercase flex items-center gap-1 cursor-pointer"
+                                  title="Delete Article"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
                             </div>
                             
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -3331,6 +3546,19 @@ export default function AdminHub({
                           </div>
                         )}
 
+                        <div className="flex items-center gap-2 pt-1">
+                          <input
+                            type="checkbox"
+                            id="coupon-upi-only"
+                            checked={newCouponUpiOnly}
+                            onChange={(e) => setNewCouponUpiOnly(e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-sand-300 text-[#D4BC96] focus:ring-[#D4BC96]"
+                          />
+                          <label htmlFor="coupon-upi-only" className="text-[10px] text-sand-700 font-mono cursor-pointer select-none">
+                            Prepaid / UPI Only (Disables Cash on Delivery)
+                          </label>
+                        </div>
+
                         <button
                           type="submit"
                           className="w-full py-2.5 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] font-medium text-xs uppercase tracking-widest rounded transition-colors cursor-pointer shadow-md flex items-center justify-center gap-1.5"
@@ -3357,9 +3585,16 @@ export default function AdminHub({
                                 <span className="font-mono font-bold tracking-wider text-sm text-sand-900 uppercase">
                                   {cp.code}
                                 </span>
-                                <span className="text-[10px] font-medium text-emerald-600 block bg-emerald-50 w-fit px-2 py-0.5 rounded-full mt-1.5 font-mono">
-                                  {cp.discountPercent}% OFF {cp.scope === "category" ? `on ${cp.categoryScope}` : "Cart"}
-                                </span>
+                                <div className="flex flex-wrap gap-1 mt-1.5">
+                                  <span className="text-[10px] font-medium text-emerald-600 block bg-emerald-50 w-fit px-2 py-0.5 rounded-full font-mono">
+                                    {cp.discountPercent}% OFF {cp.scope === "category" ? `on ${cp.categoryScope}` : "Cart"}
+                                  </span>
+                                  {cp.upiOnly && (
+                                    <span className="text-[9px] font-bold text-amber-700 block bg-amber-50 border border-amber-200 w-fit px-1.5 py-0.5 rounded-full font-mono">
+                                      UPI ONLY
+                                    </span>
+                                  )}
+                                </div>
                               </div>
 
                               <button
@@ -3644,14 +3879,117 @@ export default function AdminHub({
               {/* TAB 6: PRODUCT REVIEWS MODERATION */}
               {activeTab === "reviews" && (
                 <div className="space-y-8 font-sans">
-                  <div>
-                    <h3 className="text-xl font-light font-serif tracking-wide text-sand-900">
-                      Product Scent Reviews Moderation
-                    </h3>
-                    <p className="text-xs text-sand-400 font-light font-sans">
-                      Moderate, view, and delete user-submitted reviews across all active products. Deletions are immediately synchronized live to all customers in real-time.
-                    </p>
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                    <div>
+                      <h3 className="text-xl font-light font-serif tracking-wide text-sand-900">
+                        Product Scent Reviews Moderation
+                      </h3>
+                      <p className="text-xs text-sand-400 font-light font-sans">
+                        Create, edit, verify, or remove user-submitted scent impressions. Updates sync live in real-time.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingReview(!isAddingReview)}
+                      className="px-3.5 py-2 bg-[#2D2926] hover:bg-[#D4BC96] text-white text-[10px] uppercase font-mono tracking-wider rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>{isAddingReview ? "Close Form" : "Add Review"}</span>
+                    </button>
                   </div>
+
+                  {/* Add New Review Sub-form */}
+                  {isAddingReview && (
+                    <form onSubmit={handleAddCustomReview} className="bg-sand-50 border border-sand-200 p-5 rounded-2xl space-y-4 animate-fadeIn">
+                      <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">
+                        Create Verified Scent Impression
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+                        <div className="sm:col-span-2">
+                          <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Target Product</label>
+                          <select
+                            value={newReviewProdId}
+                            onChange={(e) => setNewReviewProdId(e.target.value)}
+                            className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                          >
+                            <option value="">-- Choose Fragrance --</option>
+                            {products.map(p => (
+                              <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Reviewer Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. Siddharth Rao"
+                            value={newReviewAuthor}
+                            onChange={(e) => setNewReviewAuthor(e.target.value)}
+                            className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Rating (1 to 5 Stars)</label>
+                          <select
+                            value={newReviewRating}
+                            onChange={(e) => setNewReviewRating(Number(e.target.value))}
+                            className="w-full bg-white border border-sand-200 p-2 text-xs rounded text-sand-900 outline-none focus:ring-1 focus:ring-[#D4BC96] font-mono"
+                          >
+                            <option value={5}>★★★★★ (5/5)</option>
+                            <option value={4}>★★★★☆ (4/5)</option>
+                            <option value={3}>★★★☆☆ (3/5)</option>
+                            <option value={2}>★★☆☆☆ (2/5)</option>
+                            <option value={1}>★☆☆☆☆ (1/5)</option>
+                          </select>
+                        </div>
+
+                        <div className="sm:col-span-2 md:col-span-4">
+                          <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Testimonial Impression Narrative</label>
+                          <textarea
+                            rows={2}
+                            required
+                            placeholder="Write the sensorial experience, longevity notes, or feedback..."
+                            value={newReviewText}
+                            onChange={(e) => setNewReviewText(e.target.value)}
+                            className="w-full bg-white border border-sand-200 p-2.5 text-xs rounded text-sand-900 outline-none focus:ring-1 focus:ring-[#D4BC96]"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2 flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="review-verified-toggle"
+                            checked={newReviewVerified}
+                            onChange={(e) => setNewReviewVerified(e.target.checked)}
+                            className="w-4 h-4 rounded border-sand-300 text-[#D4BC96] focus:ring-[#D4BC96]"
+                          />
+                          <label htmlFor="review-verified-toggle" className="text-xs text-sand-700 font-mono cursor-pointer select-none">
+                            Mark as Verified Buyer Badge
+                          </label>
+                        </div>
+
+                        <div className="sm:col-span-2 flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsAddingReview(false)}
+                            className="px-4 py-2 border border-sand-300 text-sand-600 rounded text-[10px] font-mono uppercase tracking-widest hover:bg-sand-100 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-5 py-2 bg-[#2D2926] hover:bg-[#D4BC96] text-white rounded text-[10px] font-mono uppercase tracking-widest cursor-pointer shadow-sm"
+                          >
+                            Publish Review
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
 
                   {/* Reviews statistics */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -3749,28 +4087,53 @@ export default function AdminHub({
 
                                   {/* Author / Rating / Date */}
                                   <div className="flex items-start justify-between">
-                                    <div>
-                                      <div className="flex items-center gap-1.5">
-                                        <p className="text-xs font-semibold text-sand-800">{rev.author}</p>
-                                        {rev.verified && (
-                                          <span className="text-[8px] uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-100 px-1 py-0.2 rounded font-mono">Verified Buyer</span>
-                                        )}
+                                    <div className="flex-1 mr-2">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <input
+                                          type="text"
+                                          value={rev.author}
+                                          onChange={(e) => handleUpdateReview(rev.id, { author: e.target.value })}
+                                          className="text-xs font-semibold text-sand-800 bg-transparent border-b border-dashed border-sand-200 focus:border-[#D4BC96] outline-none"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => handleToggleReviewVerified(rev.id)}
+                                          className={`text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded font-mono cursor-pointer transition-colors ${
+                                            rev.verified
+                                              ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
+                                              : "text-sand-400 bg-sand-100 hover:bg-sand-200 border border-sand-200"
+                                          }`}
+                                          title="Click to toggle verified status"
+                                        >
+                                          {rev.verified ? "✓ Verified Buyer" : "Unverified (Click to Verify)"}
+                                        </button>
                                       </div>
                                       <span className="text-[9px] text-sand-400 font-mono mt-0.5 block">{rev.date}</span>
                                     </div>
 
-                                    {/* Star Rating display */}
-                                    <div className="flex items-center gap-0.5">
-                                      {Array.from({ length: 5 }).map((_, i) => (
-                                        <span key={i}>
-                                          <Star className={`w-3 h-3 ${i < rev.rating ? "text-amber-500 fill-amber-400" : "text-sand-200"}`} />
-                                        </span>
-                                      ))}
+                                    {/* Star Rating select */}
+                                    <div className="flex items-center gap-1">
+                                      <select
+                                        value={rev.rating}
+                                        onChange={(e) => handleUpdateReview(rev.id, { rating: Number(e.target.value) })}
+                                        className="text-[10px] font-mono bg-sand-50 border border-sand-200 rounded px-1.5 py-0.5 outline-none cursor-pointer text-amber-600 font-bold"
+                                      >
+                                        <option value={5}>5 ★</option>
+                                        <option value={4}>4 ★</option>
+                                        <option value={3}>3 ★</option>
+                                        <option value={2}>2 ★</option>
+                                        <option value={1}>1 ★</option>
+                                      </select>
                                     </div>
                                   </div>
 
                                   {/* Review Paragraph */}
-                                  <p className="text-xs text-sand-600 leading-relaxed italic">"{rev.text}"</p>
+                                  <textarea
+                                    rows={2}
+                                    value={rev.text}
+                                    onChange={(e) => handleUpdateReview(rev.id, { text: e.target.value })}
+                                    className="w-full text-xs text-sand-700 bg-sand-50/50 hover:bg-white focus:bg-white border border-sand-200 p-2 rounded outline-none focus:ring-1 focus:ring-[#D4BC96] leading-relaxed italic"
+                                  />
                                 </div>
 
                                 {/* Danger delete button */}

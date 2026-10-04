@@ -40,6 +40,10 @@ import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
 import { db, withTimeout } from './config/firebase';
 import { doc, setDoc, onSnapshot, collection, deleteDoc, writeBatch } from 'firebase/firestore';
+import ThreeAtmosphere from './components/ThreeAtmosphere';
+import ThreeBottleCanvas from './components/ThreeBottleCanvas';
+import { ThreeDistilleryLab } from './components/ThreeDistilleryLab';
+import Tilt3DCard from './components/Tilt3DCard';
 
 const isEmbedIframe = (url: string): boolean => {
   if (!url) return false;
@@ -514,6 +518,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [heroMode, setHeroMode] = useState<'3d' | 'video'>('3d');
+  const [distilleryTab, setDistilleryTab] = useState<'lab' | 'video'>('lab');
 
   // Browser back button support for collection filtering
   // When a collection is selected, push a history entry so phone's back button
@@ -1515,8 +1521,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         setBulkEnquiryOpen={setIsBulkEnquiryOpen}
       />
 
+      {/* 3D Ambient Scent Atmosphere Particle Engine */}
+      <ThreeAtmosphere />
+
       {/* Main Content Body */}
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {siteSettings.marqueeEnabled && siteSettings.marqueeText && (
           <div className="bg-[#111111] text-[#D4BC96] py-1.5 overflow-hidden w-full flex border-b border-[#D4BC96]/20">
             <div className="animate-marquee whitespace-nowrap text-[9px] font-mono tracking-[0.2em] uppercase flex space-x-12 px-4">
@@ -1533,110 +1542,163 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           <Route path="/" element={
             <>
 
-        {/* HERO BANNER SECTION */}
+        {/* HERO BANNER SECTION (3D / Cinematic Video) */}
         <section 
-          className="relative h-[85vh] sm:h-[90vh] bg-[#0D0B0A] flex items-center justify-center overflow-hidden" 
+          className="relative min-h-[90vh] bg-[#0D0B0A] flex items-center justify-center overflow-hidden py-12 md:py-0" 
           id="hero-section"
         >
-          {/* Ambient Video background */}
-          <div className="absolute inset-0 z-0">
-            {heroVideoUrl ? (
-              isEmbedIframe(heroVideoUrl) ? (
-                <iframe
-                  key={heroVideoUrl}
-                  src={getEmbedVideoUrl(heroVideoUrl, true)}
-                  title="Hero Ambient Video"
-                  className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-80 scale-110 pointer-events-none select-none"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+          {heroMode === 'video' ? (
+            /* Ambient Video background */
+            <div className="absolute inset-0 z-0">
+              {heroVideoUrl ? (
+                isEmbedIframe(heroVideoUrl) ? (
+                  <iframe
+                    key={heroVideoUrl}
+                    src={getEmbedVideoUrl(heroVideoUrl, true)}
+                    title="Hero Ambient Video"
+                    className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-80 scale-110 pointer-events-none select-none"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <video
+                    ref={heroVideoRef}
+                    key={heroVideoUrl}
+                    src={heroVideoUrl}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover opacity-80 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
+                    poster={coverPhoto}
+                  />
+                )
               ) : (
-                <video
-                  ref={heroVideoRef}
-                  key={heroVideoUrl}
-                  src={heroVideoUrl}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover opacity-80 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
-                  poster={coverPhoto}
+                <img 
+                  src={coverPhoto} 
+                  alt="Luxury Sand Scent Banner background"
+                  className="w-full h-full object-cover opacity-85 scale-100 transition-all duration-300 select-none pointer-events-none"
+                  referrerPolicy="no-referrer"
                 />
-              )
-            ) : (
-              <img 
-                src={coverPhoto} 
-                alt="Luxury Sand Scent Banner background"
-                className="w-full h-full object-cover opacity-85 scale-100 transition-all duration-300 select-none pointer-events-none"
-                referrerPolicy="no-referrer"
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/85"></div>
+            </div>
+          ) : (
+            /* 3D Interactive Spatial Flagon Studio */
+            <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-auto">
+              <ThreeBottleCanvas 
+                initialColor="#2E5A36"
+                productName="Ruh Khus Imperial"
+                bottleSize="50 ml Flagon"
+                className="w-full h-full"
+                autoRotate={true}
+                interactive={true}
               />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/85"></div>
-          </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/60 pointer-events-none"></div>
+            </div>
+          )}
 
-          <div className="relative z-10 mx-auto max-w-5xl px-4 text-center flex flex-col items-center animate-float">
-            
+          <div className="relative z-10 mx-auto max-w-5xl px-4 text-center flex flex-col items-center pointer-events-none">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-[#D4BC96]/40 text-[10px] tracking-[0.25em] text-[#D4BC96] font-mono uppercase mb-4 pointer-events-auto">
+              <Sparkles className="w-3 h-3 text-[#D4BC96] animate-pulse" />
+              <span>{heroMode === '3d' ? 'Interactive 3D Olfactory Studio' : 'Haute Parfumerie Indian Sourcing'}</span>
+            </div>
+
             <h1 
-              className="text-4xl sm:text-6xl md:text-7xl font-serif text-white tracking-widest leading-tight mb-8 max-w-4xl uppercase select-none"
+              className="text-4xl sm:text-6xl md:text-7xl font-serif text-white tracking-widest leading-tight mb-6 max-w-4xl uppercase select-none pointer-events-auto"
               style={{ textShadow: "0 4px 24px rgba(0, 0, 0, 0.75)" }}
             >
               {siteSettings.heroHeadline || "FRAGRANCE"}
             </h1>
             
-            <div className="flex justify-center w-full">
+            <div className="flex flex-wrap items-center justify-center gap-4 w-full pointer-events-auto">
               <button
                 type="button"
                 onClick={() => handleSectionNavigate("shop")}
-                className="px-12 py-3.5 bg-white hover:bg-stone-200 text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-103"
+                className="px-10 py-3.5 bg-white hover:bg-stone-200 text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-103"
               >
                 SHOP NOW
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('distillery-lab-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-8 py-3.5 bg-black/70 hover:bg-black text-[#D4BC96] border border-[#D4BC96]/50 text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer backdrop-blur-md hover:scale-103"
+              >
+                Explore 3D Lab
+              </button>
             </div>
-
           </div>
 
-          {/* Ambient Video Control Toggle Badge */}
-          <div className="absolute bottom-16 right-6 z-20 hidden lg:flex items-center gap-3 bg-black/65 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/10 text-[9px] text-[#FAFAFA] font-mono tracking-widest shadow-lg">
-            <span className="flex items-center gap-1.5">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-gold-500"></span>
+          {/* Mode Switcher: 3D Spatial Flagon vs Video Atmosphere */}
+          <div className="absolute top-20 right-6 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md p-1.5 rounded-full border border-white/20 text-[10px] text-white font-mono shadow-xl">
+            <button
+              type="button"
+              onClick={() => setHeroMode('3d')}
+              className={`px-3 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
+                heroMode === '3d' ? 'bg-[#D4BC96] text-black font-bold shadow' : 'text-stone-300 hover:text-white'
+              }`}
+            >
+              <span>3D Flagon</span>
+              <span className="text-[8px] bg-black/20 px-1 rounded">LIVE</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setHeroMode('video')}
+              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                heroMode === 'video' ? 'bg-white/20 text-white font-bold' : 'text-stone-400 hover:text-white'
+              }`}
+            >
+              Video Mood
+            </button>
+          </div>
+
+          {/* Ambient Video Control Toggle Badge (When in video mode) */}
+          {heroMode === 'video' && (
+            <div className="absolute bottom-16 right-6 z-20 hidden lg:flex items-center gap-3 bg-black/65 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/10 text-[9px] text-[#FAFAFA] font-mono tracking-widest shadow-lg">
+              <span className="flex items-center gap-1.5">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-gold-500"></span>
+                </span>
+                <span className="text-stone-300">VIDEO MOOD:</span>
               </span>
-              <span className="text-stone-300">VIDEO MOOD:</span>
-            </span>
-            <div className="h-3 w-[1px] bg-white/25"></div>
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4")}
-                className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("mixkit-perfume") ? "text-gold-400 font-semibold" : "text-white/60"}`}
-              >
-                Rose Oil
-              </button>
-              <button
-                type="button"
-                onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-vapor-from-a-hot-beverage-42289-large.mp4")}
-                className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("42289") ? "text-gold-400 font-semibold" : "text-white/60"}`}
-              >
-                Vapor
-              </button>
-              <button
-                type="button"
-                onClick={() => setHeroVideoUrl("https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761")}
-                className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("435674703") ? "text-gold-400 font-semibold" : "text-white/60"}`}
-              >
-                River Ghats
-              </button>
-              <div className="h-3.5 w-[1px] bg-white/25"></div>
-              <button
-                type="button"
-                className={`hover:text-red-400 transition-colors cursor-pointer font-bold ${!heroVideoUrl ? "text-red-400" : "text-white/40"}`}
-                onClick={() => setHeroVideoUrl("")}
-              >
-                OFF ✕
-              </button>
+              <div className="h-3 w-[1px] bg-white/25"></div>
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4")}
+                  className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("mixkit-perfume") ? "text-gold-400 font-semibold" : "text-white/60"}`}
+                >
+                  Rose Oil
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-vapor-from-a-hot-beverage-42289-large.mp4")}
+                  className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("42289") ? "text-gold-400 font-semibold" : "text-white/60"}`}
+                >
+                  Vapor
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHeroVideoUrl("https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761")}
+                  className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("435674703") ? "text-gold-400 font-semibold" : "text-white/60"}`}
+                >
+                  River Ghats
+                </button>
+                <div className="h-3.5 w-[1px] bg-white/25"></div>
+                <button
+                  type="button"
+                  className={`hover:text-red-400 transition-colors cursor-pointer font-bold ${!heroVideoUrl ? "text-red-400" : "text-white/40"}`}
+                  onClick={() => setHeroVideoUrl("")}
+                >
+                  OFF ✕
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Scent note scrolling bottom marquee */}
           <div className="absolute bottom-0 left-0 right-0 py-4 bg-black/45 border-t border-sand-900/40 hidden sm:block">
@@ -1936,92 +1998,99 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 const hoverImage = prod.galleryImages?.find(img => img && img.trim() !== "");
 
                 return (
-                  <div 
-                    key={prod.id} 
-                    className="group flex flex-col justify-between transition-all duration-300 relative bg-white p-4 rounded-2xl border border-stone-100 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)]"
-                    id={`product-card-${prod.id}`}
+                  <Tilt3DCard
+                    key={prod.id}
+                    maxTilt={10}
+                    scale={1.02}
+                    glare={true}
+                    className="h-full"
                   >
-                    {/* Image visual wrapper */}
                     <div 
-                      className="relative w-full aspect-[4/5] bg-stone-50 overflow-hidden mb-4 rounded-xl cursor-pointer"
-                      onClick={() => navigate(`/product/${prod.id}`)}
+                      className="group flex flex-col justify-between h-full transition-all duration-300 relative bg-white p-4 rounded-2xl border border-stone-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]"
+                      id={`product-card-${prod.id}`}
                     >
-                      <img 
-                        src={prod.image} 
-                        alt={prod.name} 
-                        className={`w-full h-full object-contain p-4 transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
-                        referrerPolicy="no-referrer"
-                      />
-                      {hoverImage && (
+                      {/* Image visual wrapper */}
+                      <div 
+                        className="relative w-full aspect-[4/5] bg-stone-50 overflow-hidden mb-4 rounded-xl cursor-pointer"
+                        onClick={() => navigate(`/product/${prod.id}`)}
+                      >
                         <img 
-                          src={hoverImage} 
-                          alt={`${prod.name} alternate view`} 
-                          className="absolute inset-0 w-full h-full object-contain p-4 transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                          src={prod.image} 
+                          alt={prod.name} 
+                          className={`w-full h-full object-contain p-4 transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
                           referrerPolicy="no-referrer"
                         />
-                      )}
-                      {/* Sale Badge */}
-                      {prod.price > prod.salePrice && (
-                        <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2.5 py-1 leading-none shadow-sm rounded">
-                           SALE
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Card Content Data block */}
-                    <div className="flex flex-col items-center text-center px-2 flex-grow">
-                      
-                      {/* Rating block */}
-                      <div className="flex items-center space-x-1 mb-2">
-                        <div className="flex text-[#D4BC96]">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star 
-                              key={i} 
-                              className={`w-3.5 h-3.5 ${
-                                i < Math.floor(overallRating) ? "fill-[#D4BC96]" : "text-sand-200"
-                              }`} 
-                            />
-                          ))}
-                        </div>
-                        <span className="text-[11px] text-sand-500 font-mono mt-0.5">
-                          ({totalItemReviews.length})
-                        </span>
-                      </div>
-
-                      <button 
-                        onClick={() => navigate(`/product/${prod.id}`)}
-                        className="text-[18px] sm:text-[20px] font-serif text-[#2D2926] tracking-wide mb-1 hover:text-[#D4BC96] transition-colors focus:outline-none"
-                      >
-                        {prod.name}
-                      </button>
-                      
-                      <p className="text-[10px] text-sand-400 uppercase tracking-widest font-semibold mb-3">
-                        {prod.size}
-                      </p>
-
-                      <div className="flex items-center justify-center gap-2 mb-5">
-                        <span className="text-sm font-sans text-sand-950 font-medium">₹{prod.salePrice}</span>
+                        {hoverImage && (
+                          <img 
+                            src={hoverImage} 
+                            alt={`${prod.name} alternate view`} 
+                            className="absolute inset-0 w-full h-full object-contain p-4 transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                        )}
+                        {/* Sale Badge */}
                         {prod.price > prod.salePrice && (
-                          <span className="text-sm text-sand-400 line-through">₹{prod.price}</span>
+                          <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2.5 py-1 leading-none shadow-sm rounded">
+                             SALE
+                          </div>
                         )}
                       </div>
-                    </div>
 
-                    {/* Full-width Add to Cart Button */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const defaultVariant = prod.variants && prod.variants.length > 0 
-                          ? prod.variants[0].size 
-                          : prod.size;
-                        handleAddToCart(prod, defaultVariant);
-                        setIsCartOpen(true);
-                      }}
-                      className="w-full py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-white transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl mt-2 cursor-pointer"
-                    >
-                      ADD TO CART
-                    </button>
-                  </div>
+                      {/* Card Content Data block */}
+                      <div className="flex flex-col items-center text-center px-2 flex-grow">
+                        
+                        {/* Rating block */}
+                        <div className="flex items-center space-x-1 mb-2">
+                          <div className="flex text-[#D4BC96]">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-3.5 h-3.5 ${
+                                  i < Math.floor(overallRating) ? "fill-[#D4BC96]" : "text-sand-200"
+                                }`} 
+                              />
+                            ))}
+                          </div>
+                          <span className="text-[11px] text-sand-500 font-mono mt-0.5">
+                            ({totalItemReviews.length})
+                          </span>
+                        </div>
+
+                        <button 
+                          onClick={() => navigate(`/product/${prod.id}`)}
+                          className="text-[18px] sm:text-[20px] font-serif text-[#2D2926] tracking-wide mb-1 hover:text-[#D4BC96] transition-colors focus:outline-none"
+                        >
+                          {prod.name}
+                        </button>
+                        
+                        <p className="text-[10px] text-sand-400 uppercase tracking-widest font-semibold mb-3">
+                          {prod.size}
+                        </p>
+
+                        <div className="flex items-center justify-center gap-2 mb-5">
+                          <span className="text-sm font-sans text-sand-950 font-medium">₹{prod.salePrice}</span>
+                          {prod.price > prod.salePrice && (
+                            <span className="text-sm text-sand-400 line-through">₹{prod.price}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Full-width Add to Cart Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const defaultVariant = prod.variants && prod.variants.length > 0 
+                            ? prod.variants[0].size 
+                            : prod.size;
+                          handleAddToCart(prod, defaultVariant);
+                          setIsCartOpen(true);
+                        }}
+                        className="w-full py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-white transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl mt-2 cursor-pointer"
+                      >
+                        ADD TO CART
+                      </button>
+                    </div>
+                  </Tilt3DCard>
                 );
               };
 
@@ -2229,34 +2298,76 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         </section>
 
 
-        {/* DISTILLERY VIDEO SECTION */}
-        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="distillery-video-section">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+        {/* 3D DISTILLERY LABORATORY & CINEMATIC THEATER SECTION */}
+        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="distillery-lab-section">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
             
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold block mb-2 font-mono">
+              Hydro-Distillation Technology • Deg & Bhapka
+            </span>
+
             <h2 className="text-2xl sm:text-4xl font-light font-display text-sand-900 tracking-wide mb-4">
-              {siteSettings.distilleryVideoHeading || "Where are your fragrances manufactured ?"}
+              {siteSettings.distilleryVideoHeading || "The Ancient Art of Kannauj Copper Distillation"}
             </h2>
             <p className="text-xs sm:text-sm text-sand-500 font-light max-w-2xl mb-8 leading-relaxed">
-              {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our distillery. Watch the video of our 204 years old distillery in Kannauj, India."}
+              {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our 204-year-old heritage distillery in Kannauj. Interact with our live 3D copper alembic still or watch the distillery documentary."}
             </p>
-            
-            <div 
-              onClick={() => setIsDistilleryVideoOpen(true)}
-              className="group relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl bg-stone-900 cursor-pointer"
-            >
-              <img 
-                src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200" 
-                alt="Ruh Imperium Distillery" 
-                className="w-full h-full object-cover opacity-75 group-hover:scale-103 transition-transform duration-700 select-none pointer-events-none"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors duration-300" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/30 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-[#D4BC96] group-hover:text-black transition-all duration-500 shadow-xl relative">
-                  <span className="absolute inset-0 rounded-full border border-[#D4BC96] animate-ping opacity-75 pointer-events-none group-hover:animate-none"></span>
-                  <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-current ml-1" />
+
+            {/* Tab Switcher: 3D Live Deg-Bhapka Simulation vs Documentary Film */}
+            <div className="flex items-center gap-2 bg-stone-200/80 p-1.5 rounded-2xl mb-8 border border-stone-300/50 shadow-inner">
+              <button
+                type="button"
+                onClick={() => setDistilleryTab('lab')}
+                className={`px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                  distilleryTab === 'lab'
+                    ? 'bg-[#1a1715] text-[#D4BC96] font-bold shadow-lg'
+                    : 'text-stone-700 hover:text-stone-900 font-medium'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#D4BC96]" />
+                <span>3D Interactive Alembic Lab</span>
+                <span className="text-[9px] bg-[#D4BC96] text-black px-1.5 py-0.2 rounded-full font-bold font-mono">3D</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDistilleryTab('video')}
+                className={`px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                  distilleryTab === 'video'
+                    ? 'bg-[#1a1715] text-[#D4BC96] font-bold shadow-lg'
+                    : 'text-stone-700 hover:text-stone-900 font-medium'
+                }`}
+              >
+                <Play className="w-3.5 h-3.5" />
+                <span>Distillery Video</span>
+              </button>
+            </div>
+
+            {/* Dynamic Viewport */}
+            <div className="w-full max-w-5xl">
+              {distilleryTab === 'lab' ? (
+                <div className="w-full animate-fade-in">
+                  <ThreeDistilleryLab />
                 </div>
-              </div>
+              ) : (
+                <div 
+                  onClick={() => setIsDistilleryVideoOpen(true)}
+                  className="group relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl mx-auto bg-stone-900 cursor-pointer animate-fade-in"
+                >
+                  <img 
+                    src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200" 
+                    alt="Ruh Imperium Distillery" 
+                    className="w-full h-full object-cover opacity-75 group-hover:scale-103 transition-transform duration-700 select-none pointer-events-none"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors duration-300" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/30 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-[#D4BC96] group-hover:text-black transition-all duration-500 shadow-xl relative">
+                      <span className="absolute inset-0 rounded-full border border-[#D4BC96] animate-ping opacity-75 pointer-events-none group-hover:animate-none"></span>
+                      <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-current ml-1" />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
@@ -2268,10 +2379,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-16">
             
             {/* Header with double underline under Kannauj */}
-            <div className="text-center max-w-4xl mx-auto">
+            <div className="text-center max-w-4xl mx-auto space-y-3">
               <h2 className="text-3xl sm:text-5xl font-serif text-sand-900 tracking-wide leading-tight font-light">
-                Handcrafted Fragrances made with functioning plant-based ingredients, straight from India’s perfume capital <span className="relative inline-block font-semibold">Kannauj<span className="absolute bottom-1 left-0 w-full h-[3px] border-b-2 border-double border-emerald-700"></span></span>
+                {siteSettings.whyChooseHeading ? (
+                  siteSettings.whyChooseHeading
+                ) : (
+                  <>Handcrafted Fragrances made with functioning plant-based ingredients, straight from India’s perfume capital <span className="relative inline-block font-semibold">Kannauj<span className="absolute bottom-1 left-0 w-full h-[3px] border-b-2 border-double border-emerald-700"></span></span></>
+                )}
               </h2>
+              {siteSettings.whyChooseSub && (
+                <p className="text-xs sm:text-sm text-sand-500 font-light max-w-2xl mx-auto leading-relaxed">
+                  {siteSettings.whyChooseSub}
+                </p>
+              )}
             </div>
 
             {/* 3 Columns USP List with flask/beaker icons */}
@@ -2725,7 +2845,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               products={products}
             />
           } />
-          <Route path="/our-story" element={<OurStoryPage founders={founders} />} />
+          <Route path="/our-story" element={<OurStoryPage founders={founders} siteSettings={siteSettings} />} />
         </Routes>
       </main>
 

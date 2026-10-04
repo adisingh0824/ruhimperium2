@@ -1,6 +1,7 @@
 import React, { useState, useEffect, FormEvent } from "react";
-import { X, Star, Check, Award, Shovel, ShieldCheck, ShoppingCart, HelpCircle, HeartHandshake, Eye, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Star, Check, Award, Shovel, ShieldCheck, ShoppingCart, HelpCircle, HeartHandshake, Eye, Heart, ChevronLeft, ChevronRight, Box, Image as ImageIcon } from "lucide-react";
 import { Product, Review } from "../types";
+import ThreeBottleCanvas from "./ThreeBottleCanvas";
 
 interface ProductDetailsModalProps {
   product: Product;
@@ -29,6 +30,7 @@ export default function ProductDetailsModal({
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [viewMode, setViewMode] = useState<'photo' | '3d'>('photo');
 
   // Touch gesture state for swiping product photos
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -37,6 +39,7 @@ export default function ProductDetailsModal({
   // Reset active state when product changes
   useEffect(() => {
     setCurrentSlide(0);
+    setViewMode('photo');
     setSelectedSize((prev) => {
       if (prev && product.variants?.some(v => v.size === prev)) return prev;
       return product.variants?.[0]?.size || product.size;
@@ -121,114 +124,162 @@ export default function ProductDetailsModal({
             <h3 className="text-3xl font-light font-display text-sand-900 tracking-wider mb-1">
               {product.name}
             </h3>
-            <p className="text-[10px] uppercase tracking-[0.25em] text-[#D4BC96] font-medium mb-6">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-[#D4BC96] font-medium mb-4">
               {product.tagline}
             </p>
 
-            {(() => {
-              const sliderImages = [product.image, ...(product.productImages || [])].filter(Boolean);
+            {/* Mode Switcher: 2D Gallery vs 3D Spatial Flagon */}
+            <div className="flex items-center justify-between bg-sand-200/80 p-1 rounded-xl mb-3 text-xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('photo')}
+                className={`flex-1 py-1.5 px-3 rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all cursor-pointer ${
+                  viewMode === 'photo'
+                    ? 'bg-white text-sand-900 shadow-sm font-semibold'
+                    : 'text-sand-600 hover:text-sand-900'
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Gallery</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('3d')}
+                className={`flex-1 py-1.5 px-3 rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all cursor-pointer ${
+                  viewMode === '3d'
+                    ? 'bg-[#1a1715] text-[#D4BC96] shadow-md font-semibold'
+                    : 'text-sand-600 hover:text-sand-900'
+                }`}
+              >
+                <Box className="w-3.5 h-3.5 text-[#D4BC96]" />
+                <span className="flex items-center gap-1">
+                  3D Flagon <span className="text-[9px] bg-[#D4BC96] text-black px-1.5 py-0.2 rounded-full font-bold">360°</span>
+                </span>
+              </button>
+            </div>
 
-              const handlePrevSlide = (e: React.MouseEvent) => {
-                e.stopPropagation();
-                setCurrentSlide((prev) => (prev === 0 ? sliderImages.length - 1 : prev - 1));
-              };
+            {viewMode === '3d' ? (
+              <div className="h-72 w-full rounded-2xl overflow-hidden shadow-md my-4 relative bg-[#0e0c0b] border border-[#d4bc96]/30">
+                <ThreeBottleCanvas 
+                  productName={product.name}
+                  bottleSize={selectedSize}
+                  initialColor={
+                    product.name.toLowerCase().includes('khus') || product.name.toLowerCase().includes('vetiver') ? '#2E5A36' :
+                    product.name.toLowerCase().includes('rose') || product.name.toLowerCase().includes('gulab') ? '#A83248' :
+                    product.name.toLowerCase().includes('oud') ? '#633B18' :
+                    product.name.toLowerCase().includes('sandal') || product.name.toLowerCase().includes('chandan') ? '#C79D6B' :
+                    product.name.toLowerCase().includes('mitti') ? '#7C6048' : '#D49438'
+                  }
+                  autoRotate={true}
+                  className="h-full w-full"
+                />
+              </div>
+            ) : (
+              (() => {
+                const sliderImages = [product.image, ...(product.productImages || [])].filter(Boolean);
 
-              const handleNextSlide = (e: React.MouseEvent) => {
-                e.stopPropagation();
-                setCurrentSlide((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
-              };
-
-              const handleTouchStart = (e: React.TouchEvent) => {
-                setTouchEnd(null);
-                setTouchStart(e.targetTouches[0].clientX);
-              };
-
-              const handleTouchMove = (e: React.TouchEvent) => {
-                setTouchEnd(e.targetTouches[0].clientX);
-              };
-
-              const handleTouchEnd = () => {
-                if (touchStart === null || touchEnd === null) return;
-                const distance = touchStart - touchEnd;
-                const minSwipeDistance = 40;
-                if (distance > minSwipeDistance) {
-                  setCurrentSlide((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
-                } else if (distance < -minSwipeDistance) {
+                const handlePrevSlide = (e: React.MouseEvent) => {
+                  e.stopPropagation();
                   setCurrentSlide((prev) => (prev === 0 ? sliderImages.length - 1 : prev - 1));
-                }
-              };
+                };
 
-              return (
-                <div 
-                  className="h-72 w-full rounded-2xl overflow-hidden shadow-md my-4 relative group bg-sand-110 select-none touch-pan-y"
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  <img 
-                    src={sliderImages[currentSlide] || product.image} 
-                    alt={`${product.name} - Slide ${currentSlide + 1}`} 
-                    className="w-full h-full object-cover transition-all duration-500"
-                    referrerPolicy="no-referrer"
-                    key={currentSlide}
-                  />
-                  <div className="absolute inset-0 bg-[#D4BC96]/15 mix-blend-color font-sans"></div>
-                  
-                  {/* Sourced badge */}
-                  <div className="absolute bottom-4 left-4 bg-[#0D0B0A]/85 backdrop-blur-sm text-[#FAFAFA] text-[9px] uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-md border border-sand-900/40 z-10">
-                    Sourced: {product.destination}
+                const handleNextSlide = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setCurrentSlide((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
+                };
+
+                const handleTouchStart = (e: React.TouchEvent) => {
+                  setTouchEnd(null);
+                  setTouchStart(e.targetTouches[0].clientX);
+                };
+
+                const handleTouchMove = (e: React.TouchEvent) => {
+                  setTouchEnd(e.targetTouches[0].clientX);
+                };
+
+                const handleTouchEnd = () => {
+                  if (touchStart === null || touchEnd === null) return;
+                  const distance = touchStart - touchEnd;
+                  const minSwipeDistance = 40;
+                  if (distance > minSwipeDistance) {
+                    setCurrentSlide((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
+                  } else if (distance < -minSwipeDistance) {
+                    setCurrentSlide((prev) => (prev === 0 ? sliderImages.length - 1 : prev - 1));
+                  }
+                };
+
+                return (
+                  <div 
+                    className="h-72 w-full rounded-2xl overflow-hidden shadow-md my-4 relative group bg-sand-110 select-none touch-pan-y"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    <img 
+                      src={sliderImages[currentSlide] || product.image} 
+                      alt={`${product.name} - Slide ${currentSlide + 1}`} 
+                      className="w-full h-full object-cover transition-all duration-500"
+                      referrerPolicy="no-referrer"
+                      key={currentSlide}
+                    />
+                    <div className="absolute inset-0 bg-[#D4BC96]/15 mix-blend-color font-sans"></div>
+                    
+                    {/* Sourced badge */}
+                    <div className="absolute bottom-4 left-4 bg-[#0D0B0A]/85 backdrop-blur-sm text-[#FAFAFA] text-[9px] uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-md border border-sand-900/40 z-10">
+                      Sourced: {product.destination}
+                    </div>
+
+                    {/* Slider Controls (only active if sliderImages.length > 1) */}
+                    {sliderImages.length > 1 && (
+                      <>
+                        {/* Left arrow button */}
+                        <button
+                          type="button"
+                          onClick={handlePrevSlide}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white rounded-full text-sand-850 hover:text-sand-900 border border-sand-200 transition-colors cursor-pointer shadow-sm focus:outline-none z-10 hover:scale-105"
+                          aria-label="Previous image"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+
+                        {/* Right arrow button */}
+                        <button
+                          type="button"
+                          onClick={handleNextSlide}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white rounded-full text-sand-850 hover:text-sand-900 border border-sand-200 transition-colors cursor-pointer shadow-sm focus:outline-none z-10 hover:scale-105"
+                          aria-label="Next image"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+
+                        {/* Slide numbering indicator */}
+                        <div className="absolute top-4 left-4 bg-black/60 text-white text-[8.5px] font-mono px-2 py-0.5 rounded tracking-widest z-10">
+                          {currentSlide + 1} / {sliderImages.length}
+                        </div>
+
+                        {/* Dot navigators */}
+                        <div className="absolute bottom-4 right-4 flex space-x-1.5 z-10 bg-[#0D0B0A]/50 px-2 py-1.5 rounded-md backdrop-blur-xs">
+                          {sliderImages.map((_, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentSlide(idx);
+                              }}
+                              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                                currentSlide === idx ? "bg-[#D4BC96] w-3" : "bg-white/60 hover:bg-white"
+                              }`}
+                              title={`Go to slide ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
-
-                  {/* Slider Controls (only active if sliderImages.length > 1) */}
-                  {sliderImages.length > 1 && (
-                    <>
-                      {/* Left arrow button */}
-                      <button
-                        type="button"
-                        onClick={handlePrevSlide}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white rounded-full text-sand-850 hover:text-sand-900 border border-sand-200 transition-colors cursor-pointer shadow-sm focus:outline-none z-10 hover:scale-105"
-                        aria-label="Previous image"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-
-                      {/* Right arrow button */}
-                      <button
-                        type="button"
-                        onClick={handleNextSlide}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white rounded-full text-sand-850 hover:text-sand-900 border border-sand-200 transition-colors cursor-pointer shadow-sm focus:outline-none z-10 hover:scale-105"
-                        aria-label="Next image"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-
-                      {/* Slide numbering indicator */}
-                      <div className="absolute top-4 left-4 bg-black/60 text-white text-[8.5px] font-mono px-2 py-0.5 rounded tracking-widest z-10">
-                        {currentSlide + 1} / {sliderImages.length}
-                      </div>
-
-                      {/* Dot navigators */}
-                      <div className="absolute bottom-4 right-4 flex space-x-1.5 z-10 bg-[#0D0B0A]/50 px-2 py-1.5 rounded-md backdrop-blur-xs">
-                        {sliderImages.map((_, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCurrentSlide(idx);
-                            }}
-                            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                              currentSlide === idx ? "bg-[#D4BC96] w-3" : "bg-white/60 hover:bg-white"
-                            }`}
-                            title={`Go to slide ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })()}
+                );
+              })()
+            )}
           </div>
 
           {/* Sourcing Short Story Card */}

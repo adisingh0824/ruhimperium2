@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import { ArrowRight, Star, Heart, MapPin, Compass } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Founder } from "../types";
+import { Founder, SiteSettings } from "../types";
 
 interface OurStoryPageProps {
   founders?: Founder[];
+  siteSettings?: SiteSettings;
 }
 
-export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
+export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPageProps) {
   const navigate = useNavigate();
 
   // Scroll to top on page load
@@ -51,17 +52,19 @@ export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
                 CHAPTER 01
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
-                The Art Of Perfume Making
+                {siteSettings?.story01Title || "The Art Of Perfume Making"}
               </h2>
               <div className="h-[1px] w-12 bg-[#D4BC96]"></div>
               
-              <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed">
+              <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line">
                 <p>
-                  A legacy of over 200 years in the Indian perfume capital of Kannauj and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions while crafting fragrances suitable for modern lifestyles.
+                  {siteSettings?.story01Text || "A legacy of over 200 years in the Indian perfume capital of Kannauj and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions while crafting fragrances suitable for modern lifestyles."}
                 </p>
-                <p>
-                  Each blend is formulated using traditional copper stills (Degh-Bhapka) where seasonal botanicals are hydro-distilled into a base of pure oil, completely free from synthetic chemical carriers or cheap petroleum fillers.
-                </p>
+                {!siteSettings?.story01Text && (
+                  <p>
+                    Each blend is formulated using traditional copper stills (Degh-Bhapka) where seasonal botanicals are hydro-distilled into a base of pure oil, completely free from synthetic chemical carriers or cheap petroleum fillers.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -69,8 +72,8 @@ export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
             <div className="lg:col-span-5">
               <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-md border border-sand-200/50">
                 <img 
-                  src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800" 
-                  alt="Traditional Perfumery Art" 
+                  src={siteSettings?.story01Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"} 
+                  alt={siteSettings?.story01Title || "Traditional Perfumery Art"} 
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -89,8 +92,8 @@ export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
             <div className="lg:col-span-5 order-2 lg:order-1">
               <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-md border border-sand-200/50">
                 <img 
-                  src="https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800" 
-                  alt="Botanical copper stills" 
+                  src={siteSettings?.story02Image || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800"} 
+                  alt={siteSettings?.story02Title || "Botanical copper stills"} 
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -102,17 +105,19 @@ export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
                 CHAPTER 02
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
-                True Botanical Luxury & Alcohol-Free Oils
+                {siteSettings?.story02Title || "True Botanical Luxury & Alcohol-Free Oils"}
               </h2>
               <div className="h-[1px] w-12 bg-[#D4BC96]"></div>
               
-              <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed">
+              <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line">
                 <p>
-                  Rooted in tradition, Ruh Imperium transforms heritage into contemporary luxury. Using the ancient deg-bhapka distillation method—slow, hand-done, and deeply intuitive—our attars are crafted with ethically sourced, native Indian ingredients.
+                  {siteSettings?.story02Text || "Rooted in tradition, Ruh Imperium transforms heritage into contemporary luxury. Using the ancient deg-bhapka distillation method—slow, hand-done, and deeply intuitive—our attars are crafted with ethically sourced, native Indian ingredients."}
                 </p>
-                <p>
-                  This slow-perfumery ethos means each flagon is highly concentrated, lasting for hours on your skin while remaining completely gentle and free from industrial denatured alcohol, parabens, and phthalates.
-                </p>
+                {!siteSettings?.story02Text && (
+                  <p>
+                    This slow-perfumery ethos means each flagon is highly concentrated, lasting for hours on your skin while remaining completely gentle and free from industrial denatured alcohol, parabens, and phthalates.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -131,17 +136,19 @@ export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
                 CHAPTER 03
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
-                Our Sourcing Promise
+                {siteSettings?.story03Title || "Our Sourcing Promise"}
               </h2>
               <div className="h-[1px] w-12 bg-[#D4BC96]"></div>
               
-              <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed">
+              <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line">
                 <p>
-                  We believe that to make honest perfumery, we must protect the land and the people who make it possible. Ruh Imperium works directly with sustainable farmer cooperatives in flower belts like Aligarh, Kannauj, and Wayanad.
+                  {siteSettings?.story03Text || "We believe that to make honest perfumery, we must protect the land and the people who make it possible. Ruh Imperium works directly with sustainable farmer cooperatives in flower belts like Aligarh, Kannauj, and Wayanad."}
                 </p>
-                <p>
-                  By bypassing middlemen, we ensure that local artisans receive fair wages while we maintain absolute traceability of our precious biological extracts from soil to skin.
-                </p>
+                {!siteSettings?.story03Text && (
+                  <p>
+                    By bypassing middlemen, we ensure that local artisans receive fair wages while we maintain absolute traceability of our precious biological extracts from soil to skin.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -149,8 +156,8 @@ export default function OurStoryPage({ founders = [] }: OurStoryPageProps) {
             <div className="lg:col-span-5">
               <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-md border border-sand-200/50">
                 <img 
-                  src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800" 
-                  alt="Distillery video" 
+                  src={siteSettings?.story03Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800"} 
+                  alt={siteSettings?.story03Title || "Distillery video"} 
                   className="w-full h-full object-cover"
                 />
               </div>

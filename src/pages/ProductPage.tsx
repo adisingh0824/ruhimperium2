@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, ArrowLeft, ShieldCheck, HeartHandshake, Truck, ChevronLeft, ChevronRight, Home, Box, Image as ImageIcon } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Product, Review } from '../types';
+import ThreeBottleCanvas from '../components/ThreeBottleCanvas';
 
 interface ProductPageProps {
   onAddToCart: (product: Product, size: string) => void;
@@ -32,6 +33,7 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>('story');
+  const [viewMode, setViewMode] = useState<'photo' | '3d'>('photo');
 
   // Reviews state
   const [reviewerName, setReviewerName] = useState("");
@@ -189,66 +191,116 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
       <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-0 sm:py-12">
         <div className="flex flex-col lg:flex-row gap-0 sm:gap-12 lg:gap-20">
           
-          {/* Left: Sticky Image Gallery */}
+          {/* Left: Sticky Image Gallery & 3D Viewer */}
           <div className="w-full lg:w-1/2">
             <div className="lg:sticky lg:top-24 relative group">
-              {/* Desktop Slider Arrows */}
-              {validGalleryImages.length > 0 && (
-                <>
-                  <button 
-                    onClick={() => scrollGallery('left')}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white shadow-md rounded-full p-2 text-sand-800 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block cursor-pointer"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => scrollGallery('right')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white shadow-md rounded-full p-2 text-sand-800 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block cursor-pointer"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-
-              {/* Swipeable Container */}
-              <div ref={scrollRef} className="w-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:rounded-lg" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <style>{`
-                  .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                  }
-                `}</style>
-                
-                {/* Main image */}
-                <div className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-contain"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-
-                {/* Additional gallery images */}
-                {validGalleryImages.map((img, idx) => (
-                  <div key={idx} className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
-                    <img 
-                      src={img} 
-                      alt={`${product.name} gallery view ${idx + 1}`} 
-                      className="w-full h-full object-contain"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                ))}
+              {/* Mode Switcher: 2D Gallery vs 3D Spatial Flagon */}
+              <div className="flex items-center justify-between bg-sand-200/80 p-1.5 rounded-xl mb-4 text-xs max-w-sm mx-auto sm:mx-0">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('photo')}
+                  className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all cursor-pointer ${
+                    viewMode === 'photo'
+                      ? 'bg-white text-sand-900 shadow-sm font-semibold'
+                      : 'text-sand-600 hover:text-sand-900'
+                  }`}
+                >
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  <span>Photo Gallery</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('3d')}
+                  className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all cursor-pointer ${
+                    viewMode === '3d'
+                      ? 'bg-[#1a1715] text-[#D4BC96] shadow-md font-semibold'
+                      : 'text-sand-600 hover:text-sand-900'
+                  }`}
+                >
+                  <Box className="w-3.5 h-3.5 text-[#D4BC96]" />
+                  <span className="flex items-center gap-1">
+                    3D Flagon <span className="text-[9px] bg-[#D4BC96] text-black px-1.5 py-0.2 rounded-full font-bold">360°</span>
+                  </span>
+                </button>
               </div>
 
-              {/* Minimal dots indicator for mobile (shows if there are gallery images) */}
-              {validGalleryImages.length > 0 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 lg:hidden z-10 bg-white/30 backdrop-blur-md px-3 py-1.5 rounded-full">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#2D2926]"></div>
-                  {validGalleryImages.map((_, idx) => (
-                    <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
-                  ))}
+              {viewMode === '3d' ? (
+                <div className="h-[460px] w-full rounded-2xl overflow-hidden shadow-2xl relative bg-[#0e0c0b] border border-[#d4bc96]/30">
+                  <ThreeBottleCanvas 
+                    productName={product.name}
+                    bottleSize={selectedSize || product.size}
+                    initialColor={
+                      product.name.toLowerCase().includes('khus') || product.name.toLowerCase().includes('vetiver') ? '#2E5A36' :
+                      product.name.toLowerCase().includes('rose') || product.name.toLowerCase().includes('gulab') ? '#A83248' :
+                      product.name.toLowerCase().includes('oud') ? '#633B18' :
+                      product.name.toLowerCase().includes('sandal') || product.name.toLowerCase().includes('chandan') ? '#C79D6B' :
+                      product.name.toLowerCase().includes('mitti') ? '#7C6048' : '#D49438'
+                    }
+                    autoRotate={true}
+                    className="h-full w-full"
+                  />
                 </div>
+              ) : (
+                <>
+                  {/* Desktop Slider Arrows */}
+                  {validGalleryImages.length > 0 && (
+                    <>
+                      <button 
+                        onClick={() => scrollGallery('left')}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white shadow-md rounded-full p-2 text-sand-800 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block cursor-pointer"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={() => scrollGallery('right')}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white shadow-md rounded-full p-2 text-sand-800 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block cursor-pointer"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Swipeable Container */}
+                  <div ref={scrollRef} className="w-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:rounded-lg" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <style>{`
+                      .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
+                      }
+                    `}</style>
+                    
+                    {/* Main image */}
+                    <div className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-full object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+
+                    {/* Additional gallery images */}
+                    {validGalleryImages.map((img, idx) => (
+                      <div key={idx} className="flex-none w-full aspect-[4/5] snap-center relative bg-white">
+                        <img 
+                          src={img} 
+                          alt={`${product.name} gallery view ${idx + 1}`} 
+                          className="w-full h-full object-contain"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Minimal dots indicator for mobile (shows if there are gallery images) */}
+                  {validGalleryImages.length > 0 && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 lg:hidden z-10 bg-white/30 backdrop-blur-md px-3 py-1.5 rounded-full">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#2D2926]"></div>
+                      {validGalleryImages.map((_, idx) => (
+                        <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
