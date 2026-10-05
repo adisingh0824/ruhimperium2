@@ -44,6 +44,11 @@ import ThreeAtmosphere from './components/ThreeAtmosphere';
 import ThreeBottleCanvas from './components/ThreeBottleCanvas';
 import { ThreeDistilleryLab } from './components/ThreeDistilleryLab';
 import Tilt3DCard from './components/Tilt3DCard';
+import ShopByNotes from './components/ShopByNotes';
+import ImpactNumbers from './components/ImpactNumbers';
+import FaqSection from './components/FaqSection';
+import CategorySlider from './components/CategorySlider';
+import SandalwoodRitual from './components/SandalwoodRitual';
 
 const isEmbedIframe = (url: string): boolean => {
   if (!url) return false;
@@ -314,7 +319,16 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       footerBottomNarrative: "Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin.",
       footerInstagramUrl: "https://instagram.com",
       footerLinkedinUrl: "https://linkedin.com",
-      footerTwitterUrl: "https://twitter.com"
+      footerTwitterUrl: "https://twitter.com",
+      story01Title: "The Art Of Perfume Making",
+      story01Text: "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. Technology was put to good use, and a new era of intense perfumery began, courtesy of a homegrown brand with a world bound take. No unnecessary middlemen. Straight from India's perfume capital 'Kannauj' to your skin.",
+      story01Image: "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900",
+      story02Title: "Experience True Botanical Luxury and Alcohol-Free Perfume Oils",
+      story02Text: "Rooted in tradition, Ruh Imperium transforms heritage into experience. Using the ancient deg-bhapka distillation method — slow, hand-done, and deeply intuitive. Fragrances are crafted with ethically sourced, native ingredients.",
+      story02Image: "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900",
+      story03Title: "Our Story",
+      story03Text: "At Ruh Imperium, we don't just create scents; we preserve a 200-year legacy. Born in the heart of Kannauj—India’s perfume capital—our journey is a tribute to the ancient art of hydro-distillation. We utilize copper Degs and century-old techniques to extract the soul of flowers, roots, and woods.",
+      story03Image: "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"
     };
   });
 
@@ -333,8 +347,34 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       const cached = localStorage.getItem("ruh-site-settings");
       if (cached) {
         const parsed = JSON.parse(cached);
+        let updated = false;
         if (parsed.customLogoUrl && parsed.customLogoUrl.toLowerCase().includes("raahi")) {
           delete parsed.customLogoUrl;
+          updated = true;
+        }
+        // Force update story titles and texts to exact verbatim Raahi Parfums wording
+        if (!parsed.story03Title || parsed.story03Title === "Our Sourcing Heritage" || parsed.story03Text?.includes("farmers in the flower belts")) {
+          parsed.story03Title = "Our Story";
+          parsed.story03Text = "At Ruh Imperium, we don't just create scents; we preserve a 200-year legacy. Born in the heart of Kannauj—India’s perfume capital—our journey is a tribute to the ancient art of hydro-distillation. We utilize copper Degs and century-old techniques to extract the soul of flowers, roots, and woods.";
+          parsed.story03Image = "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900";
+          updated = true;
+        }
+        if (!parsed.story01Title || parsed.aboutUsText?.includes("We honor ancient traditions.") || !parsed.story01Text?.includes("No unnecessary middlemen") || parsed.story01Image?.includes("photo-1592945403244-b3fbafd7f539")) {
+          parsed.story01Title = "The Art Of Perfume Making";
+          parsed.story01Text = "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. Technology was put to good use, and a new era of intense perfumery began, courtesy of a homegrown brand with a world bound take. No unnecessary middlemen. Straight from India's perfume capital 'Kannauj' to your skin.";
+          parsed.story01Image = "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900";
+          delete parsed.aboutUsHeading;
+          delete parsed.aboutUsText;
+          delete parsed.aboutUsImage;
+          updated = true;
+        }
+        if (!parsed.story02Title || !parsed.story02Text?.includes("ancient deg-bhapka distillation") || parsed.story02Image?.includes("photo-1562690868-60bbe7293e94")) {
+          parsed.story02Title = "Experience True Botanical Luxury and Alcohol-Free Perfume Oils";
+          parsed.story02Text = "Rooted in tradition, Ruh Imperium transforms heritage into experience. Using the ancient deg-bhapka distillation method — slow, hand-done, and deeply intuitive. Fragrances are crafted with ethically sourced, native ingredients.";
+          parsed.story02Image = "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900";
+          updated = true;
+        }
+        if (updated) {
           localStorage.setItem("ruh-site-settings", JSON.stringify(parsed));
           setSiteSettings(parsed);
         }
@@ -1453,7 +1493,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white text-[#111111] font-sans antialiased text-sm flex flex-col justify-between">
+    <div className="min-h-screen bg-white text-[#111111] font-sans antialiased text-sm flex flex-col justify-between">
       
       {/* Editorial Luxury Splash Screen */}
       <AnimatePresence mode="wait">
@@ -1542,397 +1582,234 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           <Route path="/" element={
             <>
 
-        {/* HERO BANNER SECTION (3D / Cinematic Video) */}
-        <section 
-          className="relative min-h-[90vh] bg-[#0D0B0A] flex items-center justify-center overflow-hidden py-12 md:py-0" 
-          id="hero-section"
-        >
-          {heroMode === 'video' ? (
-            /* Ambient Video background */
-            <div className="absolute inset-0 z-0">
-              {heroVideoUrl ? (
-                isEmbedIframe(heroVideoUrl) ? (
-                  <iframe
-                    key={heroVideoUrl}
-                    src={getEmbedVideoUrl(heroVideoUrl, true)}
-                    title="Hero Ambient Video"
-                    className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-80 scale-110 pointer-events-none select-none"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                ) : (
-                  <video
-                    ref={heroVideoRef}
-                    key={heroVideoUrl}
-                    src={heroVideoUrl}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover opacity-80 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
-                    poster={coverPhoto}
-                  />
-                )
-              ) : (
-                <img 
-                  src={coverPhoto} 
-                  alt="Luxury Sand Scent Banner background"
-                  className="w-full h-full object-cover opacity-85 scale-100 transition-all duration-300 select-none pointer-events-none"
-                  referrerPolicy="no-referrer"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/85"></div>
-            </div>
-          ) : (
-            /* 3D Interactive Spatial Flagon Studio */
-            <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-auto">
-              <ThreeBottleCanvas 
-                initialColor="#2E5A36"
-                productName="Ruh Khus Imperial"
-                bottleSize="50 ml Flagon"
-                className="w-full h-full"
-                autoRotate={true}
-                interactive={true}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B0A] via-transparent to-[#0D0B0A]/60 pointer-events-none"></div>
-            </div>
-          )}
-
-          <div className="relative z-10 mx-auto max-w-5xl px-4 text-center flex flex-col items-center pointer-events-none">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-[#D4BC96]/40 text-[10px] tracking-[0.25em] text-[#D4BC96] font-mono uppercase mb-4 pointer-events-auto">
-              <Sparkles className="w-3 h-3 text-[#D4BC96] animate-pulse" />
-              <span>{heroMode === '3d' ? 'Interactive 3D Olfactory Studio' : 'Haute Parfumerie Indian Sourcing'}</span>
-            </div>
-
-            <h1 
-              className="text-4xl sm:text-6xl md:text-7xl font-serif text-white tracking-widest leading-tight mb-6 max-w-4xl uppercase select-none pointer-events-auto"
-              style={{ textShadow: "0 4px 24px rgba(0, 0, 0, 0.75)" }}
-            >
-              {siteSettings.heroHeadline || "FRAGRANCE"}
-            </h1>
-            
-            <div className="flex flex-wrap items-center justify-center gap-4 w-full pointer-events-auto">
-              <button
-                type="button"
-                onClick={() => handleSectionNavigate("shop")}
-                className="px-10 py-3.5 bg-white hover:bg-stone-200 text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-103"
-              >
-                SHOP NOW
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const el = document.getElementById('distillery-lab-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="px-8 py-3.5 bg-black/70 hover:bg-black text-[#D4BC96] border border-[#D4BC96]/50 text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer backdrop-blur-md hover:scale-103"
-              >
-                Explore 3D Lab
-              </button>
-            </div>
-          </div>
-
-          {/* Mode Switcher: 3D Spatial Flagon vs Video Atmosphere */}
-          <div className="absolute top-20 right-6 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md p-1.5 rounded-full border border-white/20 text-[10px] text-white font-mono shadow-xl">
-            <button
-              type="button"
-              onClick={() => setHeroMode('3d')}
-              className={`px-3 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
-                heroMode === '3d' ? 'bg-[#D4BC96] text-black font-bold shadow' : 'text-stone-300 hover:text-white'
-              }`}
-            >
-              <span>3D Flagon</span>
-              <span className="text-[8px] bg-black/20 px-1 rounded">LIVE</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setHeroMode('video')}
-              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                heroMode === 'video' ? 'bg-white/20 text-white font-bold' : 'text-stone-400 hover:text-white'
-              }`}
-            >
-              Video Mood
-            </button>
-          </div>
-
-          {/* Ambient Video Control Toggle Badge (When in video mode) */}
-          {heroMode === 'video' && (
-            <div className="absolute bottom-16 right-6 z-20 hidden lg:flex items-center gap-3 bg-black/65 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/10 text-[9px] text-[#FAFAFA] font-mono tracking-widest shadow-lg">
-              <span className="flex items-center gap-1.5">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-gold-500"></span>
-                </span>
-                <span className="text-stone-300">VIDEO MOOD:</span>
-              </span>
-              <div className="h-3 w-[1px] bg-white/25"></div>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4")}
-                  className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("mixkit-perfume") ? "text-gold-400 font-semibold" : "text-white/60"}`}
-                >
-                  Rose Oil
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-vapor-from-a-hot-beverage-42289-large.mp4")}
-                  className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("42289") ? "text-gold-400 font-semibold" : "text-white/60"}`}
-                >
-                  Vapor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setHeroVideoUrl("https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761")}
-                  className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("435674703") ? "text-gold-400 font-semibold" : "text-white/60"}`}
-                >
-                  River Ghats
-                </button>
-                <div className="h-3.5 w-[1px] bg-white/25"></div>
-                <button
-                  type="button"
-                  className={`hover:text-red-400 transition-colors cursor-pointer font-bold ${!heroVideoUrl ? "text-red-400" : "text-white/40"}`}
-                  onClick={() => setHeroVideoUrl("")}
-                >
-                  OFF ✕
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Scent note scrolling bottom marquee */}
-          <div className="absolute bottom-0 left-0 right-0 py-4 bg-black/45 border-t border-sand-900/40 hidden sm:block">
-            <div className="mx-auto max-w-7xl px-4 flex justify-between items-center text-[10px] uppercase tracking-[0.25em] text-sand-400 font-mono">
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#D4BC96]"></span>
-                <span>PURE MYSORE SANDALWOOD</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#D4BC96]"></span>
-                <span>WAYANAD ORGANIC CARDAMOM</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#D4BC96]"></span>
-                <span>COPPPER-DISTILLED KANNAUJ ROSE</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#D4BC96]"></span>
-                <span>ASSAM DARK AGARWOOD OIL</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* PRESTIGE EDITORIAL PRESS COVERAGE */}
-        <section className="bg-sand-100 py-10 border-b border-sand-200/60 select-none" id="press-section">
-          <div className="mx-auto max-w-7xl px-2">
-            <p className="text-[9px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold text-center mb-6">
-              AS FEATURED IN PRINCIPAL EDITORIALS
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 sm:justify-between text-[#8C8279] font-display text-sm tracking-[0.25em] font-light opacity-75">
-              {siteSettings.pressLogosUrls && siteSettings.pressLogosUrls.trim() !== "" ? (
-                siteSettings.pressLogosUrls.split(",").map((url, i) => (
-                  <img key={i} src={url.trim()} alt="Press" className="h-6 sm:h-8 object-contain cursor-pointer grayscale hover:grayscale-0 transition-all opacity-80 hover:opacity-100" referrerPolicy="no-referrer" />
-                ))
-              ) : (
-                <>
-                  <span className="hover:text-sand-900 transition-colors cursor-default">VOGUE</span>
-                  <span className="hover:text-sand-900 transition-colors cursor-default font-serif italic">GQ INDIA</span>
-                  <span className="hover:text-sand-900 transition-colors cursor-default">ELLE</span>
-                  <span className="hover:text-sand-900 transition-colors cursor-default font-serif">AD DIGEST</span>
-                  <span className="hover:text-[#D4BC96] transition-colors cursor-default">L'OFFICIEL</span>
-                  <span className="hover:text-sand-900 transition-colors cursor-default font-sans font-bold">BAZAAR</span>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
-
-
-
-
-
-
-        {/* DIRECT UPLOADED AD BANNER (IF ENABLED BY ADMIN) */}
-        {siteSettings.activeAdBannerEnabled && siteSettings.activeAdBannerImg && (
-          <section className="bg-sand-900 border-t border-b border-gold-400/20 py-4 select-none animate-fade-in" id="ad-banner-section">
-            <div className="mx-auto max-w-7xl px-4 flex justify-center">
-              <a 
-                href={siteSettings.activeAdBannerLink || "#shop-section"} 
-                className="block hover:opacity-90 transition-opacity rounded-xl overflow-hidden border border-gold-400/30 max-w-4xl w-full"
-              >
-                <img 
-                  src={siteSettings.activeAdBannerImg} 
-                  alt="Dynamic Promotional Ad" 
-                  className="w-full h-auto object-contain" 
-                />
-              </a>
-            </div>
-          </section>
-        )}
-
-
-        {/* SHOP / COLLECTION DIVISION */}
-        <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="shop-section">
-          <div className="mx-auto max-w-7xl px-0 sm:px-6 lg:px-8">
-            
-            {/* Header */}
-            <div className="text-center max-w-3xl mx-auto mb-10">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold block mb-2">
-                Discover Art of Indian Perfumery with our fragrance collections.
-              </span>
-              <h2 className="text-3xl sm:text-5xl font-light font-display text-sand-900 tracking-wide mb-3">
-                The Ruh Imperium Collections
-              </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96] mx-auto mt-4 mb-4"></div>
-              <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed">
-                Experience high-concentration luxury formulations handcrafted in India. Hand-purchased biological extracts, hydro-distilled in traditional copper Degs & Bhapkas.
-              </p>
-            </div>
-
-            {/* Premium Category Search Interface */}
-            <div className="max-w-4xl mx-auto mb-12">
-              {/* Minimalist Search box */}
-              <div className="relative max-w-lg mx-auto">
-                <input
-                  type="text"
-                  placeholder="Search our fragrant catalog (e.g. Jasmines, Mittis, Ouds)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white border border-sand-200 focus:border-[#D4BC96] rounded-xl px-5 py-3 text-xs text-sand-800 outline-none transition-all pr-12 shadow-xs"
-                />
-                {searchQuery ? (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-sand-400 hover:text-black cursor-pointer text-xs"
-                  >
-                    Clear
-                  </button>
-                ) : (
-                  <Sliders className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-300" />
-                )}
-              </div>
-            </div>
-
-            {/* Horizontal Collections Cards Slider Carousel (Screenshot 2) */}
-            {selectedCategory === "All" && searchQuery === "" && (
-              <div className="max-w-6xl mx-auto mb-14 relative px-2 animate-fade-in">
-                <div 
-                  id="collections-cards-scroller"
-                  onScroll={(e) => {
-                    const target = e.currentTarget;
-                    const scrollLeft = target.scrollLeft;
-                    const cardTotalWidth = 270 + 24; // approximate column snap step width
-                    const index = Math.round(scrollLeft / cardTotalWidth);
-                    if (index >= 0 && index < collections.length) {
-                      setActiveSlideIndex(index);
-                    }
-                  }}
-                  className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-none snap-x snap-mandatory scroll-smooth"
-                >
-                  {collections.map((col, idx) => {
-                    let cardImg = col.image || "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800";
-                    let cardTitle = col.name;
-
-                    if (!col.image) {
-                      const nameLower = col.name.toLowerCase();
-                      if (nameLower.includes("authentic") || nameLower.includes("traditional") || nameLower.includes("attar")) {
-                        cardTitle = "Authentic Indian Attars";
-                        cardImg = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800";
-                      } else if (nameLower.includes("next gen") || nameLower.includes("modern")) {
-                        cardTitle = "Modern Attars";
-                        cardImg = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800";
-                      } else if (nameLower.includes("best") || nameLower.includes("artisanal") || nameLower.includes("signature")) {
-                        cardTitle = "Indian Artisanal fragrances";
-                        cardImg = "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800";
-                      } else if (nameLower.includes("parfum") || nameLower.includes("edp")) {
-                        cardTitle = "Eau De Parfum";
-                        cardImg = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
-                      }
-                    }
-
-                    return (
-                      <div 
-                        key={col.id}
-                        onClick={() => {
-                          handleSelectCategory(col.id);
-                          setTimeout(() => {
-                            const el = document.getElementById(`collection-grid-header-${col.id}`);
-                            if (el) {
-                              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
-                          }, 100);
-                        }}
-                        className="group flex flex-col items-center w-[220px] sm:w-[260px] flex-shrink-0 cursor-pointer snap-start"
-                      >
-                        {/* Image element container */}
-                        <div className="w-full aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-sand-100 border border-sand-200/50 shadow-sm relative transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
-                          <img 
-                            src={cardImg} 
-                            alt={cardTitle} 
-                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103"
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              const nameLower = col.name.toLowerCase();
-                              let fallback = "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800";
-                              if (nameLower.includes("authentic") || nameLower.includes("traditional") || nameLower.includes("attar")) {
-                                fallback = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800";
-                              } else if (nameLower.includes("next gen") || nameLower.includes("modern")) {
-                                fallback = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800";
-                              } else if (nameLower.includes("best") || nameLower.includes("artisanal") || nameLower.includes("signature")) {
-                                fallback = "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800";
-                              } else if (nameLower.includes("parfum") || nameLower.includes("edp")) {
-                                fallback = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
-                              }
-                              e.currentTarget.src = fallback;
-                            }}
-                          />
-                        </div>
-                        
-                        {/* Collection Category Title & Description Below Image */}
-                        <div className="flex flex-col items-center text-center mt-4">
-                          <h4 className="text-[12px] sm:text-[13px] font-mono font-bold text-sand-900 tracking-[0.2em] uppercase transition-colors group-hover:text-[#D4BC96]">
-                            {cardTitle}
-                          </h4>
-                          <span className="text-[10px] text-sand-400 font-light mt-1 max-w-[90%] leading-relaxed">
-                            {col.tag}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Elegant Slider Pagination Dots (Screenshot 2) */}
-                <div className="flex justify-center items-center gap-2.5 mt-3">
-                  {collections.map((col, idx) => (
-                    <button
-                      key={col.id}
-                      type="button"
-                      onClick={() => {
-                        const scroller = document.getElementById("collections-cards-scroller");
-                        if (scroller) {
-                          const cardTotalWidth = 270 + 24;
-                          scroller.scrollTo({
-                            left: idx * cardTotalWidth,
-                            behavior: "smooth"
-                          });
-                        }
-                        setActiveSlideIndex(idx);
-                      }}
-                      className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                        activeSlideIndex === idx 
-                          ? "bg-[#C47265] scale-110" // beautiful terracotta pink active rose-gold dot
-                          : "bg-[#E5D7CE]" // muted soft sand gold color
-                      }`}
-                      aria-label={`Go to slide ${idx + 1}`}
+        {/* QUIQ HERO BANNER CONTAINER (RAAHI PARFUMS STYLE) */}
+        <div className="p-2 sm:p-3 -mt-2 sm:-mt-3 max-w-[1550px] mx-auto">
+          <section 
+            className="relative min-h-[75vh] sm:min-h-[82vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
+            id="hero-section"
+          >
+            {heroMode === 'video' ? (
+              /* Ambient Video background */
+              <div className="absolute inset-0 z-0">
+                {heroVideoUrl ? (
+                  isEmbedIframe(heroVideoUrl) ? (
+                    <iframe
+                      key={heroVideoUrl}
+                      src={getEmbedVideoUrl(heroVideoUrl, true)}
+                      title="Hero Ambient Video"
+                      className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-80 scale-110 pointer-events-none select-none"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <video
+                      ref={heroVideoRef}
+                      key={heroVideoUrl}
+                      src={heroVideoUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover opacity-80 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
+                      poster={coverPhoto}
                     />
-                  ))}
-                </div>
+                  )
+                ) : (
+                  <img 
+                    src={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=2560"} 
+                    alt="Luxury Sand Scent Banner background"
+                    className="w-full h-full object-cover opacity-85 scale-100 transition-all duration-300 select-none pointer-events-none"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/70"></div>
+              </div>
+            ) : (
+              /* 3D Interactive Spatial Flagon Studio */
+              <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-auto">
+                <ThreeBottleCanvas 
+                  initialColor="#2E5A36"
+                  productName="Ruh Khus Imperial"
+                  bottleSize="50 ml Flagon"
+                  className="w-full h-full"
+                  autoRotate={true}
+                  interactive={true}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/60 pointer-events-none"></div>
               </div>
             )}
 
+            <div className="relative z-10 mx-auto max-w-4xl px-4 text-center flex flex-col items-center pointer-events-none py-12">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#D4BC96]/50 text-[10px] tracking-[0.28em] text-[#D4BC96] font-mono uppercase mb-5 pointer-events-auto backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-[#D4BC96] animate-pulse" />
+                <span>{heroMode === '3d' ? 'Interactive 3D Flagon' : 'Traditional Kannauj Cooperage'}</span>
+              </div>
+
+              <h1 
+                className="text-3xl sm:text-5xl md:text-6xl font-serif text-white tracking-wide leading-tight mb-4 max-w-3xl pointer-events-auto font-light"
+                style={{ textShadow: "0 4px 24px rgba(0, 0, 0, 0.85)" }}
+              >
+                Luxury Indian Attars & Pure Kannauj Perfumes
+              </h1>
+
+              <p className="text-xs sm:text-sm text-stone-300 max-w-xl mb-6 leading-relaxed font-light pointer-events-auto">
+                Wrap Yourself in Luxury: Discover the Art of Indian Slow-Perfumery with our signature botanical collections.
+              </p>
+
+              {/* Patron Social Proof Pill (Raahi Parfums Style) */}
+              <div className="inline-flex items-center gap-3 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/15 mb-8 pointer-events-auto shadow-xl">
+                <div className="flex -space-x-2 overflow-hidden">
+                  <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" alt="Patron" />
+                  <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120" alt="Patron" />
+                  <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120" alt="Patron" />
+                  <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#19a24b] text-[9px] font-bold text-white ring-2 ring-stone-900">
+                    +5k
+                  </div>
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-1 text-[#D4BC96] text-[10px] leading-none">
+                    <span>★★★★★</span>
+                    <span className="font-mono text-white/90 ml-1 font-bold">4.9/5</span>
+                  </div>
+                  <span className="text-[9.5px] text-stone-300 font-light block mt-0.5">Loved by 10,000+ patrons across India</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap items-center justify-center gap-4 w-full pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={() => handleSectionNavigate("shop")}
+                  className="px-8 sm:px-10 py-3.5 bg-white hover:bg-stone-200 text-stone-950 text-xs uppercase tracking-[0.2em] font-bold transition-all duration-300 cursor-pointer shadow-xl rounded-full hover:scale-103"
+                >
+                  Shop Attars
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (handleSelectCategory) handleSelectCategory("Discovery Set");
+                    handleSectionNavigate("shop");
+                  }}
+                  className="px-8 sm:px-10 py-3.5 bg-black/70 hover:bg-black text-[#D4BC96] border border-[#D4BC96]/60 text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer backdrop-blur-md rounded-full hover:scale-103"
+                >
+                  Discovery Sets
+                </button>
+              </div>
+            </div>
+
+            {/* Ambient Video Control Toggle Badge (When in video mode) */}
+            {heroMode === 'video' && (
+              <div className="absolute bottom-6 right-6 z-20 hidden lg:flex items-center gap-3 bg-black/75 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/10 text-[9px] text-[#FAFAFA] font-mono tracking-widest shadow-lg">
+                <span className="flex items-center gap-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-stone-300">MOOD:</span>
+                </span>
+                <div className="h-3 w-[1px] bg-white/25"></div>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4")}
+                    className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("mixkit-perfume") ? "text-[#D4BC96] font-semibold" : "text-white/60"}`}
+                  >
+                    Rose Oil
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHeroVideoUrl("https://assets.mixkit.co/videos/preview/mixkit-vapor-from-a-hot-beverage-42289-large.mp4")}
+                    className={`hover:text-[#D4BC96] transition-colors cursor-pointer uppercase ${heroVideoUrl && heroVideoUrl.includes("42289") ? "text-[#D4BC96] font-semibold" : "text-white/60"}`}
+                  >
+                    Vapor
+                  </button>
+                  <div className="h-3.5 w-[1px] bg-white/25"></div>
+                  <button
+                    type="button"
+                    className={`hover:text-red-400 transition-colors cursor-pointer font-bold ${!heroVideoUrl ? "text-red-400" : "text-white/40"}`}
+                    onClick={() => setHeroVideoUrl("")}
+                  >
+                    OFF ✕
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+
+        {/* CONTINUOUS SCROLLING TICKER / MARQUEE (RAAHI PARFUMS STYLE) */}
+        <div className="bg-[#111111] text-[#FAFAFA] py-3 overflow-hidden select-none w-full border-t border-b border-stone-850 flex items-center">
+          <div className="flex whitespace-nowrap overflow-hidden w-full">
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-[10.5px] sm:text-[11.5px] font-mono font-bold uppercase tracking-[0.25em] text-[#D4BC96]">
+              <span>THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR</span>
+              <span>•</span>
+              <span>FROM THE PERFUME CAPITAL OF INDIA TO YOUR SKIN</span>
+              <span>•</span>
+              <span>TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES</span>
+              <span>•</span>
+              <span>COMPLIMENTARY PAN-INDIA SHIPPING</span>
+              <span>•</span>
+              <span>100% PURE BOTANICAL OILS</span>
+              <span>•</span>
+            </div>
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-[10.5px] sm:text-[11.5px] font-mono font-bold uppercase tracking-[0.25em] text-[#D4BC96]" aria-hidden="true">
+              <span>THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR</span>
+              <span>•</span>
+              <span>FROM THE PERFUME CAPITAL OF INDIA TO YOUR SKIN</span>
+              <span>•</span>
+              <span>TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES</span>
+              <span>•</span>
+              <span>COMPLIMENTARY PAN-INDIA SHIPPING</span>
+              <span>•</span>
+              <span>100% PURE BOTANICAL OILS</span>
+              <span>•</span>
+            </div>
+          </div>
+        </div>
+
+        {/* QUIQ EDITORIAL CTA SECTION (RAAHI PARFUMS STYLE) */}
+        <section className="bg-white py-12 sm:py-16 border-b border-stone-100">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight">
+                Wrap Yourself in Luxury:{" "}
+                <span className="inline-block align-middle mx-2 w-14 sm:w-20 h-7 sm:h-9 rounded-full overflow-hidden border border-stone-300 shadow-inner align-middle">
+                  <img
+                    src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=200"
+                    alt="Kannauj distillation copper degh"
+                    className="w-full h-full object-cover"
+                  />
+                </span>{" "}
+                Discover Art of Indian Perfumery with our fragrance collections!
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleSectionNavigate("shop")}
+              className="px-7 py-3 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-mono uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0"
+            >
+              Explore Collections
+            </button>
+          </div>
+        </section>
+
+        {/* QUIQ CATEGORY SLIDER (RAAHI PARFUMS STYLE) */}
+        <CategorySlider
+          collections={collections}
+          onSelectCategory={(catId) => {
+            if (catId === "Discovery Set" || catId === "Authentic Indian Attars" || catId === "Eau De Parfum" || catId === "Modern Attars" || catId === "Indian Artisanal fragrances") {
+              handleSelectCategory(catId);
+            } else {
+              handleSelectCategory("All");
+            }
+            handleSectionNavigate("shop");
+          }}
+          selectedCategory={selectedCategory}
+        />
+
+        {/* 4 FEATURED COLLECTIONS SHELVES (DIRECTLY MIRRORING RAAHI PARFUMS) */}
+        <section className="bg-white py-8 sm:py-14 border-b border-stone-100" id="shop-section">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            
             {/* Products Layout Engine */}
             {(() => {
               // Internal logic to filter products
@@ -1970,17 +1847,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
               if (filteredList.length === 0) {
                 return (
-                  <div className="text-center py-16 bg-white rounded-3xl border border-sand-200 max-w-xl mx-auto">
-                    <Sliders className="w-10 h-10 text-[#D4BC96] mx-auto mb-4 stroke-[1.2]" />
-                    <h3 className="text-lg font-serif text-sand-900 tracking-wide mb-1">No Fragrances Found</h3>
-                    <p className="text-xs text-sand-500 font-light mb-4">We couldn't locate any logs matching "{searchQuery}"</p>
+                  <div className="text-center py-16 bg-white rounded-3xl border border-stone-200 max-w-xl mx-auto">
+                    <Sliders className="w-10 h-10 text-stone-400 mx-auto mb-4 stroke-[1.2]" />
+                    <h3 className="text-lg font-serif text-stone-900 tracking-wide mb-1">No Fragrances Found</h3>
+                    <p className="text-xs text-stone-500 font-light mb-4">We couldn't locate any logs matching "{searchQuery}"</p>
                     <button
                       type="button"
                       onClick={() => {
                         setSearchQuery("");
                         setSelectedCategory("All");
                       }}
-                      className="px-5 py-2 bg-[#2D2926] text-white text-[10px] uppercase tracking-widest rounded"
+                      className="px-5 py-2 bg-stone-900 text-white text-[10px] uppercase tracking-widest rounded-full cursor-pointer hover:bg-stone-800 transition-colors"
                     >
                       Reset All Filters
                     </button>
@@ -1988,7 +1865,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 );
               }
 
-              // Card renderer helper
+              // Card renderer matching Raahi Parfums / Dawn Theme
               const renderProductCard = (prod: Product) => {
                 const totalItemReviews = reviews.filter((r) => r.productId === prod.id);
                 const overallRating = totalItemReviews.length > 0 
@@ -1998,103 +1875,100 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 const hoverImage = prod.galleryImages?.find(img => img && img.trim() !== "");
 
                 return (
-                  <Tilt3DCard
+                  <div 
                     key={prod.id}
-                    maxTilt={10}
-                    scale={1.02}
-                    glare={true}
-                    className="h-full"
+                    className="group flex flex-col justify-between h-full bg-white rounded-2xl border border-stone-200/80 p-3 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300"
+                    id={`product-card-${prod.id}`}
                   >
-                    <div 
-                      className="group flex flex-col justify-between h-full transition-all duration-300 relative bg-white p-4 rounded-2xl border border-stone-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]"
-                      id={`product-card-${prod.id}`}
-                    >
-                      {/* Image visual wrapper */}
+                    <div>
+                      {/* 1:1 Square Image Container */}
                       <div 
-                        className="relative w-full aspect-[4/5] bg-stone-50 overflow-hidden mb-4 rounded-xl cursor-pointer"
+                        className="relative w-full aspect-square bg-[#f8f8f8] rounded-xl overflow-hidden mb-3.5 cursor-pointer"
                         onClick={() => navigate(`/product/${prod.id}`)}
                       >
                         <img 
                           src={prod.image} 
                           alt={prod.name} 
-                          className={`w-full h-full object-contain p-4 transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
+                          className={`w-full h-full object-cover transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
                           referrerPolicy="no-referrer"
                         />
                         {hoverImage && (
                           <img 
                             src={hoverImage} 
                             alt={`${prod.name} alternate view`} 
-                            className="absolute inset-0 w-full h-full object-contain p-4 transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                            className="absolute inset-0 w-full h-full object-cover transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                             referrerPolicy="no-referrer"
                           />
                         )}
                         {/* Sale Badge */}
                         {prod.price > prod.salePrice && (
-                          <div className="absolute top-3 left-3 bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-sans font-bold px-2.5 py-1 leading-none shadow-sm rounded">
-                             SALE
+                          <div className="absolute top-2.5 left-2.5 bg-[#C47265] text-white text-[9px] uppercase tracking-widest font-mono font-bold px-2 py-0.5 rounded shadow-xs">
+                            SALE
                           </div>
                         )}
                       </div>
 
-                      {/* Card Content Data block */}
-                      <div className="flex flex-col items-center text-center px-2 flex-grow">
-                        
-                        {/* Rating block */}
-                        <div className="flex items-center space-x-1 mb-2">
-                          <div className="flex text-[#D4BC96]">
+                      {/* Content block */}
+                      <div className="flex flex-col text-left space-y-1">
+                        {/* Title */}
+                        <button 
+                          type="button"
+                          onClick={() => navigate(`/product/${prod.id}`)}
+                          className="text-left text-sm sm:text-[15px] font-serif font-bold text-stone-900 tracking-tight leading-snug hover:text-[#C47265] transition-colors focus:outline-none line-clamp-2"
+                        >
+                          {prod.name}
+                        </button>
+
+                        {/* Rating */}
+                        <div className="flex items-center gap-1.5 pt-0.5">
+                          <div className="flex text-amber-500">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star 
                                 key={i} 
-                                className={`w-3.5 h-3.5 ${
-                                  i < Math.floor(overallRating) ? "fill-[#D4BC96]" : "text-sand-200"
+                                className={`w-3 h-3 ${
+                                  i < Math.floor(overallRating) ? "fill-amber-400 text-amber-400" : "text-stone-200"
                                 }`} 
                               />
                             ))}
                           </div>
-                          <span className="text-[11px] text-sand-500 font-mono mt-0.5">
-                            ({totalItemReviews.length})
+                          <span className="text-[11px] text-stone-600 font-sans">
+                            {overallRating.toFixed(2)} / 5.0 <span className="text-stone-400">({totalItemReviews.length || 142})</span>
                           </span>
                         </div>
 
-                        <button 
-                          onClick={() => navigate(`/product/${prod.id}`)}
-                          className="text-[18px] sm:text-[20px] font-serif text-[#2D2926] tracking-wide mb-1 hover:text-[#D4BC96] transition-colors focus:outline-none"
-                        >
-                          {prod.name}
-                        </button>
-                        
-                        <p className="text-[10px] text-sand-400 uppercase tracking-widest font-semibold mb-3">
-                          {prod.size}
-                        </p>
-
-                        <div className="flex items-center justify-center gap-2 mb-5">
-                          <span className="text-sm font-sans text-sand-950 font-medium">₹{prod.salePrice}</span>
+                        {/* Price */}
+                        <div className="flex items-baseline gap-2 pt-1">
+                          <span className="text-sm sm:text-base font-semibold text-stone-950 font-sans">
+                            ₹ {prod.salePrice ? prod.salePrice.toLocaleString('en-IN') : prod.price.toLocaleString('en-IN')}.00
+                          </span>
                           {prod.price > prod.salePrice && (
-                            <span className="text-sm text-sand-400 line-through">₹{prod.price}</span>
+                            <span className="text-xs text-stone-400 line-through font-sans">
+                              ₹ {prod.price.toLocaleString('en-IN')}.00
+                            </span>
                           )}
                         </div>
                       </div>
-
-                      {/* Full-width Add to Cart Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const defaultVariant = prod.variants && prod.variants.length > 0 
-                            ? prod.variants[0].size 
-                            : prod.size;
-                          handleAddToCart(prod, defaultVariant);
-                          setIsCartOpen(true);
-                        }}
-                        className="w-full py-3.5 bg-stone-900 hover:bg-[#D4BC96] text-white transition-colors text-[10px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl mt-2 cursor-pointer"
-                      >
-                        ADD TO CART
-                      </button>
                     </div>
-                  </Tilt3DCard>
+
+                    {/* Dawn-style Choose Option Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const defaultVariant = prod.variants && prod.variants.length > 0 
+                          ? prod.variants[0].size 
+                          : prod.size;
+                        handleAddToCart(prod, defaultVariant);
+                        setIsCartOpen(true);
+                      }}
+                      className="w-full mt-4 py-2.5 sm:py-3 border border-stone-800 bg-transparent hover:bg-stone-900 text-stone-900 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-xs"
+                    >
+                      Choose Option
+                    </button>
+                  </div>
                 );
               };
 
-              // If filtering by specific search or category, show raw layout query
+              // If filtering by specific search or category, show filtered grid with back button
               if (selectedCategory !== "All" || searchQuery !== "") {
                 const collectionName = selectedCategory !== "All" 
                   ? (collections.find(c => c.id === selectedCategory)?.name || selectedCategory)
@@ -2104,10 +1978,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     {/* Collection Header — Back nav + title */}
                     <div
                       id={`collection-grid-header-${selectedCategory}`}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sand-200 pb-4 mb-8 scroll-mt-24"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-4 mb-8 scroll-mt-24"
                     >
                       <div className="flex items-center gap-3">
-                        {/* Back button */}
                         <button
                           type="button"
                           onClick={() => {
@@ -2115,75 +1988,177 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             setSearchQuery("");
                             window.scrollTo({ top: 0, behavior: "smooth" });
                           }}
-                          className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-sand-500 hover:text-[#2D2926] font-semibold border border-sand-200 hover:border-[#2D2926] px-3 py-2 rounded-full transition-all cursor-pointer shrink-0"
+                          className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-stone-500 hover:text-stone-900 font-semibold border border-stone-200 hover:border-stone-900 px-3 py-2 rounded-full transition-all cursor-pointer shrink-0"
                         >
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                           </svg>
                           All Collections
                         </button>
-                        <span className="text-sand-300 hidden sm:block">|</span>
-                        {/* Collection title */}
+                        <span className="text-stone-300 hidden sm:block">|</span>
                         {collectionName && (
                           <div>
-                            <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide uppercase leading-tight">
+                            <h3 className="text-xl sm:text-2xl font-serif text-stone-900 tracking-tight font-bold">
                               {collectionName}
                             </h3>
-                            <p className="text-[10px] text-sand-400 font-mono mt-0.5">{filteredList.length} fragrance{filteredList.length !== 1 ? "s" : ""}</p>
+                            <p className="text-[10px] text-stone-400 font-mono mt-0.5">{filteredList.length} fragrance{filteredList.length !== 1 ? "s" : ""}</p>
                           </div>
                         )}
                         {searchQuery && (
                           <div>
-                            <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide">
+                            <h3 className="text-xl sm:text-2xl font-serif text-stone-900 tracking-tight font-bold">
                               Results for "{searchQuery}"
                             </h3>
-                            <p className="text-[10px] text-sand-400 font-mono mt-0.5">{filteredList.length} found</p>
+                            <p className="text-[10px] text-stone-400 font-mono mt-0.5">{filteredList.length} found</p>
                           </div>
                         )}
                       </div>
-                      {/* Clear filter chip */}
                       <button
                         type="button"
                         onClick={() => { setSelectedCategory("All"); setSearchQuery(""); }}
-                        className="self-start sm:self-auto text-[9px] uppercase tracking-widest text-sand-400 hover:text-red-500 transition-colors cursor-pointer font-mono"
+                        className="self-start sm:self-auto text-[9px] uppercase tracking-widest text-stone-400 hover:text-red-500 transition-colors cursor-pointer font-mono"
                       >
                         ✕ Clear Filter
                       </button>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                       {filteredList.map((prod) => renderProductCard(prod))}
                     </div>
                   </div>
                 );
               }
 
-              // Otherwise, display Best Sellers / Selected Products
-              let bestSellers = [];
-              if (siteSettings.bestsellerProductIds && siteSettings.bestsellerProductIds.trim() !== "") {
-                const ids = siteSettings.bestsellerProductIds.split(",").map(id => id.trim());
-                bestSellers = products.filter(p => ids.includes(p.id));
-              }
-              if (bestSellers.length === 0) {
-                // fallback to top 4 highest rated products
-                bestSellers = [...products].sort((a, b) => b.rating - a.rating).slice(0, 4);
-              }
+              // Curated Collections Shelves (4 Featured Collections verbatim Raahi Parfums)
+              const authenticAttars = products.filter(p => 
+                p.category === "Authentic Indian Attars" || 
+                p.id.includes("attar") || 
+                ["mitti-attar", "sandalwood-attar", "mogra-attar", "nargis-attar", "dahn-al-oud-attar", "saffron-attar", "raat-ki-rani"].includes(p.id)
+              ).slice(0, 4);
+
+              const artisanalFragrances = products.filter(p => 
+                p.category === "Next Gen fragrances" || 
+                p.category === "Indian Artisanal fragrances" || 
+                ["sandy-hills", "island-bloom", "mogra-madness", "sidr-wood"].includes(p.id)
+              ).slice(0, 4);
+
+              const bestSellersList = products.filter(p => 
+                p.category === "BEST SELLING" || 
+                ["ruh-discovery-set", "mitti-attar", "sandalwood-attar", "mogra-attar"].includes(p.id)
+              ).slice(0, 4);
+
+              const edpFragrances = products.filter(p => 
+                p.category === "Eau De Parfum" || 
+                p.name.toLowerCase().includes("edp") || 
+                ["champa-muse", "dahn-al-oud-edp", "forest-rush", "gulab-edp"].includes(p.id)
+              ).slice(0, 4);
 
               return (
-                <div className="space-y-16">
-                  <div className="space-y-6 scroll-mt-24">
-                    {/* Group Title Box */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-sand-200 pb-4 gap-2">
-                      <div>
-                        <h3 className="text-xl sm:text-2xl font-light font-display text-sand-900 tracking-wide uppercase">
-                          {siteSettings.bestsellerHeading || "Selected Products"}
-                        </h3>
-                        <p className="text-xs text-sand-500 font-light mt-0.5">Curated selections just for you.</p>
-                      </div>
+                <div className="space-y-16 sm:space-y-24">
+                  {/* Shelf 1: Authentic Indian Attars */}
+                  <div className="space-y-6 scroll-mt-24" id="shelf-authentic-attars">
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                        Authentic Indian Attars
+                      </h2>
+                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                        An olfactory legacy of India, crafted with rare botanicals and centuries of perfumery mastery.
+                      </p>
                     </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                      {authenticAttars.map((prod) => renderProductCard(prod))}
+                    </div>
+                    <div className="flex justify-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSelectCategory("Authentic Indian Attars");
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                      >
+                        View all
+                      </button>
+                    </div>
+                  </div>
 
-                    {/* Shelf Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
-                      {bestSellers.map((prod) => renderProductCard(prod))}
+                  {/* Shelf 2: Indian Artisanal fragrances */}
+                  <div className="space-y-6 scroll-mt-24" id="shelf-artisanal">
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                        Indian Artisanal fragrances
+                      </h2>
+                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                        A collection of Artisan Indian Niche Perfumery
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                      {artisanalFragrances.map((prod) => renderProductCard(prod))}
+                    </div>
+                    <div className="flex justify-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSelectCategory("Indian Artisanal fragrances");
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                      >
+                        View all
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Shelf 3: Best Selling */}
+                  <div className="space-y-6 scroll-mt-24" id="shelf-bestsellers">
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                        Best Selling
+                      </h2>
+                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                        Most Loved. Most Reordered.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                      {bestSellersList.map((prod) => renderProductCard(prod))}
+                    </div>
+                    <div className="flex justify-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSelectCategory("BEST SELLING");
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                      >
+                        View all
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Shelf 4: Eau De Parfum */}
+                  <div className="space-y-6 scroll-mt-24" id="shelf-edp">
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                        Eau De Parfum
+                      </h2>
+                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                        For compliments, memories, and everything in between.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                      {edpFragrances.map((prod) => renderProductCard(prod))}
+                    </div>
+                    <div className="flex justify-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSelectCategory("Eau De Parfum");
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                      >
+                        View all
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2196,108 +2171,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
 
-        {/* STORY CARDS GRID SECTION (STICKY SPLIT TIMELINE RAHI PARFUMS STYLE) */}
-        <section className="bg-sand-50 py-16 sm:py-24 border-b border-sand-200" id="story-cards-section">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            
-            {/* Split layout wrapper */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start relative">
-              
-              {/* Left Column: Sticky Story Tag */}
-              <div className="lg:col-span-3 lg:sticky lg:top-28 z-10 py-2 space-y-5">
-                <span className="text-[10px] uppercase tracking-[0.3em] text-[#C47265] font-bold block font-mono">
-                  OUR STORY
-                </span>
-                <h2 className="text-3xl font-serif text-sand-900 leading-tight">
-                  From Kannauj, With Love
-                </h2>
-                <p className="text-xs text-sand-500 font-light leading-relaxed">
-                  A legacy of over 200 years in the Indian perfume capital of Kannauj. We honor ancient traditions while crafting fragrances suitable for modern lifestyles.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => handleSectionNavigate("our-story")}
-                  className="px-5 py-2.5 rounded-full border border-[#C47265] text-[#C47265] bg-transparent hover:bg-[#C47265] hover:text-white transition-all duration-300 text-[10px] uppercase tracking-widest font-mono font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xs hover:shadow-md"
-                >
-                  <span>Our Story</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Right Column: Scrolling Cards Timeline */}
-              <div className="lg:col-span-9 space-y-10 sm:space-y-14">
-                
-                {/* Step 01 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 rounded-[2rem] overflow-hidden border border-sand-200/60 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
-                    <span className="text-3xl sm:text-4xl font-sans font-extrabold text-[#D4BC96] tracking-tight font-mono">01</span>
-                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-sand-900 leading-snug">
-                      {siteSettings.aboutUsHeading || siteSettings.story01Title || "The Art Of Perfume Making"}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
-                      {siteSettings.aboutUsText || siteSettings.story01Text || "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. We honor ancient traditions."}
-                    </p>
-                  </div>
-                  <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
-                    <img 
-                      src={siteSettings.aboutUsImage || siteSettings.story01Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"} 
-                      alt="The Art Of Perfume Making" 
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
-
-                {/* Step 02 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 rounded-[2rem] overflow-hidden border border-sand-200/60 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
-                    <span className="text-3xl sm:text-4xl font-sans font-extrabold text-[#D4BC96] tracking-tight font-mono">02</span>
-                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-sand-900 leading-snug">
-                      {siteSettings.story02Title || "Experience True Botanical Luxury and Alcohol-Free Perfume Oils"}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
-                      {siteSettings.story02Text || "Rooted in tradition, Ruh Imperium transforms heritage into experience. We bring you precious alcohol-free pure oils hydro-distilled in Kannauj copper stills."}
-                    </p>
-                  </div>
-                  <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
-                    <img 
-                      src={siteSettings.story02Image || "https://images.unsplash.com/photo-1562690868-60bbe7293e94?auto=format&fit=crop&q=80&w=800"} 
-                      alt="Experience True Botanical Luxury" 
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
-
-                {/* Step 03 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 rounded-[2rem] overflow-hidden border border-sand-200/60 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
-                    <span className="text-3xl sm:text-4xl font-sans font-extrabold text-[#D4BC96] tracking-tight font-mono">03</span>
-                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-sand-900 leading-snug">
-                      {siteSettings.story03Title || "Our Sourcing Heritage"}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed whitespace-pre-wrap">
-                      {siteSettings.story03Text || "At Ruh Imperium, we don't just create scents; we preserve a multi-generational legacy. We work block-by-block with farmers in the flower belts to ensure pristine purity."}
-                    </p>
-                  </div>
-                  <div className="h-full min-h-[280px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden relative">
-                    <img 
-                      src={siteSettings.story03Image || "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=80&w=800"} 
-                      alt="Our Sourcing Heritage" 
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-103"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-        </section>
-
-
         {/* 3D DISTILLERY LABORATORY & CINEMATIC THEATER SECTION */}
         <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="distillery-lab-section">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
@@ -2307,10 +2180,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             </span>
 
             <h2 className="text-2xl sm:text-4xl font-light font-display text-sand-900 tracking-wide mb-4">
-              {siteSettings.distilleryVideoHeading || "The Ancient Art of Kannauj Copper Distillation"}
+              {siteSettings.distilleryVideoHeading || "Where are your fragrances manufactured ?"}
             </h2>
             <p className="text-xs sm:text-sm text-sand-500 font-light max-w-2xl mb-8 leading-relaxed">
-              {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our 204-year-old heritage distillery in Kannauj. Interact with our live 3D copper alembic still or watch the distillery documentary."}
+              {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our distillery. Watch the video of our 204 years old distillery in Kannauj, India, or interact with our live 3D copper alembic still."}
             </p>
 
             {/* Tab Switcher: 3D Live Deg-Bhapka Simulation vs Documentary Film */}
@@ -2441,39 +2314,118 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           </div>
         </section>
 
-        {/* DARK STATS SECTION & BADGES ROW (RAAHI STYLE) */}
-        <section className="bg-[#0A0A0A] text-white py-20 sm:py-28 border-b border-white/5">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+        {/* HOW IT WORKS / OUR STORY COMPACT (EXACT RAAHI PARFUMS STICKY STACKING TIMELINE) */}
+        <section className="hiw-compact" id="story-cards-section">
+          <div className="hiw-compact__inner">
             
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Heading, Subcopy & Sticky CTA Button matching Raahi Parfums */}
+            <div className="hiw-compact__left">
+              <h2 className="hiw-compact__heading">
+                From Kannauj, With Love
+              </h2>
+              <p className="hiw-compact__subcopy">
+                A legacy of over 200 years in the Indian perfume capital of Kannauj. We honor ancient traditions while crafting fragrances suitable for modern lifestyles.
+              </p>
+              <button
+                type="button"
+                onClick={() => handleSectionNavigate("our-story")}
+                className="hiw-compact__cta"
+              >
+                Our Story
+              </button>
+            </div>
+
+            {/* Right Column: Sticky Stacking Cards */}
+            <div className="hiw-compact__right">
               
-              {/* Stat 1: Image Card */}
-              <div className="aspect-[4/3] lg:aspect-auto rounded-3xl overflow-hidden relative border border-white/10 group shadow-lg min-h-[260px]">
-                <img 
-                  src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800" 
-                  alt="Traditional distillation stills" 
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-700 select-none pointer-events-none"
-                  referrerPolicy="no-referrer"
-                />
+              {/* Step 01 */}
+              <div className="hiw-step-wrapper">
+                <article className="hiw-step">
+                  <div className="hiw-step__content">
+                    <div className="hiw-step__number">
+                      01
+                    </div>
+                    <div className="hiw-inner__content">
+                      <h3 className="hiw-step__title">
+                        {siteSettings.story01Title || "The Art Of Perfume Making"}
+                      </h3>
+                      <p className="hiw-step__desc whitespace-pre-line">
+                        {siteSettings.story01Text || "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruhimperium.com Technology was put to good use, and a new era of intense perfumery began, courtesy of a homegrown brand with a world bound take. No unnecessary middlemen. Straight from India's perfume capital 'Kannauj' to your skin."}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hiw-step__media">
+                    <img 
+                      src={siteSettings.story01Image || "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900"} 
+                      alt="The Art Of Perfume Making" 
+                      className="hiw-step__img"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=900";
+                      }}
+                    />
+                  </div>
+                </article>
               </div>
 
-              {/* Stat 2: 75+ Signature Blends */}
-              <div className="bg-[#121212] border border-white/5 p-10 rounded-3xl flex flex-col justify-center space-y-4 hover:border-white/10 transition-colors duration-300">
-                <div className="text-5xl sm:text-6xl font-sans font-extrabold tracking-tight text-white">75+</div>
-                <h4 className="text-xs uppercase tracking-widest text-[#C47265] font-bold font-mono">Signature Blends</h4>
-                <p className="text-xs text-stone-400 font-light leading-relaxed">
-                  A diverse collection of attars crafted for every mood and moment.
-                </p>
+              {/* Step 02 */}
+              <div className="hiw-step-wrapper">
+                <article className="hiw-step">
+                  <div className="hiw-step__content">
+                    <div className="hiw-step__number">
+                      02
+                    </div>
+                    <div className="hiw-inner__content">
+                      <h3 className="hiw-step__title">
+                        {siteSettings.story02Title || "Experience True Botanical Luxury and Alcohol-Free Perfume Oils"}
+                      </h3>
+                      <p className="hiw-step__desc whitespace-pre-line">
+                        {siteSettings.story02Text || "Rooted in tradition, Ruh Imperium transforms heritage into experience. Using the ancient deg-bhapka distillation method — slow, hand-done, and deeply intuitive. Fragrances are crafted with ethically sourced, native ingredients."}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hiw-step__media">
+                    <img 
+                      src={siteSettings.story02Image || "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900"} 
+                      alt="Experience True Botanical Luxury" 
+                      className="hiw-step__img"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=900";
+                      }}
+                    />
+                  </div>
+                </article>
               </div>
 
-              {/* Stat 3: 200+ Years of Expertise */}
-              <div className="bg-[#121212] border border-white/5 p-10 rounded-3xl flex flex-col justify-center space-y-4 hover:border-white/10 transition-colors duration-300">
-                <div className="text-5xl sm:text-6xl font-sans font-extrabold tracking-tight text-white">200+</div>
-                <h4 className="text-xs uppercase tracking-widest text-[#C47265] font-bold font-mono">Years of Expertise</h4>
-                <p className="text-xs text-stone-400 font-light leading-relaxed">
-                  Blending tradition and innovation in every bottle.
-                </p>
+              {/* Step 03 */}
+              <div className="hiw-step-wrapper">
+                <article className="hiw-step">
+                  <div className="hiw-step__content">
+                    <div className="hiw-step__number">
+                      03
+                    </div>
+                    <div className="hiw-inner__content">
+                      <h3 className="hiw-step__title">
+                        {siteSettings.story03Title || "Our Story"}
+                      </h3>
+                      <p className="hiw-step__desc whitespace-pre-line">
+                        {siteSettings.story03Text || "At Ruh Imperium, we don't just create scents; we preserve a 200-year legacy. Born in the heart of Kannauj—India’s perfume capital—our journey is a tribute to the ancient art of hydro-distillation. We utilize copper Degs and century-old techniques to extract the soul of flowers, roots, and woods."}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hiw-step__media">
+                    <img 
+                      src={siteSettings.story03Image || "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"} 
+                      alt="Our Story" 
+                      className="hiw-step__img"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&q=80&w=900";
+                      }}
+                    />
+                  </div>
+                </article>
               </div>
 
             </div>
@@ -2481,50 +2433,157 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           </div>
         </section>
 
-        {/* 4 CERTIFICATION BADGES ROW */}
+
+        {/* SANDALWOOD STICK + RUBBING STONE HIGHLIGHT (RAAHI PARFUMS STYLE) */}
+        <SandalwoodRitual 
+          onExplore={() => {
+            if (handleSelectCategory) handleSelectCategory("Sandalwood");
+            handleSectionNavigate("shop");
+          }}
+        />
+
+        {/* SHOP BY NOTES SECTION (THE AROMA DECK - RAAHI PARFUMS STYLE) */}
+        <ShopByNotes 
+          onSelectNote={(note) => {
+            if (setSelectedCategory) setSelectedCategory(note);
+            handleSectionNavigate("shop");
+            setTimeout(() => {
+              const el = document.getElementById("shop-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+          }}
+          activeNote={selectedCategory}
+        />
+
+        {/* IMPACT NUMBERS BENTO GRID (RAAHI PARFUMS STYLE) */}
+        <ImpactNumbers />
+
+        {/* 4 CERTIFICATION BADGES ROW (MULTICOLUMN RAAHI PARFUMS STYLE) */}
         <section className="bg-white py-14 border-b border-sand-200/50">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center justify-items-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6 items-center justify-items-center text-center">
               
               {/* Badge 1 */}
-              <div className="flex flex-col items-center space-y-2.5">
-                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 p-3 bg-stone-50/50">
-                  <span className="text-[7px] font-sans font-extrabold tracking-tighter uppercase text-center leading-none text-stone-600">MADE IN<br/><span className="text-[10px] text-stone-850">INDIA</span></span>
+              <div className="flex flex-col items-center space-y-3 max-w-[220px]">
+                <div className="w-16 h-16 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/70 p-3 shadow-xs">
+                  <span className="text-[7.5px] font-sans font-extrabold tracking-wider uppercase text-center leading-tight text-stone-700">SOURCE<br/><span className="text-[10px] text-stone-900 font-black">DIRECT</span></span>
                 </div>
-                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Made In India</span>
+                <span className="text-xs font-serif font-medium text-stone-850 leading-snug">
+                  Packaged at source and shipped direct to you
+                </span>
               </div>
 
               {/* Badge 2 */}
-              <div className="flex flex-col items-center space-y-2.5">
-                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/50">
-                  <svg className="w-6 h-6 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <div className="flex flex-col items-center space-y-3 max-w-[220px]">
+                <div className="w-16 h-16 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/70 shadow-xs">
+                  <svg className="w-7 h-7 text-stone-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm-3 0c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm6.5-6.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Cruelty Free</span>
+                <span className="text-xs font-serif font-medium text-stone-850 leading-snug">
+                  Not tested on animals
+                </span>
               </div>
 
               {/* Badge 3 */}
-              <div className="flex flex-col items-center space-y-2.5">
-                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/50">
-                  <svg className="w-6 h-6 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <div className="flex flex-col items-center space-y-3 max-w-[220px]">
+                <div className="w-16 h-16 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/70 shadow-xs">
+                  <svg className="w-7 h-7 text-stone-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M12 3v18M3 12h18M12 3a9 9 0 0 1 9 9M12 21a9 9 0 0 1-9-9" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Plant Based</span>
+                <span className="text-xs font-serif font-medium text-stone-850 leading-snug">
+                  No animal derived ingredients
+                </span>
               </div>
 
               {/* Badge 4 */}
-              <div className="flex flex-col items-center space-y-2.5">
-                <div className="w-14 h-14 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/50">
-                  <Truck className="w-6 h-6 text-stone-600" />
+              <div className="flex flex-col items-center space-y-3 max-w-[220px]">
+                <div className="w-16 h-16 rounded-full border border-stone-200 flex items-center justify-center text-stone-750 bg-stone-50/70 shadow-xs">
+                  <Truck className="w-7 h-7 text-stone-700" />
                 </div>
-                <span className="text-[10px] uppercase tracking-widest text-stone-550 font-bold font-mono">Free Shipping</span>
+                <span className="text-xs font-serif font-medium text-stone-850 leading-snug">
+                  Free Shipping
+                </span>
               </div>
 
             </div>
           </div>
         </section>
+
+        {/* TRAVEL JOURNAL / DIARY ARTICLES (INSIGHTS RAAHI STYLE) */}
+        <section className="bg-white py-16 sm:py-24 border-b border-sand-200" id="journal-section">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            
+            {/* QUIQ CTA: INSIGHTS (RAAHI PARFUMS STYLE) */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 sm:mb-16 border-b border-stone-200/80 pb-6">
+              <div>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight flex flex-wrap items-center gap-3">
+                  <span>Insights</span>
+                  <span className="inline-block w-14 sm:w-18 h-7 sm:h-9 rounded-full overflow-hidden border border-stone-300 shadow-inner align-middle">
+                    <img
+                      src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=200"
+                      alt="Handcrafted Indian Attar"
+                      className="w-full h-full object-cover"
+                    />
+                  </span>
+                  <span className="text-stone-700 font-light">Handcrafted Indian Attars</span>
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-500 font-light mt-1">
+                  Discover the sacred distillation secrets, olfactory notes, and centuries-old Kannauj traditions.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const firstArticle = blogArticles[0];
+                  if (firstArticle) setSelectedArticle(firstArticle);
+                }}
+                className="px-6 py-2.5 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-mono uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0"
+              >
+                Read Journal
+              </button>
+            </div>
+
+            {/* List */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+              {blogArticles.slice(0, 3).map((article) => (
+                <article 
+                  key={article.id} 
+                  onClick={() => setSelectedArticle(article)}
+                  className="flex flex-col cursor-pointer group space-y-4"
+                  id={`diary-article-${article.id}`}
+                >
+                  {/* Image container */}
+                  <div className="aspect-[16/10] w-full overflow-hidden rounded-[1.5rem] bg-stone-100 border border-stone-100 shadow-sm relative transition-all duration-500 group-hover:shadow-md">
+                    <img 
+                      src={article.image} 
+                      alt={article.title} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103 select-none pointer-events-none"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+
+                  {/* Text meta */}
+                  <div className="flex flex-col space-y-2 text-left">
+                    <h3 className="text-lg font-serif font-semibold text-stone-900 leading-snug group-hover:text-[#D4BC96] transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <span className="text-[10px] tracking-widest text-stone-400 font-bold uppercase block mt-1">
+                      {article.date}
+                    </span>
+                    <p className="text-xs sm:text-[13px] text-stone-500 font-light leading-relaxed line-clamp-3">
+                      {article.excerpt}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+          </div>
+        </section>
+
+
 
         {/* SHOP BY USE SECTION (OCCASIONS GRID) */}
         <section className="bg-sand-50 py-20 sm:py-28 border-b border-sand-200/50">
@@ -2608,93 +2667,84 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           </div>
         </section>
 
-        {/* TIMELESS SCENT TAG CLOUD SECTION */}
-        <section className="bg-white py-20 sm:py-28 border-b border-sand-200/50">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        {/* TIMELESS SCENT TAG CLOUD SECTION (RAAHI PARFUMS CUSTOM LIQUID CLONE) */}
+        <section className="bg-white py-16 sm:py-24 border-b border-sand-200/50 overflow-hidden" id="tag-cloud-section">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
-              {/* Left Column: Bold text with green arrow */}
-              <div className="lg:col-span-6 space-y-6">
-                <h2 className="text-4xl sm:text-5xl font-serif font-light text-sand-900 leading-tight tracking-wide relative">
-                  A single drop that <span className="text-emerald-800 font-semibold relative">reveals<span className="absolute -top-6 -right-6 hidden sm:block">
-                    <svg className="w-12 h-12 text-emerald-600 rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+              {/* Left Column: Headline with green curve accent */}
+              <div className="lg:col-span-6 space-y-4">
+                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-stone-900 leading-[1.08] tracking-tight relative">
+                  A single drop that reveals<br />
+                  a world of <span className="font-semibold text-emerald-800 relative">timeless<span className="absolute -top-6 -right-8 hidden sm:block">
+                    <svg className="w-10 h-10 text-emerald-600 rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                     </svg>
-                  </span></span> a world of timeless fragrances.
+                  </span></span><br />
+                  fragrances.
                 </h2>
               </div>
 
-              {/* Right Column: Scent Tag Grid */}
-              <div className="lg:col-span-6 flex flex-wrap gap-3 justify-center lg:justify-start">
-                {["ROSE", "SAFFRON", "FLORAL", "MUSK", "SANDALWOOD", "WOODY", "MOGRA", "OUD", "AMBER", "FRESH", "VETIVER (KHUS)", "SPICY"].map((tag, idx) => (
-                  <button 
-                    key={`${tag}-${idx}`}
-                    onClick={() => handleSectionNavigate("shop")}
-                    className="px-6 py-2.5 rounded-full border border-stone-250 text-stone-750 text-xs font-mono uppercase tracking-wider hover:bg-[#C47265] hover:text-white hover:border-[#C47265] transition-all duration-300 cursor-pointer shadow-xs"
-                  >
-                    {tag}
-                  </button>
-                ))}
+              {/* Right Column: Flowing Chips Wall with Gradient Fade Edges */}
+              <div className="lg:col-span-6 relative overflow-hidden h-[210px] flex items-center">
+                {/* Left Fade */}
+                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                {/* Right Fade */}
+                <div className="absolute right-0 inset-y-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+                {/* Animated Marquee of Chip Columns */}
+                <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] whitespace-nowrap">
+                  {/* Column 1 */}
+                  <div className="flex flex-col gap-3">
+                    {["Rose", "Sandalwood", "Oud", "Mogra"].map(note => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                        {note}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Column 2 */}
+                  <div className="flex flex-col gap-3">
+                    {["Saffron", "Musk", "Amber", "Vetiver (Khus)"].map(note => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                        {note}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Column 3 */}
+                  <div className="flex flex-col gap-3">
+                    {["Floral", "Woody", "Fresh", "Spicy"].map(note => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                        {note}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Repeat Column 1 for loop */}
+                  <div className="flex flex-col gap-3">
+                    {["Rose", "Sandalwood", "Oud", "Mogra"].map((note, idx) => (
+                      <button key={`rep1-${note}-${idx}`} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                        {note}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Repeat Column 2 for loop */}
+                  <div className="flex flex-col gap-3">
+                    {["Saffron", "Musk", "Amber", "Vetiver (Khus)"].map((note, idx) => (
+                      <button key={`rep2-${note}-${idx}`} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                        {note}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
               </div>
 
             </div>
           </div>
         </section>
 
+        {/* FREQUENTLY ASKED QUESTIONS SECTION (RAAHI PARFUMS ACCORDION) */}
+        <FaqSection />
 
-
-
-        {/* TRAVEL JOURNAL / DIARY ARTICLES (INSIGHTS RAAHI STYLE) */}
-        <section className="bg-white py-16 sm:py-24 border-b border-sand-200" id="journal-section">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            
-            {/* Header */}
-            <div className="text-left mb-12 sm:mb-16">
-              <h2 className="text-4xl font-serif text-stone-900 tracking-tight mb-2 select-none" style={{ fontFamily: "Georgia, serif" }}>
-                Insights
-              </h2>
-              <span className="text-emerald-700 text-sm font-sans tracking-wide font-medium block">
-                Handcrafted Indian Attar
-              </span>
-            </div>
-
-            {/* List */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
-              {blogArticles.slice(0, 3).map((article) => (
-                <article 
-                  key={article.id} 
-                  onClick={() => setSelectedArticle(article)}
-                  className="flex flex-col cursor-pointer group space-y-4"
-                  id={`diary-article-${article.id}`}
-                >
-                  {/* Image container */}
-                  <div className="aspect-[16/10] w-full overflow-hidden rounded-[1.5rem] bg-stone-100 border border-stone-100 shadow-sm relative transition-all duration-500 group-hover:shadow-md">
-                    <img 
-                      src={article.image} 
-                      alt={article.title} 
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103 select-none pointer-events-none"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Text meta */}
-                  <div className="flex flex-col space-y-2 text-left">
-                    <h3 className="text-lg font-serif font-semibold text-stone-900 leading-snug group-hover:text-[#D4BC96] transition-colors line-clamp-2">
-                      {article.title}
-                    </h3>
-                    <span className="text-[10px] tracking-widest text-stone-400 font-bold uppercase block mt-1">
-                      {article.date}
-                    </span>
-                    <p className="text-xs sm:text-[13px] text-stone-500 font-light leading-relaxed line-clamp-3">
-                      {article.excerpt}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-          </div>
-        </section>
 
 
 

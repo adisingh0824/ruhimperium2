@@ -61,10 +61,10 @@ export default function Header({
   const announcements = siteSettings?.announcementText
     ? [siteSettings.announcementText]
     : [
-        "EXPERIENCE THE ART OF LUXURY SLOW-PERFUMERY",
-        "CO-FOUNDED BY MASTER PERFUMERS VIMAL & ADITYA IN MUMBAI",
-        "COMPLIMENTARY SECURE PAN-INDIA DELIVERY ON ALL PRODUCTS",
-        "USE EXCLUSIVITY CODE 'RUH20' AT CABINET TO UNLOCK 20% PRIVILEGE"
+        "BUY 2 PRODUCTS AND GET 20% DISCOUNT, USE CODE : BUY2 | FREE TESTER ON ALL PREPAID ORDERS",
+        "THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR",
+        "TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES • 100% BOTANICAL",
+        "COMPLIMENTARY SECURE PAN-INDIA DELIVERY ON ALL ORDERS"
       ];
   const [currentAnnouncementIdx, setCurrentAnnouncementIdx] = useState(0);
 
@@ -77,9 +77,33 @@ export default function Header({
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
-  const [giftingOpen, setGiftingOpen] = useState(false);
+  const [collectionsDropdownOpen, setCollectionsDropdownOpen] = useState(false);
+  const [notesDropdownOpen, setNotesDropdownOpen] = useState(false);
+  const [useDropdownOpen, setUseDropdownOpen] = useState(false);
   const [internalBulkEnquiryOpen, setInternalBulkEnquiryOpen] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < 90) {
+        setHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 150) {
+        // Scrolling down -> hide header if no modal/dropdown is open
+        if (!mobileMenuOpen && !collectionsDropdownOpen && !notesDropdownOpen && !useDropdownOpen && !searchOpen) {
+          setHeaderVisible(false);
+        }
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up -> reveal header
+        setHeaderVisible(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY, mobileMenuOpen, collectionsDropdownOpen, notesDropdownOpen, useDropdownOpen, searchOpen]);
   const bulkEnquiryOpen = propBulkEnquiryOpen !== undefined ? propBulkEnquiryOpen : internalBulkEnquiryOpen;
   const setBulkEnquiryOpen = propSetBulkEnquiryOpen || setInternalBulkEnquiryOpen;
 
@@ -97,12 +121,32 @@ export default function Header({
 
   const cartTotalItems = cart.reduce((sums, item) => sums + item.quantity, 0);
 
-  const categories = [
-    { id: "All", name: "Shop All" },
-    { id: "Gourmand", name: "Gourmand" },
-    { id: "Oriental", name: "Oriental" },
-    { id: "Wellness", name: "Wellness" },
-    { id: "Discovery Set", name: "Discovery Sets" }
+  const collectionsMenu = [
+    { id: "Authentic Indian Attars", name: "Authentic Indian Attars" },
+    { id: "Eau De Parfum", name: "Eau De Parfum" },
+    { id: "Modern Attars", name: "Modern Attars" },
+    { id: "Indian Artisanal fragrances", name: "Indian Artisanal Fragrances" },
+    { id: "Discovery Set", name: "Discovery Sets" },
+    { id: "Ruh / Absolute Oil", name: "Ruh / Absolute Oil" },
+    { id: "All", name: "Shop All Products" }
+  ];
+
+  const notesMenu = [
+    { id: "Floral", name: "Floral Notes" },
+    { id: "Woody", name: "Woody Notes" },
+    { id: "Fresh", name: "Fresh Notes" },
+    { id: "Musky", name: "Musky Notes" },
+    { id: "Gourmand", name: "Gourmand Notes" },
+    { id: "Oriental", name: "Oriental Notes" }
+  ];
+
+  const useMenu = [
+    { id: "Daily Wear", name: "Daily Wear" },
+    { id: "Office Wear", name: "Office Wear" },
+    { id: "Festival Season", name: "Festival Season" },
+    { id: "Party Wear", name: "Party Wear" },
+    { id: "Summer", name: "Summer" },
+    { id: "Winter", name: "Winter" }
   ];
 
   const handleCategorySelect = (categoryId: string) => {
@@ -110,7 +154,9 @@ export default function Header({
       setSelectedCategory(categoryId);
     }
     onNavigate("shop");
-    setShopDropdownOpen(false);
+    setCollectionsDropdownOpen(false);
+    setNotesDropdownOpen(false);
+    setUseDropdownOpen(false);
   };
 
   const handleBulkSubmit = (e: FormEvent) => {
@@ -132,7 +178,7 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-stone-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] transition-all duration-300">
+    <header className={`sticky top-0 z-50 w-full bg-white border-b border-stone-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] transition-transform duration-300 ease-in-out ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
 
       {/* Luxury Minimalist Announcement Ticker Bar */}
       <div className="bg-black text-white py-2.5 relative overflow-hidden select-none w-full border-b border-stone-900 flex items-center">
@@ -268,106 +314,157 @@ export default function Header({
         </div>
 
         <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-sand-200">
-          <ul className="flex items-center space-x-8 text-[11px] tracking-widest uppercase font-sans text-sand-900 font-semibold">
+          <ul className="flex items-center space-x-7 text-[11px] tracking-widest uppercase font-sans text-stone-900 font-semibold">
             
-            {/* 1. Shop All */}
-            <li className="relative py-3">
+            {/* 1. Collections Dropdown */}
+            <li 
+              className="relative py-3 group"
+              onMouseEnter={() => setCollectionsDropdownOpen(true)}
+              onMouseLeave={() => setCollectionsDropdownOpen(false)}
+            >
               <button
                 type="button"
-                onClick={() => {
-                  if (setSelectedCategory) setSelectedCategory("All");
-                  onNavigate("shop");
-                }}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
+                onClick={() => handleCategorySelect("All")}
+                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1"
               >
-                Shop All
+                <span>Collections</span>
+                <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
               </button>
+
+              {collectionsDropdownOpen && (
+                <div className="absolute top-full left-0 w-64 bg-white border border-stone-200 shadow-xl rounded-2xl py-2 z-50 animate-fade-in">
+                  {collectionsMenu.map((col) => (
+                    <button
+                      key={col.id}
+                      type="button"
+                      onClick={() => handleCategorySelect(col.id)}
+                      className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                    >
+                      <span>{col.name}</span>
+                      <span className="text-[9px] text-stone-400 font-mono tracking-normal">→</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
 
-            {/* 2. Gourmand */}
-            <li className="relative py-3">
+            {/* 2. Shop by Notes Dropdown */}
+            <li 
+              className="relative py-3 group"
+              onMouseEnter={() => setNotesDropdownOpen(true)}
+              onMouseLeave={() => setNotesDropdownOpen(false)}
+            >
               <button
                 type="button"
                 onClick={() => {
-                  if (setSelectedCategory) setSelectedCategory("Gourmand");
-                  onNavigate("shop");
+                  const el = document.getElementById("shop-by-notes-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1"
               >
-                Gourmand
+                <span>Shop by Notes</span>
+                <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
               </button>
+
+              {notesDropdownOpen && (
+                <div className="absolute top-full left-0 w-56 bg-white border border-stone-200 shadow-xl rounded-2xl py-2 z-50 animate-fade-in">
+                  {notesMenu.map((note) => (
+                    <button
+                      key={note.id}
+                      type="button"
+                      onClick={() => {
+                        if (setSelectedCategory) setSelectedCategory(note.id);
+                        onNavigate("shop");
+                        setNotesDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                    >
+                      <span>{note.name}</span>
+                      <span className="text-[9px] text-stone-400 font-mono tracking-normal">Explore</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
 
-            {/* 3. Oriental */}
-            <li className="relative py-3">
+            {/* 3. Shop by Occasion / Use Dropdown */}
+            <li 
+              className="relative py-3 group"
+              onMouseEnter={() => setUseDropdownOpen(true)}
+              onMouseLeave={() => setUseDropdownOpen(false)}
+            >
               <button
                 type="button"
                 onClick={() => {
-                  if (setSelectedCategory) setSelectedCategory("Oriental");
-                  onNavigate("shop");
+                  const el = document.getElementById("shop-by-use-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1"
               >
-                Oriental
+                <span>Shop By Use</span>
+                <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
               </button>
+
+              {useDropdownOpen && (
+                <div className="absolute top-full left-0 w-52 bg-white border border-stone-200 shadow-xl rounded-2xl py-2 z-50 animate-fade-in">
+                  {useMenu.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        if (setSearchQuery) setSearchQuery(item.id.replace(" Wear", ""));
+                        onNavigate("shop");
+                        setUseDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                    >
+                      <span>{item.name}</span>
+                      <span className="text-[9px] text-stone-400 font-mono tracking-normal">Occasion</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
 
-            {/* 4. Wellness */}
+            {/* 4. Discovery Set */}
             <li className="relative py-3">
               <button
                 type="button"
-                onClick={() => {
-                  if (setSelectedCategory) setSelectedCategory("Wellness");
-                  onNavigate("shop");
-                }}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
-              >
-                Wellness
-              </button>
-            </li>
-
-            {/* 5. Discovery Sets */}
-            <li className="relative py-3">
-              <button
-                type="button"
-                onClick={() => {
-                  if (setSelectedCategory) setSelectedCategory("Discovery Set");
-                  onNavigate("shop");
-                }}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
+                onClick={() => handleCategorySelect("Discovery Set")}
+                className="hover:text-[#19a24b] transition-colors cursor-pointer"
               >
                 Discovery Sets
               </button>
             </li>
 
-            {/* 6. Gifting */}
-            <li className="relative py-3">
-              <button
-                type="button"
-                onClick={() => setBulkEnquiryOpen(true)}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
-              >
-                Gifting
-              </button>
-            </li>
-
-            {/* 7. Our Story */}
+            {/* 5. Our Story */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("our-story")}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer"
               >
                 Our Story
               </button>
             </li>
 
-            {/* 8. Track Order */}
+            {/* 6. For Bulk Enquiry */}
+            <li className="relative py-3">
+              <button
+                type="button"
+                onClick={() => setBulkEnquiryOpen(true)}
+                className="hover:text-[#19a24b] transition-colors cursor-pointer"
+              >
+                Bulk Enquiry
+              </button>
+            </li>
+
+            {/* 7. Track Order */}
             <li className="relative py-3">
               <button
                 type="button"
                 onClick={onTrackOrderClick}
-                className="hover:text-stone-500 transition-colors cursor-pointer"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer"
               >
                 Track Order
               </button>
@@ -564,9 +661,9 @@ export default function Header({
 
                 {/* 2. Shop Collections header / Categories */}
                 <div className="py-1">
-                  <p className="text-[10px] uppercase tracking-widest text-[#D4BC96] font-semibold mb-2">Shop Categories</p>
+                  <p className="text-[10px] uppercase tracking-widest text-[#D4BC96] font-semibold mb-2">Collections</p>
                   <div className="pl-3 space-y-2.5 border-l border-stone-200">
-                    {categories.map((cat) => (
+                    {collectionsMenu.map((cat) => (
                       <button
                         key={cat.id}
                         type="button"

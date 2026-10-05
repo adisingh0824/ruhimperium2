@@ -2,9 +2,12 @@ import React, { useRef, useState, ReactNode } from "react";
 
 interface Tilt3DCardProps {
   children: ReactNode;
+  key?: React.Key;
   className?: string;
   maxRotation?: number; // max tilt degrees (e.g. 12)
+  maxTilt?: number;
   glareEffect?: boolean;
+  glare?: boolean;
   scale?: number;
 }
 
