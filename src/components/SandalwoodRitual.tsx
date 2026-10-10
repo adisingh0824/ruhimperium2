@@ -31,13 +31,13 @@ export default function SandalwoodRitual({ onExplore }: SandalwoodRitualProps) {
 
             <div className="space-y-4 text-sm sm:text-base text-stone-600 font-light leading-relaxed">
               <p className="text-base sm:text-lg font-medium text-stone-850">
-                Ayurveda's chill pill!
+                Ayurveda’s Ancient Calm
               </p>
               <p>
                 Spa treatment from nature – calming your mind, pampering your skin, and making you smell divine all at once.
               </p>
               <p>
-                When modern life goes nuts, trust this ancient remedy to bring back your inner balance. 🌼🧘‍♂️
+                When modern life feels overwhelming, trust this ancient remedy to restore your inner balance.
               </p>
             </div>
 

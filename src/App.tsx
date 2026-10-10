@@ -1780,7 +1780,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   className="w-full h-full object-cover"
                 />
               </span>{" "}
-              Discover Art of Indian Perfumery with our fragrance collections!
+              Discover the Art of Indian Perfumery with our fragrance collections!
             </h2>
             <button
               type="button"
@@ -2224,7 +2224,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             </span>
 
             <h2 className="text-2xl sm:text-4xl font-light font-display text-sand-900 tracking-wide mb-4">
-              {siteSettings.distilleryVideoHeading || "Where are your fragrances manufactured ?"}
+              {siteSettings.distilleryVideoHeading || "Our Heritage Distillery"}
             </h2>
             <p className="text-xs sm:text-sm text-sand-500 font-light max-w-2xl mb-8 leading-relaxed">
               {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our distillery. Watch the video of our 204 years old distillery in Kannauj, India, or interact with our live 3D copper alembic still."}
@@ -2242,8 +2242,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#D4BC96]" />
-                <span>3D Interactive Alembic Lab</span>
-                <span className="text-[9px] bg-[#D4BC96] text-black px-1.5 py-0.2 rounded-full font-bold font-mono">3D</span>
+                <span>Interactive 3D Alembic Lab</span>
               </button>
               <button
                 type="button"
