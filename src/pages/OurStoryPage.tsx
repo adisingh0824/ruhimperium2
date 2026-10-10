@@ -11,9 +11,23 @@ interface OurStoryPageProps {
 export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPageProps) {
   const navigate = useNavigate();
 
-  // Scroll to top on page load
+  // Scroll to top on page load and update SEO title/meta
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
+    const prevTitle = document.title;
+    document.title = "Our Story & Kannauj Heritage | Ruh Imperium - Fine Parfums Scent House";
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (canonical) {
+      canonical.href = "https://www.ruhimperium.shop/our-story";
+    }
+
+    return () => {
+      document.title = prevTitle;
+      if (canonical) {
+        canonical.href = "https://www.ruhimperium.shop/";
+      }
+    };
   }, []);
 
   return (

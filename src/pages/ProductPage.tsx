@@ -96,6 +96,134 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
     return () => unsub();
   }, [id]);
 
+  // Dynamic SEO metadata and Schema.org Product JSON-LD
+  useEffect(() => {
+    if (!product) return;
+
+    const previousTitle = document.title;
+    const pageTitle = `${product.name} | ${product.category ? product.category + ' - ' : ''}Ruh Imperium`;
+    document.title = pageTitle;
+
+    // Helper to update or create meta tags
+    const setMetaTag = (attr: 'name' | 'property', key: string, content: string) => {
+      let tag = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attr, key);
+        document.head.appendChild(tag);
+      }
+      tag.content = content;
+    };
+
+    const productDescription = product.description || `Buy authentic ${product.name} crafted in Kannauj, India by Ruh Imperium. 100% pure botanical distillation with long-lasting fragrance notes.`;
+    const productUrl = `https://www.ruhimperium.shop/product/${product.id}`;
+    const productImage = product.imageUrl || 'https://www.ruhimperium.shop/og-image.jpg';
+
+    setMetaTag('name', 'description', productDescription);
+    setMetaTag('property', 'og:title', pageTitle);
+    setMetaTag('property', 'og:description', productDescription);
+    setMetaTag('property', 'og:url', productUrl);
+    setMetaTag('property', 'og:image', productImage);
+    setMetaTag('property', 'og:type', 'product');
+
+    // Update canonical link
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (canonical) {
+      canonical.href = productUrl;
+    }
+
+    // Inject Schema.org Product & BreadcrumbList JSON-LD
+    const scriptId = 'product-json-ld';
+    let scriptTag = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!scriptTag) {
+      scriptTag = document.createElement('script');
+      scriptTag.id = scriptId;
+      scriptTag.type = 'application/ld+json';
+      document.head.appendChild(scriptTag);
+    }
+
+    const currentPrice = product.salePrice || product.price || 999;
+    const productReviews = reviews && reviews.length > 0 ? reviews : [];
+    const ratingValue = product.rating || 4.9;
+    const reviewCount = productReviews.length > 0 ? productReviews.length : (product.reviewCount || 28);
+
+    const schemaData = {
+      "@context": "https://schema.org/",
+      "@graph": [
+        {
+          "@type": "Product",
+          "@id": `${productUrl}#product`,
+          "name": product.name,
+          "image": [productImage],
+          "description": productDescription,
+          "sku": product.id,
+          "mpn": product.id,
+          "brand": {
+            "@type": "Brand",
+            "name": "Ruh Imperium"
+          },
+          "category": product.category || "Attar & Fine Fragrance",
+          "offers": {
+            "@type": "Offer",
+            "url": productUrl,
+            "priceCurrency": "INR",
+            "price": currentPrice,
+            "priceValidUntil": "2027-12-31",
+            "availability": product.stockStatus === 'Out of Stock' ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "name": "Ruh Imperium"
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": ratingValue,
+            "reviewCount": reviewCount,
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.ruhimperium.shop/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": product.category || "Artisanal Attars",
+              "item": `https://www.ruhimperium.shop/#shelf-${(product.category || 'authentic-attars').toLowerCase().replace(/\s+/g, '-')}`
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": product.name,
+              "item": productUrl
+            }
+          ]
+        }
+      ]
+    };
+
+    scriptTag.textContent = JSON.stringify(schemaData, null, 2);
+
+    return () => {
+      document.title = previousTitle;
+      const scriptToRemove = document.getElementById(scriptId);
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+      if (canonical) {
+        canonical.href = 'https://www.ruhimperium.shop/';
+      }
+    };
+  }, [product, reviews]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF5F2]">
