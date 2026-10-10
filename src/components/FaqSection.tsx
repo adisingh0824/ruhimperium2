@@ -42,12 +42,12 @@ export default function FaqSection() {
 
   return (
     <section className="bg-white py-16 sm:py-24 border-b border-stone-200/70" id="faq-section">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         
         {/* QUIQ CTA: FAQ HEADER (RAAHI PARFUMS STYLE) */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 border-b border-stone-200/80 pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-[#C47265] text-[10px] font-mono uppercase tracking-[0.25em] font-bold mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-[#C47265] text-xs font-sans uppercase tracking-wider font-bold mb-3">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Got Questions?</span>
             </div>
@@ -68,7 +68,7 @@ export default function FaqSection() {
           </div>
           <a
             href="mailto:support@ruhimperium.com"
-            className="px-6 py-2.5 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-mono uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0 inline-flex items-center gap-2"
+            className="px-6 py-2.5 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-sans uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0 inline-flex items-center gap-2"
           >
             <span>Ask Concierge</span>
           </a>

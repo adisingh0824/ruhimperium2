@@ -72,7 +72,7 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
         {/* Header row with arrows */}
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-stone-100">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-[0.28em] text-[#C47265] font-bold block mb-1">
+            <span className="text-xs font-mono uppercase tracking-wider text-[#C47265] font-bold block mb-1">
               CURATED ARCHIVE
             </span>
             <h3 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight">
@@ -115,8 +115,8 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
                   onClick={() => onSelectCategory(item.id)}
                   className="group flex flex-col items-center w-[200px] sm:w-[240px] flex-shrink-0 cursor-pointer snap-start"
                 >
-                  {/* Image card with rounded corners matching Raahi Parfums */}
-                  <div className={`w-full aspect-[4/5] rounded-[1.75rem] overflow-hidden bg-stone-100 border relative transition-all duration-500 group-hover:-translate-y-1.5 ${
+                  {/* Image card with rounded corners matching design system */}
+                  <div className={`w-full aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border relative transition-all duration-500 group-hover:-translate-y-1.5 ${
                     isSelected 
                       ? "border-[#19a24b] shadow-lg ring-2 ring-[#19a24b]/30" 
                       : "border-stone-200/60 shadow-xs group-hover:shadow-xl"
@@ -127,7 +127,7 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                    <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-mono uppercase tracking-widest">
+                    <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-mono uppercase tracking-wider">
                       {item.count}
                     </span>
                   </div>

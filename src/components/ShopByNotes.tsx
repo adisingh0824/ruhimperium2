@@ -75,7 +75,7 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#C47265] font-bold block mb-2">
+          <span className="text-xs font-mono uppercase tracking-wider text-[#C47265] font-bold block mb-2">
             Luxury Fragrance Collection
           </span>
           <h2 className="text-3xl sm:text-5xl font-serif text-stone-900 tracking-tight mb-4">

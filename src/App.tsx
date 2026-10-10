@@ -114,6 +114,7 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState("hero");
+  const [activeShelfTab, setActiveShelfTab] = useState<string>("all");
 
   // Dynamic Products collection
   const [products, setProducts] = useState<Product[]>(() => {
@@ -1640,7 +1641,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             )}
 
             <div className="relative z-10 mx-auto max-w-4xl px-4 text-center flex flex-col items-center pointer-events-none py-12">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#D4BC96]/50 text-[10px] tracking-[0.28em] text-[#D4BC96] font-mono uppercase mb-5 pointer-events-auto backdrop-blur-md">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#D4BC96]/50 text-xs tracking-wider text-[#D4BC96] font-mono uppercase font-semibold mb-5 pointer-events-auto backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5 text-[#D4BC96] animate-pulse" />
                 <span>{heroMode === '3d' ? 'Interactive 3D Flagon' : 'Traditional Kannauj Cooperage'}</span>
               </div>
@@ -1739,28 +1740,28 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         {/* CONTINUOUS SCROLLING TICKER / MARQUEE (RAAHI PARFUMS STYLE) */}
         <div className="bg-[#111111] text-[#FAFAFA] py-3 overflow-hidden select-none w-full border-t border-b border-stone-850 flex items-center">
           <div className="flex whitespace-nowrap overflow-hidden w-full">
-            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-mono font-semibold tracking-wider text-[#D4BC96]">
-              <span>THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR</span>
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-sans font-medium tracking-wide text-[#D4BC96]">
+              <span>The Art of Indian Perfumery, Bottled for Everyday Wear</span>
               <span aria-hidden="true">•</span>
-              <span>FROM THE PERFUME CAPITAL OF INDIA TO YOUR SKIN</span>
+              <span>From the Perfume Capital of India to Your Skin</span>
               <span aria-hidden="true">•</span>
-              <span>TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES</span>
+              <span>Traditional Attars for Contemporary Lifestyles</span>
               <span aria-hidden="true">•</span>
-              <span>COMPLIMENTARY PAN-INDIA SHIPPING</span>
+              <span>Complimentary Pan-India Shipping</span>
               <span aria-hidden="true">•</span>
-              <span>100% PURE BOTANICAL OILS</span>
+              <span>100% Pure Botanical Oils</span>
               <span aria-hidden="true">•</span>
             </div>
-            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-mono font-semibold tracking-wider text-[#D4BC96]" aria-hidden="true">
-              <span>THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR</span>
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-sans font-medium tracking-wide text-[#D4BC96]" aria-hidden="true">
+              <span>The Art of Indian Perfumery, Bottled for Everyday Wear</span>
               <span aria-hidden="true">•</span>
-              <span>FROM THE PERFUME CAPITAL OF INDIA TO YOUR SKIN</span>
+              <span>From the Perfume Capital of India to Your Skin</span>
               <span aria-hidden="true">•</span>
-              <span>TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES</span>
+              <span>Traditional Attars for Contemporary Lifestyles</span>
               <span aria-hidden="true">•</span>
-              <span>COMPLIMENTARY PAN-INDIA SHIPPING</span>
+              <span>Complimentary Pan-India Shipping</span>
               <span aria-hidden="true">•</span>
-              <span>100% PURE BOTANICAL OILS</span>
+              <span>100% Pure Botanical Oils</span>
               <span aria-hidden="true">•</span>
             </div>
           </div>
@@ -1768,24 +1769,22 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
         {/* QUIQ EDITORIAL CTA SECTION (RAAHI PARFUMS STYLE) */}
         <section className="bg-white py-12 sm:py-16 border-b border-stone-100">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight">
-                Wrap Yourself in Luxury:{" "}
-                <span className="inline-block align-middle mx-2 w-14 sm:w-20 h-7 sm:h-9 rounded-full overflow-hidden border border-stone-300 shadow-inner align-middle">
-                  <img
-                    src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=200"
-                    alt="Kannauj distillation copper degh"
-                    className="w-full h-full object-cover"
-                  />
-                </span>{" "}
-                Discover Art of Indian Perfumery with our fragrance collections!
-              </h2>
-            </div>
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center gap-6">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight max-w-3xl">
+              Wrap Yourself in Luxury:{" "}
+              <span className="inline-block align-middle mx-2 w-14 sm:w-20 h-7 sm:h-9 rounded-full overflow-hidden border border-stone-300 shadow-inner align-middle">
+                <img
+                  src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=200"
+                  alt="Kannauj distillation copper degh"
+                  className="w-full h-full object-cover"
+                />
+              </span>{" "}
+              Discover Art of Indian Perfumery with our fragrance collections!
+            </h2>
             <button
               type="button"
               onClick={() => handleSectionNavigate("shop")}
-              className="px-7 py-3 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-mono uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0"
+              className="px-8 py-3 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-sans uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer shadow-xs"
             >
               Explore Collections
             </button>
@@ -2058,115 +2057,153 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 ["champa-muse", "dahn-al-oud-edp", "forest-rush", "gulab-edp"].includes(p.id)
               ).slice(0, 4);
 
+              const SHELF_TABS = [
+                { id: "all", label: "All Curations" },
+                { id: "authentic-attars", label: "Authentic Attars" },
+                { id: "artisanal", label: "Artisanal Fragrances" },
+                { id: "bestsellers", label: "Best Selling" },
+                { id: "edp", label: "Eau De Parfum" },
+              ];
+
               return (
-                <div className="space-y-16 sm:space-y-24">
-                  {/* Shelf 1: Authentic Indian Attars */}
-                  <div className="space-y-6 scroll-mt-24" id="shelf-authentic-attars">
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
-                        Authentic Indian Attars
-                      </h2>
-                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
-                        An olfactory legacy of India, crafted with rare botanicals and centuries of perfumery mastery.
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                      {authenticAttars.map((prod) => renderProductCard(prod))}
-                    </div>
-                    <div className="flex justify-center pt-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleSelectCategory("Authentic Indian Attars");
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
-                      >
-                        View all
-                      </button>
-                    </div>
+                <div className="space-y-12 sm:space-y-16">
+                  {/* Category Pill Switcher to solve cognitive overload and false floor */}
+                  <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap pb-2 border-b border-stone-200/60" role="tablist" aria-label="Product Curations">
+                    {SHELF_TABS.map((tab) => {
+                      const isActive = activeShelfTab === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          role="tab"
+                          aria-selected={isActive}
+                          onClick={() => setActiveShelfTab(tab.id)}
+                          className={`px-5 py-2 rounded-full text-xs font-sans font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                            isActive
+                              ? "bg-stone-900 text-white shadow-xs"
+                              : "bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900"
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {/* Shelf 1: Authentic Indian Attars */}
+                  {(activeShelfTab === "all" || activeShelfTab === "authentic-attars") && (
+                    <div className="space-y-6 scroll-mt-24" id="shelf-authentic-attars">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                          Authentic Indian Attars
+                        </h2>
+                        <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                          An olfactory legacy of India, crafted with rare botanicals and centuries of perfumery mastery.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                        {authenticAttars.map((prod) => renderProductCard(prod))}
+                      </div>
+                      <div className="flex justify-center pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSelectCategory("Authentic Indian Attars");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                        >
+                          View all
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Shelf 2: Indian Artisanal fragrances */}
-                  <div className="space-y-6 scroll-mt-24" id="shelf-artisanal">
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
-                        Indian Artisanal fragrances
-                      </h2>
-                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
-                        A collection of Artisan Indian Niche Perfumery
-                      </p>
+                  {(activeShelfTab === "all" || activeShelfTab === "artisanal") && (
+                    <div className="space-y-6 scroll-mt-24" id="shelf-artisanal">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                          Indian Artisanal fragrances
+                        </h2>
+                        <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                          A collection of Artisan Indian Niche Perfumery
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                        {artisanalFragrances.map((prod) => renderProductCard(prod))}
+                      </div>
+                      <div className="flex justify-center pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSelectCategory("Indian Artisanal fragrances");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                        >
+                          View all
+                        </button>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                      {artisanalFragrances.map((prod) => renderProductCard(prod))}
-                    </div>
-                    <div className="flex justify-center pt-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleSelectCategory("Indian Artisanal fragrances");
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
-                      >
-                        View all
-                      </button>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Shelf 3: Best Selling */}
-                  <div className="space-y-6 scroll-mt-24" id="shelf-bestsellers">
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
-                        Best Selling
-                      </h2>
-                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
-                        Most Loved. Most Reordered.
-                      </p>
+                  {(activeShelfTab === "all" || activeShelfTab === "bestsellers") && (
+                    <div className="space-y-6 scroll-mt-24" id="shelf-bestsellers">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                          Best Selling
+                        </h2>
+                        <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                          Most Loved. Most Reordered.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                        {bestSellersList.map((prod) => renderProductCard(prod))}
+                      </div>
+                      <div className="flex justify-center pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSelectCategory("BEST SELLING");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                        >
+                          View all
+                        </button>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                      {bestSellersList.map((prod) => renderProductCard(prod))}
-                    </div>
-                    <div className="flex justify-center pt-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleSelectCategory("BEST SELLING");
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
-                      >
-                        View all
-                      </button>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Shelf 4: Eau De Parfum */}
-                  <div className="space-y-6 scroll-mt-24" id="shelf-edp">
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
-                        Eau De Parfum
-                      </h2>
-                      <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
-                        For compliments, memories, and everything in between.
-                      </p>
+                  {(activeShelfTab === "all" || activeShelfTab === "edp") && (
+                    <div className="space-y-6 scroll-mt-24" id="shelf-edp">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
+                          Eau De Parfum
+                        </h2>
+                        <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
+                          For compliments, memories, and everything in between.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                        {edpFragrances.map((prod) => renderProductCard(prod))}
+                      </div>
+                      <div className="flex justify-center pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSelectCategory("Eau De Parfum");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
+                        >
+                          View all
+                        </button>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                      {edpFragrances.map((prod) => renderProductCard(prod))}
-                    </div>
-                    <div className="flex justify-center pt-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleSelectCategory("Eau De Parfum");
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        className="px-8 py-2.5 rounded-full border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white transition-all text-xs font-semibold uppercase tracking-widest cursor-pointer shadow-xs hover:shadow-md"
-                      >
-                        View all
-                      </button>
-                    </div>
-                  </div>
+                  )}
                 </div>
               );
             })()}
@@ -2605,64 +2642,40 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             </div>
 
-            {/* Balanced 5-Column Grid Layout */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
-              
-              {/* 1. Party Wear */}
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
-                <img 
-                  src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" 
-                  alt="Party Wear Fragrances" 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
-                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Party Wear</span>
-              </div>
-
-              {/* 2. Office Wear */}
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
-                <img 
-                  src="https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800" 
-                  alt="Office Wear Fragrances" 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
-                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Office Wear</span>
-              </div>
-
-              {/* 3. Daily Wear */}
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
-                <img 
-                  src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=800" 
-                  alt="Daily Wear Fragrances" 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
-                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Daily Wear</span>
-              </div>
-
-              {/* 4. Summer */}
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
-                <img 
-                  src="https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800" 
-                  alt="Summer Fragrances" 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
-                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Summer</span>
-              </div>
-
-              {/* 5. Winter */}
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
-                <img 
-                  src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800" 
-                  alt="Winter Fragrances" 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
-                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Winter</span>
-              </div>
-
+            {/* Balanced 5-Column Grid Layout matching CategorySlider card architecture */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 max-w-6xl mx-auto">
+              {[
+                { title: "Party Wear", subtitle: "Bold & Alluring", image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" },
+                { title: "Office Wear", subtitle: "Subtle & Elegant", image: "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800" },
+                { title: "Daily Wear", subtitle: "Comforting & Versatile", image: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=800" },
+                { title: "Summer", subtitle: "Aquatic & Uplifting", image: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800" },
+                { title: "Winter", subtitle: "Rich & Cozy Woods", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800" },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="group flex flex-col items-center cursor-pointer"
+                  onClick={() => {
+                    if (setSearchQuery) setSearchQuery(item.title);
+                    handleSectionNavigate("shop");
+                  }}
+                >
+                  <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-sand-200/60 shadow-xs group-hover:shadow-lg transition-all duration-300 relative">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="text-center mt-3 space-y-0.5">
+                    <h4 className="text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-stone-500 font-sans tracking-normal">
+                      {item.subtitle}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
 
           </div>
@@ -2687,7 +2700,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
 
               {/* Right Column: Flowing Chips Wall with Gradient Fade Edges */}
-              <div className="lg:col-span-6 relative overflow-hidden h-[210px] flex items-center">
+              <div className="lg:col-span-6 relative overflow-hidden h-[250px] flex items-center">
                 {/* Left Fade */}
                 <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
                 {/* Right Fade */}
@@ -2695,42 +2708,47 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
                 {/* Animated Marquee of Chip Columns */}
                 <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] whitespace-nowrap">
-                  {/* Column 1 */}
-                  <div className="flex flex-col gap-3">
-                    {["Rose", "Sandalwood", "Oud", "Mogra"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                  {/* Column 1: Florals */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Florals</span>
+                    {["Rose", "Mogra", "Jasmine", "Neroli"].map(note => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
-                  {/* Column 2 */}
-                  <div className="flex flex-col gap-3">
-                    {["Saffron", "Musk", "Amber", "Vetiver (Khus)"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                  {/* Column 2: Sacred Woods */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Sacred Woods</span>
+                    {["Sandalwood", "Oud", "Cedarwood", "Patchouli"].map(note => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
-                  {/* Column 3 */}
-                  <div className="flex flex-col gap-3">
-                    {["Floral", "Woody", "Fresh", "Spicy"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                  {/* Column 3: Warm Spices */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Warm Spices</span>
+                    {["Saffron", "Cardamom", "Spicy", "Amber"].map(note => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
-                  {/* Column 4: Resinous & Botanical */}
-                  <div className="flex flex-col gap-3">
-                    {["Jasmine", "Patchouli", "Cardamom", "Neroli"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                  {/* Column 4: Resins & Musk */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Resins & Musk</span>
+                    {["Frankincense", "Benzoin", "Musk", "Woody"].map((note) => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
-                  {/* Column 5: Balsamic & Citrus */}
-                  <div className="flex flex-col gap-3">
-                    {["Bergamot", "Cedarwood", "Frankincense", "Benzoin"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                  {/* Column 5: Fresh Botanicals */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Fresh Botanicals</span>
+                    {["Bergamot", "Vetiver (Khus)", "Fresh", "Floral"].map((note) => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
@@ -2995,12 +3013,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           </div>
 
           {/* Bottom Brand Narrative */}
-          <p className="text-[11px] text-stone-500 font-light leading-relaxed text-left border-t border-white/5 pt-8 mb-8">
+          <p className="text-xs text-stone-400 font-light leading-relaxed text-left border-t border-white/5 pt-8 mb-8">
             {siteSettings.footerBottomNarrative || "Making India's native perfumery accessible to the entire world, through an honest and ethical route. A new era of intense perfumery with 200 years of industry experience. No unnecessary middlemen, straight from India's perfume capital 'Kannauj' to your skin."}
           </p>
 
           {/* Footer Copyright & Social Row */}
-          <div className="flex flex-col sm:flex-row justify-between items-center text-[10px] text-stone-600 font-light gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-stone-400 font-light gap-4">
             <p>© 2026 {siteSettings.footerBrandName || "Ruh Imperium"}. All rights reserved.</p>
             <div className="flex space-x-6 text-stone-500">
               <a href={siteSettings.footerInstagramUrl || "https://instagram.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Instagram"><Instagram className="w-4.5 h-4.5" /></a>
