@@ -563,14 +563,6 @@ export default function ThreeBottleCanvas({
         className="w-full h-[420px] sm:h-[480px] cursor-grab active:cursor-grabbing relative rounded-3xl overflow-hidden bg-radial from-stone-900/40 via-stone-950/20 to-transparent"
       />
 
-      {/* Floating 3D Badge Overlay */}
-      <div className="absolute top-4 left-4 bg-stone-950/70 backdrop-blur-md border border-[#D4BC96]/30 px-3.5 py-1.5 rounded-full flex items-center gap-2 pointer-events-none z-20">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-        <span className="text-[9.5px] uppercase tracking-[0.2em] text-[#D4BC96] font-mono font-bold">
-          3D Flagon Interactive View
-        </span>
-      </div>
-
       {/* Interactive Controls Pill Bar */}
       {interactive && (
         <div className="absolute bottom-4 inset-x-4 flex flex-wrap items-center justify-between gap-2 bg-stone-950/80 backdrop-blur-xl border border-sand-200/20 p-2.5 rounded-2xl z-20 shadow-2xl">

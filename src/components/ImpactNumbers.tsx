@@ -6,15 +6,15 @@ export default function ImpactNumbers() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-10 sm:mb-14 text-white" style={{ fontFamily: "Georgia, serif" }}>
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold tracking-tight mb-10 sm:mb-14 text-white">
           Built Through Generations, Told Through Numbers
         </h2>
 
         {/* 7-Tile Asymmetric Bento Grid matching Raahi Parfums */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-fr gap-4 sm:gap-6">
           
           {/* Tile A: 200k+ Fragrances Delivered */}
-          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end min-h-[200px] border border-white/5 hover:border-white/10 transition-colors">
+          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end h-full min-h-[220px] border border-white/5 hover:border-white/10 transition-colors">
             <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-none mb-2.5">
               200k+
             </p>
@@ -27,7 +27,7 @@ export default function ImpactNumbers() {
           </div>
 
           {/* Tile B: 72% Customer Satisfaction */}
-          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end min-h-[200px] border border-white/5 hover:border-white/10 transition-colors">
+          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end h-full min-h-[220px] border border-white/5 hover:border-white/10 transition-colors">
             <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-none mb-2.5">
               72%
             </p>
@@ -40,7 +40,7 @@ export default function ImpactNumbers() {
           </div>
 
           {/* Tile C: Square Image */}
-          <div className="rounded-3xl overflow-hidden min-h-[260px] relative border border-white/5 group">
+          <div className="rounded-3xl overflow-hidden h-full min-h-[220px] relative border border-white/5 group">
             <img 
               src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800" 
               alt="Ancestral copper distillation stills in Kannauj" 
@@ -49,7 +49,7 @@ export default function ImpactNumbers() {
           </div>
 
           {/* Tile D: 24h Fast Dispatch */}
-          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end min-h-[200px] border border-white/5 hover:border-white/10 transition-colors">
+          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end h-full min-h-[220px] border border-white/5 hover:border-white/10 transition-colors">
             <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-none mb-2.5">
               24h
             </p>
@@ -62,7 +62,7 @@ export default function ImpactNumbers() {
           </div>
 
           {/* Tile E: Wide Rectangle Image (Spans 2 columns on desktop) */}
-          <div className="lg:col-span-2 rounded-3xl overflow-hidden min-h-[240px] sm:min-h-[280px] relative border border-white/5 group">
+          <div className="lg:col-span-2 rounded-3xl overflow-hidden h-full min-h-[220px] relative border border-white/5 group">
             <img 
               src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200" 
               alt="Artisanal perfume formulation" 
@@ -71,7 +71,7 @@ export default function ImpactNumbers() {
           </div>
 
           {/* Tile F: 75+ Signature Blends */}
-          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end min-h-[200px] border border-white/5 hover:border-white/10 transition-colors">
+          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end h-full min-h-[220px] border border-white/5 hover:border-white/10 transition-colors">
             <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-none mb-2.5">
               75+
             </p>
@@ -84,7 +84,7 @@ export default function ImpactNumbers() {
           </div>
 
           {/* Tile G: 200+ Years of Expertise */}
-          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end min-h-[200px] border border-white/5 hover:border-white/10 transition-colors">
+          <div className="bg-[#0f0f0f] rounded-3xl p-6 sm:p-8 flex flex-col justify-end h-full min-h-[220px] border border-white/5 hover:border-white/10 transition-colors">
             <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-none mb-2.5">
               200+
             </p>

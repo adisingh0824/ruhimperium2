@@ -20,7 +20,7 @@ export const PRODUCTS: Product[] = [
     },
     destination: "Thar & Indian Coastlines",
     destinationState: "Rajasthan & Goa",
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800",
     rating: 5.0,
     reviewsCount: 384,
     category: "Next Gen fragrances"
@@ -92,7 +92,7 @@ export const PRODUCTS: Product[] = [
     },
     destination: "Kullu & Kashmir Ranges",
     destinationState: "Jammu & Kashmir",
-    image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=800",
     rating: 5.0,
     reviewsCount: 219,
     category: "Next Gen fragrances"
@@ -116,7 +116,7 @@ export const PRODUCTS: Product[] = [
     },
     destination: "Kannauj Scent Hub",
     destinationState: "Uttar Pradesh",
-    image: "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800",
     rating: 5.0,
     reviewsCount: 146,
     category: "BEST SELLING"
@@ -164,7 +164,7 @@ export const PRODUCTS: Product[] = [
     },
     destination: "Mysore Cooperative",
     destinationState: "Karnataka",
-    image: "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800",
     rating: 5.0,
     reviewsCount: 126,
     category: "BEST SELLING"
@@ -442,7 +442,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     readTime: "4 min read",
     author: "Maldev Singh, Olfactory lead",
     date: "May 28, 2026",
-    image: "https://images.unsplash.com/photo-1540206276907-fbd77eeaa0a8?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800",
     location: "Mysore, India",
     content: `For over two millennia, the royal forests of Mysore, Karnataka, have been synonymous with the finest sandalwood on earth. Popularly known as Mysore Sandalwood (*Santalum album*), the oil extracted from these slow-growing heartwoods carries a uniquely dense, milky, and extremely long-lasting woody aroma that synthetic alternatives fail to replicate.
 
@@ -457,7 +457,7 @@ When blended with zesty bergamot and sea salt in our Sandy Hills EDP, the sandal
     readTime: "5 min read",
     author: "Shubhangi V.",
     date: "June 05, 2026",
-    image: "https://images.unsplash.com/photo-1595151830531-2974eb3a13d7?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800",
     location: "Kannauj, India",
     content: `Walking through the narrow alleys of Kannauj, Uttar Pradesh, feels like traveling back to the 12th century. The air is thick with the sweet aroma of boiling jasmine, rose petals, and baked terra-cotta clay. 
 

@@ -129,12 +129,17 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
                 </div>
 
                 {/* Footer preview */}
-                <div className="relative z-10 pt-6 mt-4 border-t border-stone-200/60 flex items-center justify-between">
-                  <span className="text-[10px] text-stone-500 font-mono tracking-wider">
-                    {note.sampleFragrances}
-                  </span>
-                  <span className="text-xs font-semibold text-[#19a24b] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 font-mono">
-                    Explore →
+                <div className="relative z-10 pt-5 mt-4 border-t border-stone-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400 mr-1">Notes:</span>
+                    {note.sampleFragrances.split(', ').map((frag) => (
+                      <span key={frag} className="px-2 py-0.5 rounded-md bg-white/70 border border-stone-200/70 text-stone-700 text-[11px] font-sans font-medium">
+                        {frag}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-xs font-semibold text-stone-900 group-hover:text-[#19a24b] transition-colors inline-flex items-center gap-1 font-sans shrink-0 whitespace-nowrap">
+                    Explore Family <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                   </span>
                 </div>
               </div>

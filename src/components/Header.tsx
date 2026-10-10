@@ -14,7 +14,8 @@ import {
   Sparkles,
   CheckCircle,
   Truck,
-  LockKeyhole
+  LockKeyhole,
+  LogOut
 } from "lucide-react";
 import { CartItem, SiteSettings } from "../types";
 import Logo from "./Logo";
@@ -183,21 +184,21 @@ export default function Header({
       {/* Luxury Minimalist Announcement Ticker Bar */}
       <div className="bg-black text-white py-2.5 relative overflow-hidden select-none w-full border-b border-stone-900 flex items-center">
         <div className="flex whitespace-nowrap overflow-hidden w-full">
-          <div className="animate-marquee inline-flex shrink-0 items-center gap-8 pr-8 text-[10px] sm:text-[11px] font-sans font-bold uppercase tracking-[0.25em] text-white">
+          <div className="animate-marquee inline-flex shrink-0 items-center gap-8 pr-8 text-xs font-sans font-semibold tracking-wider text-white">
             <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
             <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
             <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
           </div>
-          <div className="animate-marquee inline-flex shrink-0 items-center gap-8 pr-8 text-[10px] sm:text-[11px] font-sans font-bold uppercase tracking-[0.25em] text-white" aria-hidden="true">
+          <div className="animate-marquee inline-flex shrink-0 items-center gap-8 pr-8 text-xs font-sans font-semibold tracking-wider text-white" aria-hidden="true">
             <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
             <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
             <span>{siteSettings?.announcementText || "Traditional Attars for Contemporary Lifestyles"}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
           </div>
         </div>
       </div>
@@ -208,7 +209,7 @@ export default function Header({
         {/* TOP ROW: Search | Logo | Profile & Bag */}
         <div className="grid grid-cols-3 h-24 items-center border-b border-stone-50">
           
-          {/* TOP LEFT: Quick Scent Search */}
+          {/* TOP LEFT: Mobile Trigger / Spacing */}
           <div className="flex items-center justify-start gap-4">
             {/* Mobile Menu Trigger */}
             <button
@@ -216,24 +217,40 @@ export default function Header({
               className="lg:hidden p-2 -ml-2 text-sand-900 hover:text-stone-300 transition-colors"
               onClick={() => setMobileMenuOpen(true)}
               id="mobile-menu-trigger"
+              aria-label="Open navigation menu"
             >
               <Menu className="w-6 h-6 stroke-[1.25]" />
             </button>
+          </div>
 
-            {/* Elegant search magnifying glass */}
-            <div className="hidden lg:flex items-center gap-2 relative">
+          {/* TOP CENTER: Logo */}
+          <div className="flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => onNavigate("hero")}
+              className="cursor-pointer focus:outline-none py-1 group"
+            >
+              <Logo variant="header" showSubtitle={false} customLogoUrl={siteSettings?.customLogoUrl} />
+            </button>
+          </div>
+
+          {/* TOP RIGHT: Utilities (Search, Account, Admin, Bag, Logout) */}
+          <div className="flex items-center justify-end gap-3 sm:gap-5">
+            {/* Elegant search magnifying glass & sliding bar */}
+            <div className="relative flex items-center">
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 text-sand-900 hover:text-[#D4BC96] transition-all duration-300 transform hover:scale-105"
+                className="p-1.5 text-sand-900 hover:text-[#D4BC96] transition-all duration-300 transform hover:scale-105"
                 title="Search the olfactory logs"
+                aria-label="Search fragrances"
               >
-                <Search className="w-[18px] h-[18px] stroke-[1.5]" />
+                <Search className="w-5 h-5 stroke-[1.5]" />
               </button>
               
               {/* Sliding Luxury Search Bar */}
               {searchOpen && (
-                <div className="absolute left-10 top-1/2 -translate-y-1/2 bg-white border border-stone-200 rounded-full px-4 py-1.5 flex items-center shadow-md w-72 z-40 animate-fade-in">
+                <div className="absolute right-8 top-1/2 -translate-y-1/2 bg-white border border-stone-200 rounded-full px-4 py-1.5 flex items-center shadow-md w-64 sm:w-72 z-40 animate-fade-in">
                   <input
                     type="text"
                     placeholder="Search notes, ingredients, attars..."
@@ -250,52 +267,45 @@ export default function Header({
                       if (setSearchQuery) setSearchQuery("");
                       setSearchOpen(false);
                     }}
-                    className="text-stone-400 hover:text-stone-600 ml-1.5"
+                    className="text-stone-400 hover:text-stone-600 ml-1.5 cursor-pointer"
+                    aria-label="Close search"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* TOP CENTER: Logo */}
-          <div className="flex items-center justify-center">
-            <button
-              type="button"
-              onClick={() => onNavigate("hero")}
-              className="cursor-pointer focus:outline-none py-1 group"
-            >
-              <Logo variant="header" showSubtitle={false} customLogoUrl={siteSettings?.customLogoUrl} />
-            </button>
-          </div>
-
-          {/* TOP RIGHT: Account & Bag */}
-          <div className="flex items-center justify-end gap-4 sm:gap-6">
             <button
               type="button"
               onClick={onLoungeClick}
-              className="text-sand-900 hover:text-stone-300 transition-colors"
+              className="text-sand-900 hover:text-stone-600 transition-colors p-1"
+              aria-label="Account Lounge"
+              title="Account"
             >
-              <User className="w-5 h-5" />
+              <User className="w-5 h-5 stroke-[1.5]" />
             </button>
 
             <button
               type="button"
               onClick={onAdminClick}
-              className="text-sand-900 hover:text-stone-300 transition-colors"
+              className="text-sand-900 hover:text-stone-600 transition-colors p-1"
+              aria-label="Admin console"
+              title="Admin"
             >
-              <LockKeyhole className="w-4 h-4" />
+              <LockKeyhole className="w-4 h-4 stroke-[1.5]" />
             </button>
 
             <button
               type="button"
               onClick={onOpenCart}
-              className="relative text-sand-900 hover:text-stone-300 transition-colors"
+              className="relative text-sand-900 hover:text-stone-600 transition-colors p-1"
+              aria-label="Shopping bag"
+              title="Cart"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
               {cartTotalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartTotalItems}
                 </span>
               )}
@@ -305,9 +315,11 @@ export default function Header({
               <button
                 type="button"
                 onClick={onLogout}
-                className="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-700 font-medium transition-colors"
+                className="text-stone-700 hover:text-stone-950 transition-colors p-1"
+                aria-label="Log out"
+                title="Log out"
               >
-                Logout
+                <LogOut className="w-4.5 h-4.5 stroke-[1.5]" />
               </button>
             )}
           </div>

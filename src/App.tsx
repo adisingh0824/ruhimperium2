@@ -1484,7 +1484,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               setIsCartOpen(true);
             }
           }}
-          className="w-full py-2.5 bg-[#C47265] hover:bg-[#B36256] text-white transition-all text-[9.5px] uppercase tracking-widest font-semibold focus:outline-none rounded-xl shadow-xs hover:shadow-md cursor-pointer"
+          className="w-full py-2.5 bg-[#C47265] hover:bg-[#B36256] text-white transition-all text-xs uppercase tracking-wider font-semibold focus:outline-none rounded-xl shadow-xs hover:shadow-md cursor-pointer"
         >
           {prod.variants && prod.variants.length > 1 ? "Choose Option" : "Add to cart"}
         </button>
@@ -1689,7 +1689,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     if (handleSelectCategory) handleSelectCategory("Discovery Set");
                     handleSectionNavigate("shop");
                   }}
-                  className="px-8 sm:px-10 py-3.5 bg-black/70 hover:bg-black text-[#D4BC96] border border-[#D4BC96]/60 text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 cursor-pointer backdrop-blur-md rounded-full hover:scale-103"
+                  className="px-8 sm:px-10 py-3.5 bg-black/80 hover:bg-[#D4BC96] text-[#D4BC96] hover:text-stone-950 border-2 border-[#D4BC96] text-xs uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer backdrop-blur-md rounded-full hover:scale-103 shadow-lg"
                 >
                   Discovery Sets
                 </button>
@@ -1739,29 +1739,29 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         {/* CONTINUOUS SCROLLING TICKER / MARQUEE (RAAHI PARFUMS STYLE) */}
         <div className="bg-[#111111] text-[#FAFAFA] py-3 overflow-hidden select-none w-full border-t border-b border-stone-850 flex items-center">
           <div className="flex whitespace-nowrap overflow-hidden w-full">
-            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-[10.5px] sm:text-[11.5px] font-mono font-bold uppercase tracking-[0.25em] text-[#D4BC96]">
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-mono font-semibold tracking-wider text-[#D4BC96]">
               <span>THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>FROM THE PERFUME CAPITAL OF INDIA TO YOUR SKIN</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>COMPLIMENTARY PAN-INDIA SHIPPING</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>100% PURE BOTANICAL OILS</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
             </div>
-            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-[10.5px] sm:text-[11.5px] font-mono font-bold uppercase tracking-[0.25em] text-[#D4BC96]" aria-hidden="true">
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-mono font-semibold tracking-wider text-[#D4BC96]" aria-hidden="true">
               <span>THE ART OF INDIAN PERFUMERY, BOTTLED FOR EVERYDAY WEAR</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>FROM THE PERFUME CAPITAL OF INDIA TO YOUR SKIN</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>TRADITIONAL ATTARS FOR CONTEMPORARY LIFESTYLES</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>COMPLIMENTARY PAN-INDIA SHIPPING</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
               <span>100% PURE BOTANICAL OILS</span>
-              <span>•</span>
+              <span aria-hidden="true">•</span>
             </div>
           </div>
         </div>
@@ -1891,6 +1891,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                           alt={prod.name} 
                           className={`w-full h-full object-cover transition-all duration-700 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800";
+                          }}
                         />
                         {hoverImage && (
                           <img 
@@ -1898,6 +1901,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             alt={`${prod.name} alternate view`} 
                             className="absolute inset-0 w-full h-full object-cover transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                             referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
+                            }}
                           />
                         )}
                         {/* Sale Badge */}
@@ -1960,7 +1966,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         handleAddToCart(prod, defaultVariant);
                         setIsCartOpen(true);
                       }}
-                      className="w-full mt-4 py-2.5 sm:py-3 border border-stone-800 bg-transparent hover:bg-stone-900 text-stone-900 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-xs"
+                      className="w-full mt-4 py-2.5 sm:py-3 border-2 border-stone-900 bg-transparent hover:bg-stone-900 text-stone-900 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
                     >
                       Choose Option
                     </button>
@@ -2561,6 +2567,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       alt={article.title} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103 select-none pointer-events-none"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800";
+                      }}
                     />
                   </div>
 
@@ -2589,77 +2598,69 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         <section className="bg-sand-50 py-20 sm:py-28 border-b border-sand-200/50">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
             
-            <div className="text-center max-w-xl mx-auto space-y-2">
-              <h2 className="text-3xl font-serif text-sand-900 tracking-wide">Shop By Use</h2>
-              <div className="h-[1px] w-12 bg-[#C47265] mx-auto"></div>
+            <div className="text-center max-w-xl mx-auto">
+              <div className="inline-flex flex-col items-center">
+                <h2 className="text-3xl font-serif text-sand-900 tracking-wide">Shop By Use</h2>
+                <div className="h-[2px] w-12 bg-[#C47265] mt-2 rounded-full" aria-hidden="true"></div>
+              </div>
             </div>
 
-            {/* Grid Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-6xl mx-auto">
+            {/* Balanced 5-Column Grid Layout */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
               
-              {/* 1. Party Wear (Large Left Card) */}
-              <div className="md:col-span-6 aspect-[4/3] md:aspect-auto md:min-h-[460px] rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer" onClick={() => handleSectionNavigate("shop")}>
+              {/* 1. Party Wear */}
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
                 <img 
                   src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" 
                   alt="Party Wear Fragrances" 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Party Wear</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
+                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Party Wear</span>
               </div>
 
-              {/* Middle Column (Daily Wear & Office Wear) */}
-              <div className="md:col-span-3 grid grid-rows-2 gap-6">
-                
-                {/* 2. Office Wear */}
-                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
-                  <img 
-                    src="https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800" 
-                    alt="Office Wear Fragrances" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Office Wear</span>
-                </div>
-
-                {/* 3. Daily Wear */}
-                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
-                  <img 
-                    src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=800" 
-                    alt="Daily Wear Fragrances" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Daily Wear</span>
-                </div>
-
+              {/* 2. Office Wear */}
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
+                <img 
+                  src="https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=80&w=800" 
+                  alt="Office Wear Fragrances" 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
+                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Office Wear</span>
               </div>
 
-              {/* Right Column (Summer & Winter) */}
-              <div className="md:col-span-3 grid grid-rows-2 gap-6">
-                
-                {/* 4. Summer */}
-                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
-                  <img 
-                    src="https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800" 
-                    alt="Summer Fragrances" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Summer</span>
-                </div>
+              {/* 3. Daily Wear */}
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
+                <img 
+                  src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=800" 
+                  alt="Daily Wear Fragrances" 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
+                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Daily Wear</span>
+              </div>
 
-                {/* 5. Winter */}
-                <div className="rounded-3xl overflow-hidden relative group border border-sand-200/60 shadow-sm cursor-pointer aspect-[4/3] md:aspect-auto" onClick={() => handleSectionNavigate("shop")}>
-                  <img 
-                    src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800" 
-                    alt="Winter Fragrances" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-102"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                  <span className="absolute top-6 left-6 px-3.5 py-1.5 bg-white text-stone-900 text-[10px] font-mono uppercase tracking-widest rounded-md font-bold shadow-xs">Winter</span>
-                </div>
+              {/* 4. Summer */}
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
+                <img 
+                  src="https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800" 
+                  alt="Summer Fragrances" 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
+                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Summer</span>
+              </div>
 
+              {/* 5. Winter */}
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden relative group border border-sand-200/60 shadow-xs hover:shadow-md cursor-pointer transition-all duration-300" onClick={() => handleSectionNavigate("shop")}>
+                <img 
+                  src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800" 
+                  alt="Winter Fragrances" 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-750 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-colors" />
+                <span className="absolute bottom-4 left-4 px-3 py-1 bg-white text-stone-900 text-xs font-semibold rounded-md shadow-xs">Winter</span>
               </div>
 
             </div>
@@ -2718,18 +2719,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       </button>
                     ))}
                   </div>
-                  {/* Repeat Column 1 for loop */}
+                  {/* Column 4: Resinous & Botanical */}
                   <div className="flex flex-col gap-3">
-                    {["Rose", "Sandalwood", "Oud", "Mogra"].map((note, idx) => (
-                      <button key={`rep1-${note}-${idx}`} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                    {["Jasmine", "Patchouli", "Cardamom", "Neroli"].map((note) => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
                         {note}
                       </button>
                     ))}
                   </div>
-                  {/* Repeat Column 2 for loop */}
+                  {/* Column 5: Balsamic & Citrus */}
                   <div className="flex flex-col gap-3">
-                    {["Saffron", "Musk", "Amber", "Vetiver (Khus)"].map((note, idx) => (
-                      <button key={`rep2-${note}-${idx}`} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
+                    {["Bergamot", "Cedarwood", "Frankincense", "Benzoin"].map((note) => (
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer">
                         {note}
                       </button>
                     ))}
@@ -2866,12 +2867,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   {/* Bio container */}
                   <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
-                      <span className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold font-mono block">
+                      <span className="text-xs uppercase tracking-wider text-[#A0783E] font-semibold font-mono block mb-1">
                         {fnd.role}
                       </span>
-                      <h4 className="text-xl font-serif font-bold text-sand-900">
+                      <h3 className="text-xl font-serif font-bold text-sand-900">
                         {fnd.name}
-                      </h4>
+                      </h3>
                       <p className="text-xs text-sand-500 font-light leading-relaxed">
                         {fnd.bio}
                       </p>
@@ -2907,9 +2908,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-16">
             
             {/* Left Column: Khus Attar Image Card */}
-            <div className="lg:col-span-3 h-[360px] rounded-3xl overflow-hidden relative border border-white/10 group shadow-lg">
+            <div className="lg:col-span-3 aspect-[4/3] max-h-[260px] rounded-2xl overflow-hidden relative border border-white/10 group shadow-lg self-center">
               <img 
-                src={siteSettings.footerImage || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600"} 
+                src={siteSettings.footerImage || "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=600"} 
                 alt="Khus Botanical Attar Sourcing" 
                 className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105 select-none pointer-events-none"
                 referrerPolicy="no-referrer"
@@ -2920,28 +2921,25 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             {/* Middle Column: Menu & Connect Lists */}
             <div className="lg:col-span-6 grid grid-cols-2 gap-8 lg:pl-8">
               {/* Menu List */}
-              <div className="space-y-5">
-                <h4 className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C47265] font-bold">Menu</h4>
-                <ul className="space-y-3.5 text-xs text-stone-400 font-light font-sans">
+              <div className="space-y-4">
+                <h4 className="text-xs sm:text-sm font-sans uppercase tracking-wider text-white font-semibold mb-3">Navigation</h4>
+                <ul className="space-y-3 text-xs text-stone-400 font-light font-sans">
                   <li><button type="button" onClick={() => handleSectionNavigate("hero")} className="hover:text-white cursor-pointer transition-colors block">Home</button></li>
-                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop</button></li>
                   <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop All</button></li>
                   <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Wellness</button></li>
-                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Gifting</button></li>
-                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">For Bulk Enquiry</button></li>
+                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Bespoke Gifting</button></li>
                   <li><button type="button" onClick={() => handleSectionNavigate("our-story")} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
-                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact Us</button></li>
                   <li><button type="button" onClick={() => setIsOrderTrackerOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Track your order</button></li>
                 </ul>
               </div>
 
               {/* Connect List */}
-              <div className="space-y-5">
-                <h4 className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C47265] font-bold">Connect</h4>
-                <ul className="space-y-3.5 text-xs text-stone-400 font-light font-sans">
-                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact</button></li>
+              <div className="space-y-4">
+                <h4 className="text-xs sm:text-sm font-sans uppercase tracking-wider text-white font-semibold mb-3">Connect</h4>
+                <ul className="space-y-3 text-xs text-stone-400 font-light font-sans">
+                  <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Contact Concierge</button></li>
                   <li><button type="button" onClick={() => setIsPrivacyOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Terms of Service</button></li>
-                  <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Refund policy</button></li>
+                  <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Refund Policy</button></li>
                   <li><button type="button" onClick={() => setIsPrivacyOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Privacy Policy</button></li>
                   <li><button type="button" onClick={() => setIsShippingOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Shipping Policy</button></li>
                 </ul>
@@ -2951,10 +2949,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             {/* Right Column: Large Brand Header */}
             <div className="lg:col-span-3 flex justify-start lg:justify-end items-center">
               <div className="text-left lg:text-right space-y-1">
-                <h3 className="text-xl sm:text-2xl font-serif text-white tracking-[0.25em] uppercase font-bold" style={{ fontFamily: "Cinzel, Georgia, serif" }}>
+                <h3 className="text-xl sm:text-2xl font-serif text-white tracking-[0.25em] uppercase font-bold">
                   {siteSettings.footerBrandName || "RUH IMPERIUM"}
                 </h3>
-                <span className="text-[8.5px] text-stone-500 font-mono tracking-[0.45em] uppercase block">
+                <span className="text-[9px] text-stone-400 font-mono tracking-[0.45em] uppercase block">
                   {siteSettings.footerSubLabel || "BOTANICAL PERFUMERY"}
                 </span>
               </div>
@@ -2965,8 +2963,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           {/* Horizontal Newsletter Card Wrapper */}
           <div className="bg-stone-900/40 rounded-[1.5rem] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/5 mb-10">
             <div className="space-y-1.5 text-left">
-              <h4 className="text-sm font-serif font-semibold tracking-wider text-white uppercase">{siteSettings.footerNewsletterTitle || "Journey with us."}</h4>
-              <p className="text-[11px] text-stone-400 font-light max-w-md">
+              <h4 className="text-base font-serif font-semibold tracking-normal text-white">{siteSettings.footerNewsletterTitle?.replace(/\.$/, "") || "Journey with Us"}</h4>
+              <p className="text-xs sm:text-sm text-stone-300 font-light max-w-md leading-relaxed">
                 {siteSettings.footerNewsletterText || "Be the first to know about new launches, stories from Kannauj, and exclusive offers."}
               </p>
             </div>

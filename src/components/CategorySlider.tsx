@@ -100,49 +100,53 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
           </div>
         </div>
 
-        {/* Horizontal Slider */}
-        <div
-          ref={scrollerRef}
-          className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth snap-x snap-mandatory"
-        >
-          {CATEGORY_ITEMS.map((item) => {
-            const isSelected = selectedCategory.toLowerCase() === item.id.toLowerCase();
+        {/* Horizontal Slider with Right Gradient Fade */}
+        <div className="relative">
+          <div
+            ref={scrollerRef}
+            className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth snap-x snap-mandatory pr-12"
+          >
+            {CATEGORY_ITEMS.map((item) => {
+              const isSelected = selectedCategory.toLowerCase() === item.id.toLowerCase();
 
-            return (
-              <div
-                key={item.id}
-                onClick={() => onSelectCategory(item.id)}
-                className="group flex flex-col items-center w-[200px] sm:w-[240px] flex-shrink-0 cursor-pointer snap-start"
-              >
-                {/* Image card with rounded corners matching Raahi Parfums */}
-                <div className={`w-full aspect-[4/5] rounded-[1.75rem] overflow-hidden bg-stone-100 border relative transition-all duration-500 group-hover:-translate-y-1.5 ${
-                  isSelected 
-                    ? "border-[#19a24b] shadow-lg ring-2 ring-[#19a24b]/30" 
-                    : "border-stone-200/60 shadow-xs group-hover:shadow-xl"
-                }`}>
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                  <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-mono uppercase tracking-widest">
-                    {item.count}
-                  </span>
-                </div>
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => onSelectCategory(item.id)}
+                  className="group flex flex-col items-center w-[200px] sm:w-[240px] flex-shrink-0 cursor-pointer snap-start"
+                >
+                  {/* Image card with rounded corners matching Raahi Parfums */}
+                  <div className={`w-full aspect-[4/5] rounded-[1.75rem] overflow-hidden bg-stone-100 border relative transition-all duration-500 group-hover:-translate-y-1.5 ${
+                    isSelected 
+                      ? "border-[#19a24b] shadow-lg ring-2 ring-[#19a24b]/30" 
+                      : "border-stone-200/60 shadow-xs group-hover:shadow-xl"
+                  }`}>
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                    <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-mono uppercase tracking-widest">
+                      {item.count}
+                    </span>
+                  </div>
 
-                {/* Category Title */}
-                <div className="text-center mt-3.5 space-y-0.5">
-                  <h4 className="text-xs sm:text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
-                    {item.title}
-                  </h4>
-                  <p className="text-[10px] text-stone-400 font-mono tracking-wider">
-                    {item.tagline}
-                  </p>
+                  {/* Category Title */}
+                  <div className="text-center mt-3.5 space-y-0.5">
+                    <h4 className="text-xs sm:text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-stone-500 font-sans tracking-normal">
+                      {item.tagline}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          {/* Subtle Right-edge Gradient Fade */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-14 bg-gradient-to-l from-white to-transparent hidden sm:block" aria-hidden="true" />
         </div>
 
       </div>

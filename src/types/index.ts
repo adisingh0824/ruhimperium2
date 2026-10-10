@@ -120,6 +120,7 @@ export interface SiteSettings {
   distilleryVideoHeading?: string;
   distilleryVideoText?: string;
   distilleryVideoUrl?: string;
+  distilleryVideoPoster?: string;
   story01Title?: string;
   story01Text?: string;
   story01Image?: string;

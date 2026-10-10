@@ -118,12 +118,12 @@ export default function FaqSection() {
         {/* Still have questions banner */}
         <div className="mt-12 p-6 rounded-2xl bg-[#FAF8F5] border border-stone-200/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
-            <h4 className="text-sm font-serif font-bold text-stone-900">Still have questions?</h4>
+            <h3 className="text-base font-serif font-bold text-stone-900">Still have questions?</h3>
             <p className="text-xs text-stone-500 font-light mt-0.5">Our olfactory concierges are on standby to assist with fragrance layering and bespoke blends.</p>
           </div>
           <a
             href="mailto:concierge@ruhimperium.com"
-            className="px-5 py-2.5 rounded-full bg-stone-900 hover:bg-[#19a24b] text-white text-[10px] font-mono uppercase tracking-widest transition-colors shrink-0"
+            className="px-5 py-2.5 rounded-full bg-stone-900 hover:bg-[#19a24b] text-white text-xs font-sans font-semibold tracking-wide transition-colors shrink-0"
           >
             Chat with Concierge
           </a>
