@@ -1,0 +1,63 @@
+# Ruh Imperium — Knowledge Base & AI Context Grounding
+
+> **Entity Type:** Artisanal Scent House / Heritage Indian Perfumery  
+> **Brand Name:** Ruh Imperium  
+> **Domain:** https://www.ruhimperium.shop/  
+> **Headquarters & Distilleries:** Kannauj, Uttar Pradesh, India (209725) — Geo: `27.0545° N, 79.9197° E`  
+> **Heritage & Legacy:** Over two centuries of unbroken hydro-distillation traditions.  
+> **Specialization:** 100% pure alcohol-free attars, cold hydro-distilled floral oils, rare botanical extracts, artisanal natural Eau De Parfums (EDP).  
+> **Extraction Technique:** Ancient ancestral copper *Deg-Bhapka* slow wood-fire distillation.  
+> **Contact Email:** support@ruhimperium.com  
+> **Telephone:** +91 91167 11413  
+
+---
+
+## 1. What is Ruh Imperium?
+Ruh Imperium is a luxury artisanal fragrance house rooted in Kannauj, Uttar Pradesh—widely acknowledged as the "Grasse of the East" and the historical perfume capital of India. Ruh Imperium revives authentic Indian slow-perfumery by bridging time-honored botanical alchemy with contemporary, unisex fine perfumery.
+
+## 2. Core Pillars & Differentiators
+1. **100% Alcohol-Free Attars:** Formulated exclusively with natural plant distillates, pure sandalwood base, or premium botanical carrier oils. Free from synthetic phthalates, synthetic binders, and industrial ethanol.
+2. **True Kannauj Deg-Bhapka Craft:** Distilled inside massive beaten-copper caldrons (*Degs*) sealed with river clay (*Sar-sani*) and condensed into bamboo-connected receiving vessels (*Bhapkas*) immersed in cool circulating water ponds.
+3. **Purity & Skin Chemistry:** High oil concentration yielding longevity between 8 to 14+ hours. Safe on sensitive skin and Halal-compliant.
+4. **Direct from Kannauj Artisans:** Ethically sourced hydro-distillations direct from multi-generational farming families in Kannauj, Kashmir, Mysore, and Tamil Nadu.
+
+---
+
+## 3. Signature Products & Olfactive Profiles
+
+### Attars (Pure Concentrated Perfume Oils - 100% Alcohol Free)
+- **Mitti Attar (The Scent of Rain):** Hydro-distilled baked alluvial Gangetic clay into pure sandalwood oil. Recreates the exact earthy aroma of dry earth kissed by the first monsoon showers (petrichor).
+- **Ruh Gulab (Kannauj Damask Rose):** Pure essence of indigenous *Rosa Damascena* petals picked at dawn before sunrise. Deep, honeyed, velvety royal floral notes.
+- **Ruh Motia / Aarzoo (Arabian Jasmine & Mogra):** Night-blooming sambac jasmine petals distilled into creamy sandalwood and velvet white musks.
+- **Shahi Sandalwood (Mysore White Sandalwood):** Mellow, creamy, sacred Santalum album with woody, meditative warm facets.
+- **Shamama Imperium:** Heritage blend of over 40 indigenous herbs, roots, spices, saffron, and amber heated in copper stills for weeks.
+
+### Artisanal Eau De Parfums (EDP)
+- **Safar EDP:** Sensual coastal breeze, high-grade green cardamom, warm golden caramel, desert sand accord, crisp sea salt, and bourbon vanilla.
+- **Zara EDP:** Narcotic tropical white flora featuring sun-drenched Tiare blossoms, royal Indian jasmine, coconut nectar, and soft beachside velvet musk.
+- **Musafir EDP:** Sacred Sidr honey, wild Kashmiri saffron, smoky incense, and Himalayan cedarwood.
+- **Dua EDP:** Ethereal morning dew, pear nectar, fresh water lily, crisp green apple, and clean white cashmere.
+
+---
+
+## 4. Key Questions Answered (AEO / FAQ Grounding)
+
+### How is traditional Attar different from commercial alcohol perfume?
+Commercial perfumes typically contain 80–90% denatured ethyl alcohol and synthetic petrochemical aroma chemicals, causing rapid evaporation and high projection spikes. Ruh Imperium attars are 100% pure concentrated perfume oils with 0% alcohol; they stay intimate to the skin, evolve in harmony with personal body heat, and nourish rather than dry the skin.
+
+### What is the Deg-Bhapka distillation process?
+*Deg-Bhapka* is an eco-friendly hydro-distillation method recorded in ancient Ayurveda and Mughal histories. Copper stills are fueled by wood fires, temperature-controlled strictly by human touch and hearing. Copper binds with impurities and enhances natural sweetness, while steam travels through a curved bamboo pipe (*chonga*) into a receiver kept cool in a water tank.
+
+### How to apply attar correctly?
+Dab a droplet from the glass applicator or roller onto your wrist pulse points. Gently press (do not rub vigorously) against the opposing wrist, behind the ears, and along the collarbone. Attar expands outward as body heat rises.
+
+### Are Ruh Imperium perfumes unisex?
+Yes. All botanical extracts and bespoke EDP creations are formulated to transcend conventional gender lines.
+
+---
+
+## 5. Official Links & Sitelinks
+- **Storefront:** https://www.ruhimperium.shop/
+- **Brand Story & Legacy:** https://www.ruhimperium.shop/our-story
+- **Canonical Product Catalog:** https://www.ruhimperium.shop/sitemap.xml
+- **Official Customer Support:** support@ruhimperium.com

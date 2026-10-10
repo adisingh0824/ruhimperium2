@@ -163,6 +163,33 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
             "name": "Ruh Imperium"
           },
           "category": product.category || "Attar & Fine Fragrance",
+          "countryOfOrigin": {
+            "@type": "Country",
+            "name": "India"
+          },
+          "material": product.ingredients?.join(', ') || "Pure Botanical Distillate, Sandalwood Base",
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "Alcohol Content",
+              "value": "0% (100% Alcohol-Free)"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Distillation Method",
+              "value": "Traditional Kannauj Deg-Bhapka Hydro-Distillation"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Longevity",
+              "value": product.longevity || "8-12 Hours"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Origin",
+              "value": "Kannauj, Uttar Pradesh, India"
+            }
+          ],
           "offers": {
             "@type": "Offer",
             "url": productUrl,
