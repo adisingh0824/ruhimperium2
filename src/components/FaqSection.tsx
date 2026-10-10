@@ -47,7 +47,7 @@ export default function FaqSection() {
         {/* QUIQ CTA: FAQ HEADER (RAAHI PARFUMS STYLE) */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 border-b border-stone-200/80 pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-[#C47265] text-xs font-sans uppercase tracking-wider font-bold mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-[#A3483B] text-xs font-sans uppercase tracking-wider font-bold mb-3">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Got Questions?</span>
             </div>
@@ -68,7 +68,7 @@ export default function FaqSection() {
           </div>
           <a
             href="mailto:support@ruhimperium.com"
-            className="px-6 py-2.5 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#19a24b] hover:border-[#19a24b] text-white text-xs font-sans uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0 inline-flex items-center gap-2"
+            className="px-6 py-2.5 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#15803d] hover:border-[#15803d] text-white text-xs font-sans uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0 inline-flex items-center gap-2"
           >
             <span>Ask Concierge</span>
           </a>
@@ -88,14 +88,14 @@ export default function FaqSection() {
                   aria-expanded={isOpen}
                 >
                   <span className={`text-base sm:text-lg font-serif transition-colors ${
-                    isOpen ? "text-[#19a24b] font-medium" : "text-stone-900 group-hover:text-[#19a24b]"
+                    isOpen ? "text-[#15803d] font-medium" : "text-stone-900 group-hover:text-[#15803d]"
                   }`}>
                     {faq.question}
                   </span>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all shrink-0 ${
                     isOpen 
-                      ? "bg-[#19a24b] border-[#19a24b] text-white" 
-                      : "border-stone-200 text-stone-600 group-hover:border-[#19a24b] group-hover:text-[#19a24b]"
+                      ? "bg-[#15803d] border-[#15803d] text-white" 
+                      : "border-stone-200 text-stone-600 group-hover:border-[#15803d] group-hover:text-[#15803d]"
                   }`}>
                     {isOpen ? (
                       <Minus className="w-4 h-4 stroke-[2.5]" />

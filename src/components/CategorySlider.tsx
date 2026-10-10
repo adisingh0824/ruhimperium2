@@ -72,7 +72,7 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
         {/* Header row with arrows */}
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-stone-100">
           <div>
-            <span className="text-xs font-mono uppercase tracking-wider text-[#C47265] font-bold block mb-1">
+            <span className="text-xs font-mono uppercase tracking-wider text-[#A3483B] font-bold block mb-1">
               CURATED ARCHIVE
             </span>
             <h3 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight">
@@ -104,7 +104,10 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
         <div className="relative">
           <div
             ref={scrollerRef}
-            className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth snap-x snap-mandatory pr-12"
+            tabIndex={0}
+            role="region"
+            aria-label="Fragrance categories slider"
+            className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth snap-x snap-mandatory pr-12 focus:outline-none focus:ring-1 focus:ring-stone-400 rounded-2xl"
           >
             {CATEGORY_ITEMS.map((item) => {
               const isSelected = selectedCategory.toLowerCase() === item.id.toLowerCase();

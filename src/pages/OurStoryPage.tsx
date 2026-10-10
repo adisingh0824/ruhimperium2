@@ -48,13 +48,13 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
             
             {/* Text details */}
             <div className="lg:col-span-7 space-y-6">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-bold block font-mono">
+              <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block font-mono">
                 CHAPTER 01
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
                 {siteSettings?.story01Title || "The Art Of Perfume Making"}
               </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96]"></div>
+              <div className="h-[1px] w-12 bg-[#7A5623]/30"></div>
               
               <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line">
                 <p>
@@ -101,13 +101,13 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
 
             {/* Text details */}
             <div className="lg:col-span-7 space-y-6 order-1 lg:order-2">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-bold block font-mono">
+              <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block font-mono">
                 CHAPTER 02
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
                 {siteSettings?.story02Title || "True Botanical Luxury & Alcohol-Free Oils"}
               </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96]"></div>
+              <div className="h-[1px] w-12 bg-[#7A5623]/30"></div>
               
               <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line">
                 <p>
@@ -132,13 +132,13 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
             
             {/* Text details */}
             <div className="lg:col-span-7 space-y-6">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-bold block font-mono">
+              <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block font-mono">
                 CHAPTER 03
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
                 {siteSettings?.story03Title || "Our Sourcing Promise"}
               </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96]"></div>
+              <div className="h-[1px] w-12 bg-[#7A5623]/30"></div>
               
               <div className="space-y-4 text-stone-600 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line">
                 <p>
@@ -171,13 +171,13 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
       <section className="py-20 sm:py-28 bg-[#F8F6F0]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-bold block mb-2.5 font-mono">
+            <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block mb-2.5 font-mono">
               THE HEIRS & ARCHITECTS
             </span>
             <h2 className="text-3xl sm:text-4xl font-light font-display text-stone-900 tracking-wide">
               Leadership & Sourcing Legacy
             </h2>
-            <div className="h-[1px] w-12 bg-[#D4BC96] mx-auto mt-5"></div>
+            <div className="h-[1px] w-12 bg-[#7A5623]/30 mx-auto mt-5"></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
@@ -206,12 +206,12 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
                   />
                 </div>
                 <div className="p-6 sm:p-8 space-y-3">
-                  <span className="text-[9px] uppercase tracking-widest text-[#D4BC96] font-semibold font-mono block">
+                  <span className="text-xs uppercase tracking-wider text-[#7E5B26] font-semibold font-mono block">
                     {fnd.role}
                   </span>
-                  <h4 className="text-xl font-serif font-bold text-stone-900">
+                  <h3 className="text-xl font-serif font-bold text-stone-900">
                     {fnd.name}
-                  </h4>
+                  </h3>
                   <p className="text-xs text-stone-500 font-light leading-relaxed">
                     {fnd.bio}
                   </p>

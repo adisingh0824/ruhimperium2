@@ -507,7 +507,7 @@ export const ThreeDistilleryLab: React.FC = () => {
         {/* Temperature / Fire Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="text-xs uppercase tracking-widest text-[#d4af37] font-serif flex items-center gap-1.5">
+            <label htmlFor="furnace-temp-range" className="text-xs uppercase tracking-widest text-[#d4af37] font-serif flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-amber-500" />
               Furnace Heat ({temperature}°C)
             </label>
@@ -516,6 +516,9 @@ export const ThreeDistilleryLab: React.FC = () => {
             </span>
           </div>
           <input
+            id="furnace-temp-range"
+            name="furnace-temp-range"
+            aria-label={`Furnace Heat Temperature: ${temperature}°C`}
             type="range"
             min={60}
             max={115}

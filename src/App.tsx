@@ -1663,7 +1663,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" alt="Patron" />
                   <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120" alt="Patron" />
                   <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120" alt="Patron" />
-                  <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#19a24b] text-[9px] font-bold text-white ring-2 ring-stone-900">
+                  <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#15803d] text-[9px] font-bold text-white ring-2 ring-stone-900">
                     +5k
                   </div>
                 </div>
@@ -1907,7 +1907,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         )}
                         {/* Sale Badge */}
                         {prod.price > prod.salePrice && (
-                          <div className="absolute top-2.5 left-2.5 bg-[#C47265] text-white text-[9px] uppercase tracking-widest font-mono font-bold px-2 py-0.5 rounded shadow-xs">
+                          <div className="absolute top-2.5 left-2.5 bg-[#A3483B] text-white text-[9px] uppercase tracking-widest font-mono font-bold px-2 py-0.5 rounded shadow-xs">
                             SALE
                           </div>
                         )}
@@ -1919,7 +1919,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         <button 
                           type="button"
                           onClick={() => navigate(`/product/${prod.id}`)}
-                          className="text-left text-sm sm:text-[15px] font-serif font-bold text-stone-900 tracking-tight leading-snug hover:text-[#C47265] transition-colors focus:outline-none line-clamp-2"
+                          className="text-left text-sm sm:text-[15px] font-serif font-bold text-stone-900 tracking-tight leading-snug hover:text-[#A3483B] transition-colors focus:outline-none line-clamp-2"
                         >
                           {prod.name}
                         </button>
@@ -1937,7 +1937,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             ))}
                           </div>
                           <span className="text-[11px] text-stone-600 font-sans">
-                            {overallRating.toFixed(2)} / 5.0 <span className="text-stone-400">({totalItemReviews.length || 142})</span>
+                            {overallRating.toFixed(2)} / 5.0 <span className="text-stone-500">({totalItemReviews.length || 142})</span>
                           </span>
                         </div>
 
@@ -1947,7 +1947,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                             ₹ {prod.salePrice ? prod.salePrice.toLocaleString('en-IN') : prod.price.toLocaleString('en-IN')}.00
                           </span>
                           {prod.price > prod.salePrice && (
-                            <span className="text-xs text-stone-400 line-through font-sans">
+                            <span className="text-xs text-stone-500 line-through font-sans">
                               ₹ {prod.price.toLocaleString('en-IN')}.00
                             </span>
                           )}
@@ -2218,7 +2218,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="distillery-lab-section">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
             
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-semibold block mb-2 font-mono">
+            <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block mb-2 font-mono">
               Hydro-Distillation Technology • Deg & Bhapka
             </span>
 
@@ -2615,7 +2615,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     <h3 className="text-lg font-serif font-semibold text-stone-900 leading-snug group-hover:text-[#D4BC96] transition-colors line-clamp-2">
                       {article.title}
                     </h3>
-                    <span className="text-[10px] tracking-widest text-stone-400 font-bold uppercase block mt-1">
+                    <span className="text-xs font-mono tracking-wider text-stone-600 font-semibold uppercase block mt-1">
                       {article.date}
                     </span>
                     <p className="text-xs sm:text-[13px] text-stone-500 font-light leading-relaxed line-clamp-3">
@@ -2638,7 +2638,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             <div className="text-center max-w-xl mx-auto">
               <div className="inline-flex flex-col items-center">
                 <h2 className="text-3xl font-serif text-sand-900 tracking-wide">Shop By Use</h2>
-                <div className="h-[2px] w-12 bg-[#C47265] mt-2 rounded-full" aria-hidden="true"></div>
+                <div className="h-[2px] w-12 bg-[#A3483B] mt-2 rounded-full" aria-hidden="true"></div>
               </div>
             </div>
 
@@ -2667,9 +2667,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     />
                   </div>
                   <div className="text-center mt-3 space-y-0.5">
-                    <h4 className="text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
+                    <h3 className="text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
                       {item.title}
-                    </h4>
+                    </h3>
                     <p className="text-xs text-stone-500 font-sans tracking-normal">
                       {item.subtitle}
                     </p>
@@ -2832,13 +2832,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-bold block mb-2.5">
+              <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block mb-2.5 font-mono">
                 HEIRS & ARCHITECTS
               </span>
               <h2 className="text-3xl sm:text-4xl font-light font-display text-sand-900 tracking-wide">
                 {siteSettings.foundersHeading || "Our Story & Legacy"}
               </h2>
-              <div className="h-[1px] w-12 bg-[#D4BC96] mx-auto mt-5 mb-5"></div>
+              <div className="h-[1px] w-12 bg-[#7A5623]/30 mx-auto mt-5 mb-5"></div>
               <p className="text-xs sm:text-sm text-sand-500 font-light leading-relaxed">
                 {siteSettings.foundersText || "Ruh Imperium was sparked by a shared vision to traverse India's historic trade routes, distilling pristine biological extracts and crafting honest, high-concentration luxury fragrances."}
               </p>
@@ -2885,7 +2885,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   {/* Bio container */}
                   <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
-                      <span className="text-xs uppercase tracking-wider text-[#A0783E] font-semibold font-mono block mb-1">
+                      <span className="text-xs uppercase tracking-wider text-[#7E5B26] font-semibold font-mono block mb-1">
                         {fnd.role}
                       </span>
                       <h3 className="text-xl font-serif font-bold text-sand-900">
