@@ -131,15 +131,15 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
                 {/* Footer preview */}
                 <div className="relative z-10 pt-5 mt-4 border-t border-stone-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                    <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400 mr-1">Notes:</span>
+                    <span className="text-xs uppercase font-mono tracking-wider text-stone-600 font-semibold mr-1">Notes:</span>
                     {note.sampleFragrances.split(', ').map((frag) => (
-                      <span key={frag} className="px-2 py-0.5 rounded-md bg-white/70 border border-stone-200/70 text-stone-700 text-[11px] font-sans font-medium">
+                      <span key={frag} className="px-2 py-0.5 rounded-md bg-white/90 border border-stone-300 text-stone-800 text-xs font-sans font-medium">
                         {frag}
                       </span>
                     ))}
                   </div>
-                  <span className="text-xs font-semibold text-stone-900 group-hover:text-[#19a24b] transition-colors inline-flex items-center gap-1 font-sans shrink-0 whitespace-nowrap">
-                    Explore Family <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
+                  <span className="text-xs font-semibold text-stone-900 group-hover:text-[#15803d] transition-colors inline-flex items-center gap-1 font-sans shrink-0 whitespace-nowrap">
+                    Explore Family <span className="group-hover:translate-x-1 transition-transform inline-block" aria-hidden="true">→</span>
                   </span>
                 </div>
               </div>

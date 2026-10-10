@@ -1668,11 +1668,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                 </div>
                 <div className="text-left">
-                  <div className="flex items-center gap-1 text-[#D4BC96] text-[10px] leading-none">
-                    <span>★★★★★</span>
+                  <div className="flex items-center gap-1 text-[#D4BC96] text-xs leading-none">
+                    <span aria-hidden="true">★★★★★</span>
+                    <span className="sr-only">Rated 4.9 out of 5 stars</span>
                     <span className="font-mono text-white/90 ml-1 font-bold">4.9/5</span>
                   </div>
-                  <span className="text-[9.5px] text-stone-300 font-light block mt-0.5">Loved by 10,000+ patrons across India</span>
+                  <span className="text-xs text-stone-200 font-light block mt-0.5">Loved by 10,000+ patrons across India</span>
                 </div>
               </div>
               
@@ -2710,45 +2711,45 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] whitespace-nowrap">
                   {/* Column 1: Florals */}
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Florals</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Florals</span>
                     {["Rose", "Mogra", "Jasmine", "Neroli"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
                   {/* Column 2: Sacred Woods */}
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Sacred Woods</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Sacred Woods</span>
                     {["Sandalwood", "Oud", "Cedarwood", "Patchouli"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
                   {/* Column 3: Warm Spices */}
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Warm Spices</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Warm Spices</span>
                     {["Saffron", "Cardamom", "Spicy", "Amber"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
                   {/* Column 4: Resins & Musk */}
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Resins & Musk</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Resins & Musk</span>
                     {["Frankincense", "Benzoin", "Musk", "Woody"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
                   {/* Column 5: Fresh Botanicals */}
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-medium uppercase tracking-wider text-stone-400 px-2">Fresh Botanicals</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Fresh Botanicals</span>
                     {["Bergamot", "Vetiver (Khus)", "Fresh", "Floral"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#19a24b] hover:text-[#19a24b] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
