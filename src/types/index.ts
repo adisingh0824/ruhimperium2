@@ -109,6 +109,9 @@ export interface SiteSettings {
   foundersHeading: string;
   foundersText: string;
   customLogoUrl?: string;
+  heroMediaType?: '3d' | 'video' | 'photo';
+  distilleryMediaType?: 'lab' | 'video' | 'photo';
+  distilleryPhotoUrl?: string;
   razorpayKeyId?: string;
   razorpayKeySecret?: string;
   razorpayEnabled?: boolean;

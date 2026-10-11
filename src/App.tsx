@@ -559,8 +559,25 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-  const [heroMode, setHeroMode] = useState<'3d' | 'video'>('3d');
-  const [distilleryTab, setDistilleryTab] = useState<'lab' | 'video'>('lab');
+  const [heroMode, setHeroMode] = useState<'3d' | 'video' | 'photo'>(() => {
+    return siteSettings?.heroMediaType || '3d';
+  });
+  const [distilleryTab, setDistilleryTab] = useState<'lab' | 'video' | 'photo'>(() => {
+    return siteSettings?.distilleryMediaType || 'lab';
+  });
+
+  // Keep live media modes synchronized when admin updates site settings in Firestore
+  useEffect(() => {
+    if (siteSettings?.heroMediaType) {
+      setHeroMode(siteSettings.heroMediaType);
+    }
+  }, [siteSettings?.heroMediaType]);
+
+  useEffect(() => {
+    if (siteSettings?.distilleryMediaType) {
+      setDistilleryTab(siteSettings.distilleryMediaType);
+    }
+  }, [siteSettings?.distilleryMediaType]);
 
   // Browser back button support for collection filtering
   // When a collection is selected, push a history entry so phone's back button
@@ -1589,7 +1606,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             className="relative min-h-[75vh] sm:min-h-[82vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
             id="hero-section"
           >
-            {heroMode === 'video' ? (
+            {heroMode === 'photo' ? (
+              /* High-Resolution Static Cover Photo Banner */
+              <div className="absolute inset-0 z-0">
+                <img 
+                  src={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=2560"} 
+                  alt="Luxury Sand Scent Banner background" 
+                  className="w-full h-full object-cover opacity-90 scale-100 transition-all duration-300 select-none pointer-events-none"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
+              </div>
+            ) : heroMode === 'video' ? (
               /* Ambient Video background */
               <div className="absolute inset-0 z-0">
                 {heroVideoUrl ? (
@@ -1641,9 +1669,44 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             )}
 
             <div className="relative z-10 mx-auto max-w-4xl px-4 text-center flex flex-col items-center pointer-events-none py-12">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#D4BC96]/50 text-xs tracking-wider text-[#D4BC96] font-mono uppercase font-semibold mb-5 pointer-events-auto backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-[#D4BC96] animate-pulse" />
-                <span>{heroMode === '3d' ? 'Interactive 3D Flagon' : 'Traditional Kannauj Cooperage'}</span>
+              {/* Interactive Medium Switcher Pill */}
+              <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-black/75 border border-[#D4BC96]/60 text-xs tracking-wider text-[#D4BC96] font-mono uppercase font-semibold mb-5 pointer-events-auto backdrop-blur-md shadow-2xl">
+                <button
+                  type="button"
+                  onClick={() => setHeroMode('3d')}
+                  className={`px-3 py-1 rounded-full text-[10px] uppercase font-mono tracking-wider transition-all cursor-pointer flex items-center gap-1.5 ${
+                    heroMode === '3d'
+                      ? 'bg-[#D4BC96] text-black font-bold shadow-md'
+                      : 'text-stone-300 hover:text-white'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>3D Flagon</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHeroMode('video')}
+                  className={`px-3 py-1 rounded-full text-[10px] uppercase font-mono tracking-wider transition-all cursor-pointer flex items-center gap-1.5 ${
+                    heroMode === 'video'
+                      ? 'bg-[#D4BC96] text-black font-bold shadow-md'
+                      : 'text-stone-300 hover:text-white'
+                  }`}
+                >
+                  <Play className="w-3 h-3 fill-current" />
+                  <span>Scent Film</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHeroMode('photo')}
+                  className={`px-3 py-1 rounded-full text-[10px] uppercase font-mono tracking-wider transition-all cursor-pointer flex items-center gap-1.5 ${
+                    heroMode === 'photo'
+                      ? 'bg-[#D4BC96] text-black font-bold shadow-md'
+                      : 'text-stone-300 hover:text-white'
+                  }`}
+                >
+                  <ImageIcon className="w-3 h-3" />
+                  <span>Still Banner</span>
+                </button>
               </div>
 
               <h1 
@@ -2230,8 +2293,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our distillery. Watch the video of our 204 years old distillery in Kannauj, India, or interact with our live 3D copper alembic still."}
             </p>
 
-            {/* Tab Switcher: 3D Live Deg-Bhapka Simulation vs Documentary Film */}
-            <div className="flex items-center gap-2 bg-stone-200/80 p-1.5 rounded-2xl mb-8 border border-stone-300/50 shadow-inner">
+            {/* Tab Switcher: 3D Live Deg-Bhapka Simulation vs Documentary Film vs Showcase Photo */}
+            <div className="flex flex-wrap items-center justify-center gap-2 bg-stone-200/80 p-1.5 rounded-2xl mb-8 border border-stone-300/50 shadow-inner">
               <button
                 type="button"
                 onClick={() => setDistilleryTab('lab')}
@@ -2256,6 +2319,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <Play className="w-3.5 h-3.5" />
                 <span>Distillery Video</span>
               </button>
+              <button
+                type="button"
+                onClick={() => setDistilleryTab('photo')}
+                className={`px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                  distilleryTab === 'photo'
+                    ? 'bg-[#1a1715] text-[#D4BC96] font-bold shadow-lg'
+                    : 'text-stone-700 hover:text-stone-900 font-medium'
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Distillery Gallery Still</span>
+              </button>
             </div>
 
             {/* Dynamic Viewport */}
@@ -2264,13 +2339,32 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <div className="w-full animate-fade-in">
                   <ThreeDistilleryLab />
                 </div>
+              ) : distilleryTab === 'photo' ? (
+                <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl mx-auto bg-stone-900 animate-fade-in group">
+                  <img 
+                    src={siteSettings.distilleryPhotoUrl || siteSettings.distilleryVideoPoster || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"} 
+                    alt="Ruh Imperium Heritage Distillery in Kannauj" 
+                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 select-none"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6 sm:p-8 text-left">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4BC96] font-bold block mb-1">
+                        KANNAUJ HERITAGE ATELIER
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-serif text-white font-medium">
+                        204-Year-Old Traditional Copper Woodfire Distillation
+                      </h3>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div 
                   onClick={() => setIsDistilleryVideoOpen(true)}
                   className="group relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl mx-auto bg-stone-900 cursor-pointer animate-fade-in"
                 >
                   <img 
-                    src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200" 
+                    src={siteSettings.distilleryPhotoUrl || siteSettings.distilleryVideoPoster || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"} 
                     alt="Ruh Imperium Distillery" 
                     className="w-full h-full object-cover opacity-75 group-hover:scale-103 transition-transform duration-700 select-none pointer-events-none"
                     referrerPolicy="no-referrer"

@@ -2000,6 +2000,31 @@ export default function AdminHub({
                     </div>
                   </div>
 
+                  {/* HERO DISPLAY MODE SELECTOR */}
+                  <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sand-200 pb-2">
+                      <div className="flex items-center gap-2 text-[#D4BC96]">
+                        <Sparkles className="w-4 h-4" />
+                        <span className="text-xs font-bold font-mono uppercase tracking-widest">Hero Top Banner Display Mode</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-sand-500">Active Live Mode:</span>
+                        <select
+                          value={siteSettings.heroMediaType || "3d"}
+                          onChange={(e) => handleUpdateSiteSetting("heroMediaType", e.target.value as any)}
+                          className="bg-white border border-sand-300 text-[10px] font-mono px-3 py-1.5 rounded-lg text-sand-900 outline-none font-bold"
+                        >
+                          <option value="3d">Interactive 3D Flagon Studio</option>
+                          <option value="video">Ambient Video Loop (Scent Film)</option>
+                          <option value="photo">Static Cover Banner Photo</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p className="text-[10.5px] text-sand-600 font-light leading-relaxed">
+                      Choose which medium shows to all customers when they first open the store. If <strong>Ambient Video Loop</strong> or <strong>Static Cover Banner Photo</strong> is chosen, all users immediately see your uploaded media with atmospheric luxury typography intact.
+                    </p>
+                  </div>
+
                   {/* COVER PHOTO EDITING */}
                   <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
                     <div className="flex items-center gap-2 text-[#D4BC96]">
@@ -2684,38 +2709,96 @@ export default function AdminHub({
                       </div>
                     </div>
 
-                    {/* ====== 3. MANUFACTURING VIDEO SECTION ====== */}
+                    {/* ====== 3. MANUFACTURING VIDEO & PHOTO SECTION ====== */}
                     <div className="bg-sand-50/70 rounded-2xl border border-sand-200 p-5 space-y-4 md:col-span-2">
-                      <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">1-D. Distillery Manufacturing Video Section</div>
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sand-200 pb-2">
+                        <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">1-D. Distillery Lab / Video / Photo Section</div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-mono uppercase tracking-wider text-sand-500">Default Mode:</span>
+                          <select
+                            value={siteSettings.distilleryMediaType || "lab"}
+                            onChange={(e) => handleUpdateSiteSetting("distilleryMediaType", e.target.value as any)}
+                            className="bg-white border border-sand-300 text-[10px] font-mono px-2 py-1 rounded text-sand-900 outline-none"
+                          >
+                            <option value="lab">Interactive 3D Alembic Lab</option>
+                            <option value="video">Documentary Video</option>
+                            <option value="photo">Distillery Photo / Still</option>
+                          </select>
+                        </div>
+                      </div>
+
                       <div className="space-y-4 bg-white p-4 rounded-xl border border-sand-200">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Video Heading / Title</label>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Section Heading / Title</label>
                             <input
                               type="text"
                               value={siteSettings.distilleryVideoHeading || ""}
                               onChange={(e) => handleUpdateSiteSetting("distilleryVideoHeading", e.target.value)}
+                              placeholder="Where are your fragrances manufactured ?"
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
                             />
                           </div>
                           <div>
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">YouTube Embed / Video Link Address</label>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Video Link (YouTube Embed, Vimeo, or direct MP4)</label>
                             <input
                               type="text"
                               value={siteSettings.distilleryVideoUrl || ""}
                               onChange={(e) => handleUpdateSiteSetting("distilleryVideoUrl", e.target.value)}
-                              placeholder="https://www.youtube.com/embed/..."
+                              placeholder="https://www.youtube.com/embed/Tscv0R6q13Y"
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
                             />
                           </div>
                           <div className="sm:col-span-2">
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Video Description Subtext</label>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Section Description Subtext</label>
                             <textarea
                               rows={2}
                               value={siteSettings.distilleryVideoText || ""}
                               onChange={(e) => handleUpdateSiteSetting("distilleryVideoText", e.target.value)}
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none leading-relaxed"
                             />
+                          </div>
+
+                          {/* Distillery Photo Upload & Preview */}
+                          <div className="sm:col-span-2 border-t border-dashed border-sand-200 pt-3">
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1.5">Distillery Showcase Photo (Replaces Video/Lab when Photo mode is chosen)</label>
+                            <div className="flex flex-col sm:flex-row items-center gap-4 bg-sand-50/60 p-3 rounded-lg border border-sand-200">
+                              <div className="w-28 h-18 rounded-md overflow-hidden bg-sand-200 border shrink-0">
+                                <img
+                                  src={siteSettings.distilleryPhotoUrl || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=600"}
+                                  alt="Distillery Preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 w-full space-y-2">
+                                <input
+                                  type="text"
+                                  value={siteSettings.distilleryPhotoUrl || ""}
+                                  onChange={(e) => handleUpdateSiteSetting("distilleryPhotoUrl", e.target.value)}
+                                  placeholder="Or paste direct image URL (https://...)"
+                                  className="w-full bg-white border border-sand-200 p-2 text-xs rounded outline-none"
+                                />
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  id="distillery-photo-file-upload"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    handleFileChange(e, (base64) => {
+                                      handleUpdateSiteSetting("distilleryPhotoUrl", base64);
+                                    });
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => document.getElementById("distillery-photo-file-upload")?.click()}
+                                  className="px-3.5 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white text-[9.5px] font-mono uppercase tracking-wider rounded cursor-pointer transition-all inline-flex items-center gap-1.5"
+                                >
+                                  <Upload className="w-3 h-3" />
+                                  <span>Upload Distillery Photo</span>
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
