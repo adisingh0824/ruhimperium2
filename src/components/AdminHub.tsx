@@ -20,7 +20,8 @@ import {
   FileText,
   Ticket,
   MessageSquare,
-  Star
+  Star,
+  Sparkles
 } from "lucide-react";
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
 import { storage, db, withTimeout } from "../config/firebase";

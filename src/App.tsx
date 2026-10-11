@@ -24,7 +24,8 @@ import {
   Flower2,
   Trees,
   Play,
-  Truck
+  Truck,
+  Image as ImageIcon
 } from 'lucide-react';
 import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
 import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
