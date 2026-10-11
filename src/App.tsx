@@ -2499,7 +2499,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         />
 
         {/* IMPACT NUMBERS BENTO GRID (RAAHI PARFUMS STYLE) */}
-        <ImpactNumbers />
+        <ImpactNumbers siteSettings={siteSettings} />
 
         {/* 4 CERTIFICATION BADGES ROW (MULTICOLUMN RAAHI PARFUMS STYLE) */}
         <section className="bg-white py-14 border-b border-sand-200/50">
