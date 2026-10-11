@@ -622,15 +622,23 @@ export default function Header({
             )}
 
             {/* Quick Contact options at bottom */}
-            <div className="bg-stone-50 p-4 border-t border-stone-100 flex items-center justify-around text-[10.5px] text-stone-500 font-serif font-light">
-              <span className="flex items-center gap-1.5 hover:text-stone-900 transition-colors">
+            <div className="bg-stone-50 p-4 border-t border-stone-100 flex items-center justify-around text-[10.5px] text-stone-600 font-serif font-light">
+              <a 
+                href="tel:+919116711413" 
+                className="flex items-center gap-1.5 hover:text-stone-950 transition-colors"
+                title="Call Imperial Concierge"
+              >
                 <Phone className="w-3.5 h-3.5 text-gold-500" />
-                <span>+91 999 008 1111</span>
-              </span>
-              <span className="flex items-center gap-1.5 hover:text-stone-900 transition-colors">
+                <span>+91 91167 11413</span>
+              </a>
+              <a 
+                href="mailto:support@ruhimperium.com" 
+                className="flex items-center gap-1.5 hover:text-stone-950 transition-colors"
+                title="Email Imperial Concierge"
+              >
                 <Mail className="w-3.5 h-3.5 text-gold-500" />
-                <span>ambassador@ruh-imperium.com</span>
-              </span>
+                <span>support@ruhimperium.com</span>
+              </a>
             </div>
 
           </div>
@@ -643,7 +651,17 @@ export default function Header({
           <div className="w-[85%] max-w-sm bg-stone-50 h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div>
               <div className="flex items-center justify-between mb-8 border-b border-stone-200/50 pb-4">
-                <Logo variant="header" showSubtitle={true} className="!items-start" customLogoUrl={siteSettings?.customLogoUrl} />
+                <button
+                  type="button"
+                  onClick={() => {
+                    onNavigate("hero");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-left focus:outline-none"
+                  aria-label="Return to home"
+                >
+                  <Logo variant="header" showSubtitle={true} className="!items-start" customLogoUrl={siteSettings?.customLogoUrl} />
+                </button>
                 <button
                   type="button"
                   className="p-1.5 text-stone-400 hover:text-stone-900 rounded-full hover:bg-stone-200/60"
@@ -745,12 +763,28 @@ export default function Header({
             </div>
 
             {/* Mobile Footer */}
-            <div className="border-t border-stone-200 pt-6">
-              <p className="text-[10px] tracking-widest uppercase text-stone-400 mb-2">
-                Ruh Imperium Sourcing
+            <div className="border-t border-stone-200 pt-6 space-y-3">
+              <p className="text-[10px] tracking-widest uppercase text-stone-400">
+                Direct Imperial Concierge
               </p>
-              <p className="text-xs text-stone-500 font-light leading-relaxed font-serif">
-                Olfactory masterpieces designed down the sacred spice roads, incense markets, and sacred woods that span our beautiful continent.
+              <div className="flex flex-col space-y-2 text-xs font-serif text-stone-700">
+                <a 
+                  href="tel:+919116711413" 
+                  className="flex items-center gap-2 hover:text-[#D4BC96] transition-colors py-1"
+                >
+                  <Phone className="w-3.5 h-3.5 text-gold-500 shrink-0" />
+                  <span>+91 91167 11413</span>
+                </a>
+                <a 
+                  href="mailto:support@ruhimperium.com" 
+                  className="flex items-center gap-2 hover:text-[#D4BC96] transition-colors py-1"
+                >
+                  <Mail className="w-3.5 h-3.5 text-gold-500 shrink-0" />
+                  <span>support@ruhimperium.com</span>
+                </a>
+              </div>
+              <p className="text-[11px] text-stone-500 font-light leading-relaxed font-serif pt-1">
+                Pure copper still botanical extractions straight from Kannauj, India to your door.
               </p>
             </div>
           </div>

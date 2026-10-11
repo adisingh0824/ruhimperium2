@@ -88,6 +88,8 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
                 <img 
                   src={siteSettings?.story01Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"} 
                   alt={siteSettings?.story01Title || "Traditional Perfumery Art"} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -108,6 +110,8 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
                 <img 
                   src={siteSettings?.story02Image || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800"} 
                   alt={siteSettings?.story02Title || "Botanical copper stills"} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -172,6 +176,8 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
                 <img 
                   src={siteSettings?.story03Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800"} 
                   alt={siteSettings?.story03Title || "Distillery video"} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -216,6 +222,8 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
                   <img 
                     src={fnd.image} 
                     alt={fnd.name} 
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                 </div>

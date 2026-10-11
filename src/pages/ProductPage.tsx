@@ -40,6 +40,7 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
   const [ratingInput, setRatingInput] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [formSuccess, setFormSuccess] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -305,7 +306,15 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
   };
 
   const handleReviewSubmit = () => {
-    if (!reviewerName.trim() || !reviewText.trim()) return;
+    if (!reviewerName.trim()) {
+      setFormError("Please enter your name before submitting.");
+      return;
+    }
+    if (!reviewText.trim()) {
+      setFormError("Please write your olfactory scent review.");
+      return;
+    }
+    setFormError("");
     if (onAddReview && product) {
       onAddReview({
         productId: product.id,
@@ -319,7 +328,7 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
     setReviewerName("");
     setRatingInput(5);
     setReviewText("");
-    setTimeout(() => setFormSuccess(false), 4000);
+    setTimeout(() => setFormSuccess(false), 5000);
   };
 
   const productReviews = product ? reviews.filter((r) => r.productId === product.id) : [];
@@ -439,6 +448,8 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
                         <img 
                           src={img} 
                           alt={`${product.name} gallery view ${idx + 1}`} 
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-contain"
                           referrerPolicy="no-referrer"
                         />
@@ -681,6 +692,13 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
                 <h6 className="text-lg font-serif text-sand-800 tracking-wide mb-6">
                   Leave a Verified Scent review
                 </h6>
+
+                {formError && (
+                  <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-4 rounded-lg mb-6 flex items-center gap-2">
+                    <span className="font-bold text-sm">⚠️</span>
+                    <span>{formError}</span>
+                  </div>
+                )}
 
                 {formSuccess && (
                   <div className="bg-green-50 border border-green-200 text-green-700 text-xs p-4 rounded-lg mb-6 flex items-center gap-2">

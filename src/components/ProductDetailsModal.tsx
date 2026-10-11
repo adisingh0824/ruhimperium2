@@ -53,6 +53,7 @@ export default function ProductDetailsModal({
   const [ratingInput, setRatingInput] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [formSuccess, setFormSuccess] = useState(false);
+  const [formError, setFormError] = useState("");
 
   if (!isOpen) return null;
 
@@ -61,21 +62,29 @@ export default function ProductDetailsModal({
 
   const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!reviewerName.trim() || !reviewText.trim()) return;
+    if (!reviewerName.trim()) {
+      setFormError("Please enter your name.");
+      return;
+    }
+    if (!reviewText.trim()) {
+      setFormError("Please write your olfactory review.");
+      return;
+    }
 
+    setFormError("");
     onAddReview({
       productId: product.id,
       productName: product.name,
-      author: reviewerName,
+      author: reviewerName.trim(),
       rating: ratingInput,
-      text: reviewText
+      text: reviewText.trim()
     });
 
     setReviewerName("");
     setRatingInput(5);
     setReviewText("");
     setFormSuccess(true);
-    setTimeout(() => setFormSuccess(false), 4000);
+    setTimeout(() => setFormSuccess(false), 5000);
   };
 
   const selectedVariant = product.variants?.find(v => 
@@ -583,6 +592,13 @@ export default function ProductDetailsModal({
               <h6 className="text-base font-serif text-sand-800 tracking-wide mb-4">
                 Leave a Verified Scent review
               </h6>
+
+              {formError && (
+                <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-lg mb-4 flex items-center gap-1.5">
+                  <span className="font-bold text-sm">⚠️</span>
+                  <span>{formError}</span>
+                </div>
+              )}
 
               {formSuccess && (
                 <div className="bg-green-50 border border-green-200 text-green-700 text-xs p-3 rounded-lg mb-4 flex items-center gap-1.5">

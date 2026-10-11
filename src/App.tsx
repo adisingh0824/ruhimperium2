@@ -33,6 +33,7 @@ import Header from "./components/Header";
 import ProductDetailsModal from "./components/ProductDetailsModal";
 import ProductPage from "./pages/ProductPage";
 import OurStoryPage from "./pages/OurStoryPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import CartDrawer from "./components/CartDrawer";
 import AdminHub from "./components/AdminHub";
 import OrderTracker from "./components/OrderTracker";
@@ -1512,7 +1513,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#111111] font-sans antialiased text-sm flex flex-col justify-between">
+    <div className="min-h-screen w-full overflow-x-hidden bg-white text-[#111111] font-sans antialiased text-sm flex flex-col justify-between">
       
       {/* Editorial Luxury Splash Screen */}
       <AnimatePresence mode="wait">
@@ -3010,6 +3011,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             />
           } />
           <Route path="/our-story" element={<OurStoryPage founders={founders} siteSettings={siteSettings} />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
 
@@ -3039,7 +3041,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <ul className="space-y-3 text-xs text-stone-400 font-light font-sans">
                   <li><button type="button" onClick={() => handleSectionNavigate("hero")} className="hover:text-white cursor-pointer transition-colors block">Home</button></li>
                   <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Shop All</button></li>
-                  <li><button type="button" onClick={() => handleSectionNavigate("shop")} className="hover:text-white cursor-pointer transition-colors block">Wellness</button></li>
+                  <li><button type="button" onClick={() => { handleSelectCategory("Ruh / Absolute Oil"); handleSectionNavigate("shop"); }} className="hover:text-white cursor-pointer transition-colors block">Wellness</button></li>
                   <li><button type="button" onClick={() => setBulkEnquiryOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Bespoke Gifting</button></li>
                   <li><button type="button" onClick={() => handleSectionNavigate("our-story")} className="hover:text-white cursor-pointer transition-colors block">Our Story</button></li>
                   <li><button type="button" onClick={() => setIsOrderTrackerOpen(true)} className="hover:text-white cursor-pointer transition-colors block">Track your order</button></li>
@@ -3114,11 +3116,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
           {/* Footer Copyright & Social Row */}
           <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-stone-400 font-light gap-4">
-            <p>© 2026 {siteSettings.footerBrandName || "Ruh Imperium"}. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} {siteSettings.footerBrandName || "Ruh Imperium"}. All rights reserved.</p>
             <div className="flex space-x-6 text-stone-500">
-              <a href={siteSettings.footerInstagramUrl || "https://instagram.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Instagram"><Instagram className="w-4.5 h-4.5" /></a>
+              <a href={siteSettings.footerInstagramUrl || "https://instagram.com/ruhimperium"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Instagram"><Instagram className="w-4.5 h-4.5" /></a>
               <a href={siteSettings.footerLinkedinUrl || "https://linkedin.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="LinkedIn"><Linkedin className="w-4.5 h-4.5" /></a>
-              <a href={siteSettings.footerTwitterUrl || "https://twitter.com"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Twitter"><Twitter className="w-4.5 h-4.5" /></a>
+              <a href={siteSettings.footerTwitterUrl || "https://twitter.com/ruhimperium"} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Twitter"><Twitter className="w-4.5 h-4.5" /></a>
             </div>
           </div>
 
