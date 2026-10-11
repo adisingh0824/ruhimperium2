@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="goldGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#F5E6CA"/>
+      <stop offset="60%" stop-color="#D4BC96"/>
+      <stop offset="100%" stop-color="#8C6D3B"/>
+    </radialGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1816"/>
+      <stop offset="100%" stop-color="#0A0A0A"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" stroke="#D4BC96" stroke-width="8" stroke-opacity="0.3"/>
+  
+  <!-- Outer decorative royal ring -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-dasharray="8 8" opacity="0.6"/>
+  <circle cx="256" cy="256" r="185" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.4"/>
+  
+  <!-- Center Alembic Still / Flagon Emblem -->
+  <!-- Flagon neck and cap -->
+  <rect x="236" y="110" width="40" height="30" rx="6" fill="url(#goldGrad)"/>
+  <rect x="244" y="140" width="24" height="40" fill="url(#goldGrad)"/>
+  <!-- Bottle body -->
+  <path d="M 220 180 L 292 180 L 330 250 L 330 360 A 24 24 0 0 1 306 384 L 206 384 A 24 24 0 0 1 182 360 L 182 250 Z" fill="url(#goldGrad)" fill-opacity="0.15" stroke="url(#goldGrad)" stroke-width="6"/>
+  
+  <!-- Stylized Royal 'R' monogram -->
+  <text x="256" y="325" font-family="'Cinzel', 'Cormorant Garamond', serif" font-size="120" font-weight="600" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="2">R</text>
+
+  <!-- Star accents -->
+  <polygon points="256,60 262,75 278,75 265,85 270,100 256,90 242,100 247,85 234,75 250,75" fill="url(#goldGrad)"/>
+</svg>
