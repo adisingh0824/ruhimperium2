@@ -1,33 +1,41 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, initializeFirestore, doc, getDocFromServer } from "firebase/firestore";
-import { getAuth, signInAnonymously } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-import defaultConfig from "../../firebase-applet-config.json";
+// Firebase SDK initialization for Ruh Imperium
+// This file replaces the previous env‑based config with the concrete values you provided.
+// It exports the Firestore DB, Storage bucket, optional Analytics, and a timeout helper.
 
-// Allow runtime override via Vite environment variables
-const config = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || defaultConfig.apiKey,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || defaultConfig.authDomain,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || defaultConfig.projectId,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || defaultConfig.storageBucket,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || defaultConfig.messagingSenderId,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || defaultConfig.appId,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || defaultConfig.measurementId
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import { getAnalytics } from "firebase/analytics";
+
+// -----------------------------------------------------------------------------
+// Your Firebase project credentials – copy‑paste from the Firebase console.
+// -----------------------------------------------------------------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyCHzalBGVMTP3rRAdLaUZsbpl56JhY6l54",
+  authDomain: "ruh-imperium.firebaseapp.com",
+  projectId: "ruh-imperium",
+  storageBucket: "ruh-imperium.firebasestorage.app",
+  messagingSenderId: "117266018138",
+  appId: "1:117266018138:web:fe9873ad4de79a4f4dcd63",
+  measurementId: "G-818PXTEQSR",
 };
 
-const app = initializeApp(config);
+// Initialise Firebase app (singleton)
+const app = initializeApp(firebaseConfig);
 
-// Connect to the (default) database created by the user in the Firebase Console
+// Export core services used throughout the codebase
 export const db = getFirestore(app);
-
-export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const analytics = getAnalytics(app);
 
-// Helper to prevent infinite hangs on offline/missing databases
-export const withTimeout = <T>(promise: Promise<T>, ms: number = 4000): Promise<T> => {
+/**
+ * Helper that adds a timeout + simple error handling to any Firestore write.
+ * Usage: `withTimeout(() => setDoc(...))`.
+ */
+export const withTimeout = async (promise: Promise<any>, ms = 8000) => {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Error("Connection to live database timed out. Ensure your database is active."));
+      reject(new Error("Firestore write timed out"));
     }, ms);
     promise
       .then((value) => {
@@ -40,25 +48,3 @@ export const withTimeout = <T>(promise: Promise<T>, ms: number = 4000): Promise<
       });
   });
 };
-
-// Validate and test initial connection, and sign in anonymously to satisfy Storage rules
-async function validateConnection() {
-  try {
-    await signInAnonymously(auth);
-    console.log("Firebase Auth signed in anonymously.");
-  } catch (error) {
-    console.warn("Anonymous auth failed (Storage uploads may fallback to Base64 if rules require auth):", error);
-  }
-
-  try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-    console.log("Firebase/Firestore connected successfully!");
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn("Firebase configuration or network note: The client is offline or starting up.");
-    } else {
-      console.log("Firestore status update:", error);
-    }
-  }
-}
-validateConnection();
