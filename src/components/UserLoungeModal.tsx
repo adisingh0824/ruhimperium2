@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { UserAccount, Order, Product } from "../types";
 import { useUser, SignIn, useClerk } from "@clerk/clerk-react";
+import { safeStorage } from "../App";
 
 interface UserLoungeModalProps {
   isOpen: boolean;
@@ -110,8 +111,8 @@ export function TraditionalUserLoungeModal({
       const matchingOrders = orders.filter(o => o.email.toLowerCase() === currentUser.email.toLowerCase());
       setUserOrders(matchingOrders);
 
-      // Load Wishlist from localStorage
-      const cachedWishlist = localStorage.getItem(`ruh-wishlist-${currentUser.email}`);
+      // Load Wishlist from safeStorage
+      const cachedWishlist = safeStorage.getItem(`ruh-wishlist-${currentUser.email}`);
       if (cachedWishlist) {
         try {
           const ids: string[] = JSON.parse(cachedWishlist);
@@ -123,8 +124,8 @@ export function TraditionalUserLoungeModal({
         setWishlistProducts([]);
       }
 
-      // Load Custom Blends from localStorage
-      const cachedBlends = localStorage.getItem(`ruh-blends-${currentUser.email}`);
+      // Load Custom Blends from safeStorage
+      const cachedBlends = safeStorage.getItem(`ruh-blends-${currentUser.email}`);
       if (cachedBlends) {
         try {
           setSavedBlends(JSON.parse(cachedBlends));
@@ -236,7 +237,7 @@ export function TraditionalUserLoungeModal({
     if (!currentUser) return;
     const filtered = savedBlends.filter((b: any) => b.id !== blendId);
     setSavedBlends(filtered);
-    localStorage.setItem(`ruh-blends-${currentUser.email}`, JSON.stringify(filtered));
+    safeStorage.setItem(`ruh-blends-${currentUser.email}`, JSON.stringify(filtered));
   };
 
   // Re-order custom blend
@@ -273,7 +274,7 @@ export function TraditionalUserLoungeModal({
   const handleRemoveFromWishlist = (productId: string) => {
     if (!currentUser) return;
     const filteredIds = wishlistProducts.filter(p => p.id !== productId).map(p => p.id);
-    localStorage.setItem(`ruh-wishlist-${currentUser.email}`, JSON.stringify(filteredIds));
+    safeStorage.setItem(`ruh-wishlist-${currentUser.email}`, JSON.stringify(filteredIds));
     setWishlistProducts(prev => prev.filter(p => p.id !== productId));
   };
 

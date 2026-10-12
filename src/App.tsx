@@ -78,6 +78,31 @@ const isEmbedIframe = (url: string): boolean => {
   );
 };
 
+export const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {}
+    return null;
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {}
+  },
+  removeItem: (key: string): void => {
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.removeItem(key);
+      }
+    } catch (e) {}
+  }
+};
+
 export default function App() {
   // Initialization guards for Firestore setup
   const initPendingRef = useRef<Record<string, boolean>>({});
@@ -120,7 +145,7 @@ export default function App() {
 
   // Dynamic Products collection
   const [products, setProducts] = useState<Product[]>(() => {
-    const cached = localStorage.getItem("ruh-products");
+    const cached = safeStorage.getItem("ruh-products");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -135,7 +160,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-products", JSON.stringify(products));
+    safeStorage.setItem("ruh-products", JSON.stringify(products));
   }, [products]);
 
   // Automatically sync cart item details when products database is changed or customized
@@ -171,7 +196,7 @@ export default function App() {
 
   // Dynamic Collections/Categories
   const [collections, setCollections] = useState<Collection[]>(() => {
-    const cached = localStorage.getItem("ruh-collections");
+    const cached = safeStorage.getItem("ruh-collections");
     if (cached) {
       try {
         return JSON.parse(cached);
@@ -188,27 +213,27 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-collections", JSON.stringify(collections));
+    safeStorage.setItem("ruh-collections", JSON.stringify(collections));
   }, [collections]);
 
   // Dynamic Cover Hero Graphic
   const [coverPhoto, setCoverPhoto] = useState<string>(() => {
-    const cached = localStorage.getItem("ruh-cover-photo");
-    return cached || "/src/assets/images/traditional_degh_distillation_pots_1781437229236.jpg";
+    const cached = safeStorage.getItem("ruh-cover-photo");
+    return cached || "/images/traditional_degh_distillation_pots_1781437229236.jpg";
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-cover-photo", coverPhoto);
+    safeStorage.setItem("ruh-cover-photo", coverPhoto);
   }, [coverPhoto]);
 
   // Dynamic Hero Video URL
   const [heroVideoUrl, setHeroVideoUrl] = useState<string>(() => {
-    const cached = localStorage.getItem("ruh-hero-video-url");
+    const cached = safeStorage.getItem("ruh-hero-video-url");
     return cached || "https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761";
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-hero-video-url", heroVideoUrl);
+    safeStorage.setItem("ruh-hero-video-url", heroVideoUrl);
   }, [heroVideoUrl]);
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -235,7 +260,7 @@ export default function App() {
 
   // Dynamic leadership profiles with default social handles
   const [founders, setFounders] = useState<Founder[]>(() => {
-    const cached = localStorage.getItem("ruh-founders");
+    const cached = safeStorage.getItem("ruh-founders");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -271,12 +296,12 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-founders", JSON.stringify(founders));
+    safeStorage.setItem("ruh-founders", JSON.stringify(founders));
   }, [founders]);
 
   // Dynamic site textual configuration settings
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
-    const cached = localStorage.getItem("ruh-site-settings");
+    const cached = safeStorage.getItem("ruh-site-settings");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -336,18 +361,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-site-settings", JSON.stringify(siteSettings));
+    safeStorage.setItem("ruh-site-settings", JSON.stringify(siteSettings));
   }, [siteSettings]);
 
   // Purge any legacy cached keys or old logo URLs from browser localStorage
   useEffect(() => {
     try {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.toLowerCase().includes("raahi")) {
-          localStorage.removeItem(key);
-        }
-      });
-      const cached = localStorage.getItem("ruh-site-settings");
+      if (typeof window !== "undefined" && window.localStorage) {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.toLowerCase().includes("raahi")) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      const cached = safeStorage.getItem("ruh-site-settings");
       if (cached) {
         const parsed = JSON.parse(cached);
         let updated = false;
@@ -378,24 +405,24 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           updated = true;
         }
         if (updated) {
-          localStorage.setItem("ruh-site-settings", JSON.stringify(parsed));
+          safeStorage.setItem("ruh-site-settings", JSON.stringify(parsed));
           setSiteSettings(parsed);
         }
       }
     } catch (e) {}
   }, []);
 
-  // Handle splash screen timer
+  // Handle splash screen timer with fast mobile reveal
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsSplashLoading(false);
-    }, 2800); // 2.8 seconds white splash background reveal
+    }, 1400); // 1.4 seconds fast mobile reveal
     return () => clearTimeout(timer);
   }, []);
 
   // Dynamic system coupon tokens register
   const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    const cached = localStorage.getItem("ruh-coupons");
+    const cached = safeStorage.getItem("ruh-coupons");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -409,12 +436,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-coupons", JSON.stringify(coupons));
+    safeStorage.setItem("ruh-coupons", JSON.stringify(coupons));
   }, [coupons]);
 
   // Dynamic orders ledger
   const [orders, setOrders] = useState<Order[]>(() => {
-    const cached = localStorage.getItem("ruh-orders");
+    const cached = safeStorage.getItem("ruh-orders");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -447,12 +474,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   });
 
   useEffect(() => {
-    localStorage.setItem("ruh-orders", JSON.stringify(orders));
+    safeStorage.setItem("ruh-orders", JSON.stringify(orders));
   }, [orders]);
 
   // Security and overlay states
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
-    const cached = localStorage.getItem("ruh-admin-logged-in");
+    const cached = safeStorage.getItem("ruh-admin-logged-in");
     return cached === "true";
   });
 
@@ -461,7 +488,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // General Customer Accounts Registry & Lounge Trigger
   const [users, setUsers] = useState<UserAccount[]>(() => {
-    const cached = localStorage.getItem("ruh-users");
+    const cached = safeStorage.getItem("ruh-users");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -483,18 +510,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   });
 
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
-    const cached = localStorage.getItem("ruh-current-user");
+    const cached = safeStorage.getItem("ruh-current-user");
     return cached ? JSON.parse(cached) : null;
   });
 
   const [isLoungeOpen, setIsLoungeOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("ruh-users", JSON.stringify(users));
+    safeStorage.setItem("ruh-users", JSON.stringify(users));
   }, [users]);
 
   useEffect(() => {
-    localStorage.setItem("ruh-current-user", JSON.stringify(currentUser));
+    safeStorage.setItem("ruh-current-user", JSON.stringify(currentUser));
   }, [currentUser]);
 
   // Sync active session user details when live database is changed
@@ -507,15 +534,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     }
   }, [users, currentUser]);
 
-  // Cart state loaded from localStorage for persistent travel logs!
+  // Cart state loaded from safeStorage for persistent travel logs!
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const cached = localStorage.getItem("ruh-cart");
+    const cached = safeStorage.getItem("ruh-cart");
     return cached ? JSON.parse(cached) : [];
   });
 
   // Custom reviews list state allowing real-time submissions
   const [reviews, setReviews] = useState<Review[]>(() => {
-    const cached = localStorage.getItem("ruh-reviews");
+    const cached = safeStorage.getItem("ruh-reviews");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -543,7 +570,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Custom blog articles state allowing real-time admin updates & picture uploads
   const [blogArticles, setBlogArticles] = useState<BlogArticle[]>(() => {
-    const cached = localStorage.getItem("ruh-blog-articles");
+    const cached = safeStorage.getItem("ruh-blog-articles");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -606,17 +633,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     return () => window.removeEventListener("popstate", handlePopState);
   }, [selectedCategory]);
 
-  // Sync state helpers to localStorage
+  // Sync state helpers to safeStorage
   useEffect(() => {
-    localStorage.setItem("ruh-cart", JSON.stringify(cart));
+    safeStorage.setItem("ruh-cart", JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem("ruh-reviews", JSON.stringify(reviews));
+    safeStorage.setItem("ruh-reviews", JSON.stringify(reviews));
   }, [reviews]);
 
   useEffect(() => {
-    localStorage.setItem("ruh-blog-articles", JSON.stringify(blogArticles));
+    safeStorage.setItem("ruh-blog-articles", JSON.stringify(blogArticles));
   }, [blogArticles]);
 
   // Keep refs in sync with latest state values (avoids stale closures in update functions)
@@ -866,7 +893,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               twitter: "https://twitter.com/adityasingh_ruh"
             }
           ];
-          const cached = localStorage.getItem("ruh-founders");
+          const cached = safeStorage.getItem("ruh-founders");
           const startingFounders = cached ? JSON.parse(cached) : initialFounders;
           await setDoc(doc(db, "settings", "founders"), { list: startingFounders });
         } catch (err) {
@@ -891,7 +918,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             { id: "signature-perfumes", name: "Signature Extraits de Parfum", tag: "High-concentration artisanal blends", icon: "⚜️" },
             { id: "attar", name: "Traditional Attars", tag: "Kannauj copper-aged distillations", icon: "🪔" }
           ];
-          const cached = localStorage.getItem("ruh-collections");
+          const cached = safeStorage.getItem("ruh-collections");
           const startingCollections = cached ? JSON.parse(cached) : initialCollections;
           await withTimeout(setDoc(doc(db, "settings", "collections"), { list: startingCollections }));
         } catch (err) {
@@ -912,8 +939,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         if (initPendingRef.current["assets"]) return;
         initPendingRef.current["assets"] = true;
         try {
-          const cachedCover = localStorage.getItem("ruh-cover-photo") || "/src/assets/images/traditional_degh_distillation_pots_1781437229236.jpg";
-          const cachedVideo = localStorage.getItem("ruh-hero-video-url") || "https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4";
+          const cachedCover = safeStorage.getItem("ruh-cover-photo") || "/images/traditional_degh_distillation_pots_1781437229236.jpg";
+          const cachedVideo = safeStorage.getItem("ruh-hero-video-url") || "https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4";
           await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: cachedCover, heroVideoUrl: cachedVideo }));
         } catch (err) {
           console.error("Error setting assets:", err);
@@ -1246,7 +1273,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const handleAddCustomToCart = (customProduct: Product) => {
     // Automatically archive in user's bespoke cabinet if logged in
     if (currentUser) {
-      const cachedBlends = localStorage.getItem(`ruh-blends-${currentUser.email}`);
+      const cachedBlends = safeStorage.getItem(`ruh-blends-${currentUser.email}`);
       const list = cachedBlends ? JSON.parse(cachedBlends) : [];
       
       const parseNumber = (text: string) => {
@@ -1268,7 +1295,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       };
       
       list.unshift(newBlend);
-      localStorage.setItem(`ruh-blends-${currentUser.email}`, JSON.stringify(list));
+      safeStorage.setItem(`ruh-blends-${currentUser.email}`, JSON.stringify(list));
     }
 
     setCart((prevCart) => {
@@ -1310,7 +1337,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     }
 
     const key = `ruh-wishlist-${currentUser.email}`;
-    const cached = localStorage.getItem(key);
+    const cached = safeStorage.getItem(key);
     let ids: string[] = cached ? JSON.parse(cached) : [];
 
     let msg = "";
@@ -1322,7 +1349,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       msg = "Formulation catalogued in your private wishlist cabinet!";
     }
 
-    localStorage.setItem(key, JSON.stringify(ids));
+    safeStorage.setItem(key, JSON.stringify(ids));
     // Trigger state sync or simple shallow copy re-evaluate
     setCurrentUser({ ...currentUser });
     showToast(msg);
@@ -1330,7 +1357,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   const isProductWishlisted = (productId: string) => {
     if (!currentUser) return false;
-    const cached = localStorage.getItem(`ruh-wishlist-${currentUser.email}`);
+    const cached = safeStorage.getItem(`ruh-wishlist-${currentUser.email}`);
     if (!cached) return false;
     const ids: string[] = JSON.parse(cached);
     return ids.includes(productId);
@@ -1519,10 +1546,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       <AnimatePresence mode="wait">
         {isSplashLoading && (
           <motion.div
+            onClick={() => setIsSplashLoading(false)}
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.7, ease: "easeInOut" }}
-            className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center pointer-events-auto select-none"
+            className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center pointer-events-auto select-none cursor-pointer"
             id="ruh-splash-loader"
           >
             <motion.div
@@ -1569,7 +1597,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         isAdminLoggedIn={isAdminLoggedIn}
         onLogout={() => {
           setIsAdminLoggedIn(false);
-          localStorage.removeItem("ruh-admin-logged-in");
+          safeStorage.removeItem("ruh-admin-logged-in");
         }}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -3228,7 +3256,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         isAdminLoggedIn={isAdminLoggedIn}
         onLogoutAdmin={() => {
           setIsAdminLoggedIn(false);
-          localStorage.removeItem("ruh-admin-logged-in");
+          safeStorage.removeItem("ruh-admin-logged-in");
         }}
         onSelectProduct={(p) => {
           setSelectedProduct(p);

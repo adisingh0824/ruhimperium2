@@ -28,6 +28,7 @@ import { storage, db, withTimeout } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import InvoiceBill from "./InvoiceBill";
+import { safeStorage } from "../App";
 
 async function sha256(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
@@ -168,7 +169,7 @@ export default function AdminHub({
   const [adminUsers, setAdminUsers] = useState<{username: string; password: string}[]>(() => {
     const masterAdmin = { username: defaultAdminEmail, password: defaultAdminHashed };
     const masterAdminCom = { username: "sadityasingh7990@gmail.com", password: defaultAdminHashed };
-    const cached = localStorage.getItem("ruh-admin-users");
+    const cached = safeStorage.getItem("ruh-admin-users");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -204,9 +205,9 @@ export default function AdminHub({
     return () => unsubscribe();
   }, []);
 
-  // Sync to local storage & Firestore on changes
+  // Sync to safeStorage & Firestore on changes
   useEffect(() => {
-    localStorage.setItem("ruh-admin-users", JSON.stringify(adminUsers));
+    safeStorage.setItem("ruh-admin-users", JSON.stringify(adminUsers));
     
     if (adminUsers.length > 0) {
       if (syncAdminsRef.current) return;
@@ -301,7 +302,7 @@ export default function AdminHub({
     const newAdmin = { username: email.trim().toLowerCase(), password: hashedPassword };
     setAdminUsers([newAdmin]);
     setIsAdminLoggedIn(true);
-    localStorage.setItem("ruh-admin-logged-in", "true");
+    safeStorage.setItem("ruh-admin-logged-in", "true");
   };
 
   // Handles standard secure credentials matching from dynamic registered admins
@@ -339,7 +340,7 @@ export default function AdminHub({
 
     if (matchFound) {
       setIsAdminLoggedIn(true);
-      localStorage.setItem("ruh-admin-logged-in", "true");
+      safeStorage.setItem("ruh-admin-logged-in", "true");
     } else {
       setLoginError("Invalid Executive Credentials. Access Denied.");
     }

@@ -111,6 +111,19 @@ export default function ThreeAtmosphere() {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance"
+      });
+    } catch (e) {
+      console.warn("WebGL unavailable or disabled on this device:", e);
+      return;
+    }
+
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(
@@ -121,11 +134,6 @@ export default function ThreeAtmosphere() {
     );
     camera.position.z = 45;
 
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      powerPreference: "high-performance"
-    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);

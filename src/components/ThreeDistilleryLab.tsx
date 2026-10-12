@@ -61,7 +61,14 @@ export const ThreeDistilleryLab: React.FC = () => {
     camera.position.set(0, 1.8, 6.5);
     camera.lookAt(0, 0.8, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    } catch (e) {
+      console.warn("WebGL unavailable or disabled on this device for 3D distillery lab:", e);
+      return;
+    }
+
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
