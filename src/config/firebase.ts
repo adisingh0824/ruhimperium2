@@ -32,7 +32,7 @@ export const analytics = getAnalytics(app);
  * Helper that adds a timeout + simple error handling to any Firestore write.
  * Usage: `withTimeout(() => setDoc(...))`.
  */
-export const withTimeout = async (promise: Promise<any>, ms = 8000) => {
+export const withTimeout = async (promise: Promise<any>, ms = 25000) => {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error("Firestore write timed out"));

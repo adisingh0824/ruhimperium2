@@ -136,6 +136,27 @@ export default function AdminHub({
     setIsSiteDirty(true);
   };
 
+  // Real-time automatic live synchronization: any change made by admin is pushed to Firestore live
+  useEffect(() => {
+    if (isSiteDirty && isAdminLoggedIn) {
+      const timer = setTimeout(async () => {
+        try {
+          setIsSaving(true);
+          await parentSetSiteSettings(localSiteSettings);
+          await parentSetFounders(localFounders);
+          setIsSiteDirty(false);
+          setSaveSuccess(true);
+          setTimeout(() => setSaveSuccess(false), 2500);
+        } catch (e) {
+          console.error("Real-time auto-sync error:", e);
+        } finally {
+          setIsSaving(false);
+        }
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [localSiteSettings, localFounders, isSiteDirty, isAdminLoggedIn, parentSetSiteSettings, parentSetFounders]);
+
   const handleSaveAllSiteChanges = async () => {
     setIsSaving(true);
     try {

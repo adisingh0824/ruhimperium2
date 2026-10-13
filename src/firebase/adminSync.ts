@@ -15,6 +15,7 @@
  * Both functions use the `withTimeout` wrapper defined in `src/config/firebase.ts`
  * to avoid hanging when the network is offline.
  */
+import type { Dispatch, SetStateAction } from "react";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db, withTimeout } from "../config/firebase";
 
@@ -28,7 +29,7 @@ import { db, withTimeout } from "../config/firebase";
  */
 export const syncCollection = <T>(
   path: string,
-  setState: React.Dispatch<React.SetStateAction<T[]>>,
+  setState: Dispatch<SetStateAction<T[]>>,
   fallbackData: T[]
 ) => {
   const unsub = onSnapshot(doc(db, "settings", path), (snap) => {
@@ -37,7 +38,7 @@ export const syncCollection = <T>(
       setState(data.list ?? []);
     } else {
       // Initialise the document with the fallback array
-      withTimeout(() => setDoc(doc(db, "settings", path), { list: fallbackData }));
+      withTimeout(setDoc(doc(db, "settings", path), { list: fallbackData }));
       setState(fallbackData);
     }
   });
@@ -52,5 +53,5 @@ export const syncCollection = <T>(
  * @param list  New array to persist
  */
 export const writeCollection = <T>(path: string, list: T[]) => {
-  return withTimeout(() => setDoc(doc(db, "settings", path), { list }));
+  return withTimeout(setDoc(doc(db, "settings", path), { list }));
 };

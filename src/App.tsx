@@ -103,6 +103,13 @@ export const safeStorage = {
   }
 };
 
+export function cleanForFirestore<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data, (_, value) => {
+    if (value === undefined) return null;
+    return value;
+  }));
+}
+
 export default function App() {
   // Initialization guards for Firestore setup
   const initPendingRef = useRef<Record<string, boolean>>({});
@@ -1009,9 +1016,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setSiteSettings(resolved);
+    const sanitized = cleanForFirestore(resolved);
+    setSiteSettings(sanitized);
+    siteSettingsRef.current = sanitized;
+    safeStorage.setItem("ruh-site-settings", JSON.stringify(sanitized));
     try {
-      await withTimeout(setDoc(doc(db, "settings", "site"), resolved));
+      await withTimeout(setDoc(doc(db, "settings", "site"), sanitized));
     } catch (e) {
       console.error("Firestore settings sync error: ", e);
     } finally {
@@ -1027,9 +1037,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setFounders(resolved);
+    const sanitized = cleanForFirestore(resolved);
+    setFounders(sanitized);
+    foundersRef.current = sanitized;
+    safeStorage.setItem("ruh-founders", JSON.stringify(sanitized));
     try {
-      await withTimeout(setDoc(doc(db, "settings", "founders"), { list: resolved }));
+      await withTimeout(setDoc(doc(db, "settings", "founders"), { list: sanitized }));
     } catch (e) {
       console.error("Firestore founders sync error: ", e);
     } finally {
@@ -1045,10 +1058,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setCollections(resolved);
-    collectionsRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setCollections(sanitized);
+    collectionsRef.current = sanitized;
+    safeStorage.setItem("ruh-collections", JSON.stringify(sanitized));
     try {
-      await withTimeout(setDoc(doc(db, "settings", "collections"), { list: resolved }));
+      await withTimeout(setDoc(doc(db, "settings", "collections"), { list: sanitized }));
     } catch (e) {
       console.error("Firestore collections sync error: ", e);
     } finally {
@@ -1060,6 +1075,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     writeLockRef.current["assets"] = true;
     setCoverPhoto(newVal);
     coverPhotoRef.current = newVal;
+    safeStorage.setItem("ruh-cover-photo", newVal);
     try {
       await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true }));
     } catch (e) {
@@ -1073,6 +1089,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     writeLockRef.current["assets"] = true;
     setHeroVideoUrl(newVal);
     heroVideoUrlRef.current = newVal;
+    safeStorage.setItem("ruh-hero-video-url", newVal);
     try {
       await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }));
     } catch (e) {
@@ -1081,6 +1098,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       setTimeout(() => { writeLockRef.current["assets"] = false; }, 1000);
     }
   };
+
   const updateProducts = async (newVal: Product[] | ((prev: Product[]) => Product[])) => {
     writeLockRef.current["products"] = true;
     const previousProducts = productsRef.current;
@@ -1090,16 +1108,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setProducts(resolved);
-    productsRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setProducts(sanitized);
+    productsRef.current = sanitized;
+    safeStorage.setItem("ruh-products", JSON.stringify(sanitized));
     try {
       const batch = writeBatch(db);
-      const currentIds = new Set(resolved.map(p => p.id));
+      const currentIds = new Set(sanitized.map(p => p.id));
       const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
       for (const id of deletedIds) {
         batch.delete(doc(db, "products", id));
       }
-      for (const p of resolved) {
+      for (const p of sanitized) {
         batch.set(doc(db, "products", p.id), p);
       }
       await withTimeout(batch.commit());
@@ -1119,16 +1139,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setBlogArticles(resolved);
-    blogArticlesRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setBlogArticles(sanitized);
+    blogArticlesRef.current = sanitized;
+    safeStorage.setItem("ruh-blog-articles", JSON.stringify(sanitized));
     try {
       const batch = writeBatch(db);
-      const currentIds = new Set(resolved.map(b => b.id));
+      const currentIds = new Set(sanitized.map(b => b.id));
       const deletedIds = previousBlogs.filter(b => !currentIds.has(b.id)).map(b => b.id);
       for (const id of deletedIds) {
         batch.delete(doc(db, "blogArticles", id));
       }
-      for (const b of resolved) {
+      for (const b of sanitized) {
         batch.set(doc(db, "blogArticles", b.id), b);
       }
       await withTimeout(batch.commit());
@@ -1148,16 +1170,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setCoupons(resolved);
-    couponsRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setCoupons(sanitized);
+    couponsRef.current = sanitized;
+    safeStorage.setItem("ruh-coupons", JSON.stringify(sanitized));
     try {
       const batch = writeBatch(db);
-      const currentCodes = new Set(resolved.map(c => c.code));
+      const currentCodes = new Set(sanitized.map(c => c.code));
       const deletedCodes = previousCoupons.filter(c => !currentCodes.has(c.code)).map(c => c.code);
       for (const code of deletedCodes) {
         batch.delete(doc(db, "coupons", code));
       }
-      for (const c of resolved) {
+      for (const c of sanitized) {
         batch.set(doc(db, "coupons", c.code), c);
       }
       await withTimeout(batch.commit());
@@ -1177,16 +1201,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setReviews(resolved);
-    reviewsRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setReviews(sanitized);
+    reviewsRef.current = sanitized;
+    safeStorage.setItem("ruh-reviews", JSON.stringify(sanitized));
     try {
       const batch = writeBatch(db);
-      const currentIds = new Set(resolved.map(r => r.id));
+      const currentIds = new Set(sanitized.map(r => r.id));
       const deletedIds = previousReviews.filter(r => !currentIds.has(r.id)).map(r => r.id);
       for (const id of deletedIds) {
         batch.delete(doc(db, "reviews", id));
       }
-      for (const r of resolved) {
+      for (const r of sanitized) {
         batch.set(doc(db, "reviews", r.id), r);
       }
       await withTimeout(batch.commit());
@@ -1206,16 +1232,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setOrders(resolved);
-    ordersRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setOrders(sanitized);
+    ordersRef.current = sanitized;
+    safeStorage.setItem("ruh-orders", JSON.stringify(sanitized));
     try {
       const batch = writeBatch(db);
-      const currentIds = new Set(resolved.map(o => o.id));
+      const currentIds = new Set(sanitized.map(o => o.id));
       const deletedIds = previousOrders.filter(o => !currentIds.has(o.id)).map(o => o.id);
       for (const id of deletedIds) {
         batch.delete(doc(db, "orders", id));
       }
-      for (const o of resolved) {
+      for (const o of sanitized) {
         batch.set(doc(db, "orders", o.id), o);
       }
       await withTimeout(batch.commit());
@@ -1235,15 +1263,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     } else {
       resolved = newVal;
     }
-    setUsers(resolved);
-    usersRef.current = resolved;
+    const sanitized = cleanForFirestore(resolved);
+    setUsers(sanitized);
+    usersRef.current = sanitized;
+    safeStorage.setItem("ruh-users", JSON.stringify(sanitized));
     try {
-      const currentEmails = new Set(resolved.map(u => u.email.toLowerCase()));
+      const currentEmails = new Set(sanitized.map(u => u.email.toLowerCase()));
       const deletedEmails = previousUsers.filter(u => !currentEmails.has(u.email.toLowerCase())).map(u => u.email);
       for (const email of deletedEmails) {
         await deleteDoc(doc(db, "users", email.toLowerCase()));
       }
-      for (const u of resolved) {
+      for (const u of sanitized) {
         await setDoc(doc(db, "users", u.email.toLowerCase()), u);
       }
     } catch (e) {
@@ -1739,15 +1769,21 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 </button>
               </div>
 
+              {siteSettings.heroTagline && (
+                <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#D4BC96] font-mono mb-2 block font-semibold pointer-events-auto">
+                  {siteSettings.heroTagline}
+                </span>
+              )}
+
               <h1 
                 className="text-3xl sm:text-5xl md:text-6xl font-serif text-white tracking-wide leading-tight mb-4 max-w-3xl pointer-events-auto font-light"
                 style={{ textShadow: "0 4px 24px rgba(0, 0, 0, 0.85)" }}
               >
-                Luxury Indian Attars & Pure Kannauj Perfumes
+                {siteSettings.heroHeadline || "Luxury Indian Attars & Pure Kannauj Perfumes"}
               </h1>
 
               <p className="text-xs sm:text-sm text-stone-300 max-w-xl mb-6 leading-relaxed font-light pointer-events-auto">
-                Wrap Yourself in Luxury: Discover the Art of Indian Slow-Perfumery with our signature botanical collections.
+                {siteSettings.heroDescription || "Wrap Yourself in Luxury: Discover the Art of Indian Slow-Perfumery with our signature botanical collections."}
               </p>
 
               {/* Patron Social Proof Pill (Raahi Parfums Style) */}
@@ -1830,6 +1866,28 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             )}
           </section>
         </div>
+
+        {/* PROMO AD BANNER (ADMIN LIVE CONFIGURABLE) */}
+        {siteSettings.activeAdBannerEnabled && siteSettings.activeAdBannerImg && (
+          <div className="max-w-[1550px] mx-auto px-2 sm:px-3 my-4">
+            <a 
+              href={siteSettings.activeAdBannerLink || "#shop-section"} 
+              onClick={(e) => {
+                if (siteSettings.activeAdBannerLink?.startsWith("#")) {
+                  e.preventDefault();
+                  handleSectionNavigate(siteSettings.activeAdBannerLink.replace("#", ""));
+                }
+              }}
+              className="block w-full overflow-hidden rounded-2xl shadow-lg border border-stone-200 hover:opacity-95 transition-all"
+            >
+              <img 
+                src={siteSettings.activeAdBannerImg} 
+                alt="Promotion" 
+                className="w-full h-auto max-h-[360px] object-cover" 
+              />
+            </a>
+          </div>
+        )}
 
         {/* CONTINUOUS SCROLLING TICKER / MARQUEE (RAAHI PARFUMS STYLE) */}
         <div className="bg-[#111111] text-[#FAFAFA] py-3 overflow-hidden select-none w-full border-t border-b border-stone-850 flex items-center">
@@ -2140,10 +2198,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 ["sandy-hills", "island-bloom", "mogra-madness", "sidr-wood"].includes(p.id)
               ).slice(0, 4);
 
-              const bestSellersList = products.filter(p => 
-                p.category === "BEST SELLING" || 
-                ["ruh-discovery-set", "mitti-attar", "sandalwood-attar", "mogra-attar"].includes(p.id)
-              ).slice(0, 4);
+              const bestSellersList = (() => {
+                if (siteSettings?.bestsellerProductIds) {
+                  const customIds = siteSettings.bestsellerProductIds.split(",").map(s => s.trim()).filter(Boolean);
+                  const customList = customIds.map(id => products.find(p => p.id === id)).filter(Boolean) as Product[];
+                  if (customList.length > 0) return customList.slice(0, 4);
+                }
+                return products.filter(p => 
+                  p.category === "BEST SELLING" || 
+                  ["ruh-discovery-set", "mitti-attar", "sandalwood-attar", "mogra-attar"].includes(p.id)
+                ).slice(0, 4);
+              })();
 
               const edpFragrances = products.filter(p => 
                 p.category === "Eau De Parfum" || 
@@ -2246,7 +2311,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                     <div className="space-y-6 scroll-mt-24" id="shelf-bestsellers">
                       <div>
                         <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
-                          Best Selling
+                          {siteSettings.bestsellerHeading || "Best Selling"}
                         </h2>
                         <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
                           Most Loved. Most Reordered.
@@ -2603,6 +2668,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
         {/* SANDALWOOD STICK + RUBBING STONE HIGHLIGHT (RAAHI PARFUMS STYLE) */}
         <SandalwoodRitual 
+          siteSettings={siteSettings}
           onExplore={() => {
             if (handleSelectCategory) handleSelectCategory("Sandalwood");
             handleSectionNavigate("shop");
