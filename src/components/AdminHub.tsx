@@ -966,37 +966,7 @@ export default function AdminHub({
             {/* Core Tab Screen View */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-white flex flex-col justify-between">
               
-              {firestorePermissionError && (
-                <div className="bg-amber-50 border border-amber-300 text-amber-900 px-5 py-4 rounded-2xl mb-6 text-xs shadow-xs">
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl leading-none">⚠️</span>
-                    <div className="space-y-1.5 flex-1">
-                      <p className="font-bold text-amber-950 uppercase tracking-wider text-[11px] font-mono">
-                        Cloud Firestore Action Required: Permission Denied
-                      </p>
-                      <p className="text-amber-800 leading-relaxed text-xs">
-                        Firebase is blocking live database updates because of Firestore Security Rules. Until rules are enabled in your Firebase Console, changes cannot be seen by other users in real time.
-                      </p>
-                      <div className="bg-white/90 p-3 rounded-xl border border-amber-200 mt-2 font-mono text-[11px] text-amber-900 space-y-1.5">
-                        <p className="font-bold text-stone-900">How to enable real-time updates for all users:</p>
-                        <p>1. Open <b>Firebase Console</b> &gt; Project <b>ruh-imperium</b> &gt; <b>Firestore Database</b> &gt; <b>Rules</b> tab</p>
-                        <p>2. Paste this rule:</p>
-                        <pre className="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[10px] overflow-x-auto mt-1">
-{`rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}`}
-                        </pre>
-                        <p>3. Click <b>Publish</b>. All changes will instantly sync across all devices in real time.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* Firestore permission diagnostic banner removed — rules configured via Firebase Console */}
 
               {/* TAB 1: PRODUCT CATALOG MANAGEMENT */}
               {activeTab === "products" && (
