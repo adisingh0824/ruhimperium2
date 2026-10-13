@@ -1745,7 +1745,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             )}
 
             <div className="relative z-10 mx-auto max-w-4xl px-4 text-center flex flex-col items-center pointer-events-none py-12">
-              {/* Interactive Medium Switcher Pill */}
+              {/* Interactive Medium Switcher Pill — ADMIN ONLY */}
+              {isAdminLoggedIn && (
               <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-black/75 border border-[#D4BC96]/60 text-xs tracking-wider text-[#D4BC96] font-mono uppercase font-semibold mb-5 pointer-events-auto backdrop-blur-md shadow-2xl">
                 <button
                   type="button"
@@ -1784,6 +1785,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <span>Still Banner</span>
                 </button>
               </div>
+              )}
 
               {siteSettings.heroTagline && (
                 <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#D4BC96] font-mono mb-2 block font-semibold pointer-events-auto">
@@ -1843,8 +1845,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             </div>
 
-            {/* Ambient Video Control Toggle Badge (When in video mode) */}
-            {heroMode === 'video' && (
+            {/* Ambient Video Control Toggle Badge (When in video mode) — ADMIN ONLY */}
+            {heroMode === 'video' && isAdminLoggedIn && (
               <div className="absolute bottom-6 right-6 z-20 hidden lg:flex items-center gap-3 bg-black/75 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/10 text-[9px] text-[#FAFAFA] font-mono tracking-widest shadow-lg">
                 <span className="flex items-center gap-1.5">
                   <span className="relative flex h-1.5 w-1.5">
