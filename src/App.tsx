@@ -133,6 +133,7 @@ export default function App() {
   const heroVideoUrlRef = useRef<string>("");
   // Full-screen editorial brand splash loader
   const [isSplashLoading, setIsSplashLoading] = useState(true);
+  const [firestorePermissionError, setFirestorePermissionError] = useState(false);
 
   // Floating Rich Notification Toasts
   const [toasts, setToasts] = useState<{ id: string; message: string; type: string }[]>([]);
@@ -670,6 +671,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // FIRESTORE ENHANCED PERMANENT SYNCHRONIZATION ENGINE
   // -------------------------------------------------------------
   useEffect(() => {
+    const handleFirestoreError = (label: string, err: any) => {
+      if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
+        setFirestorePermissionError(true);
+      }
+      console.warn(`[Firestore] ${label} error (non-fatal):`, err);
+    };
+
     // 1. SITE SETTINGS LIVE SYNC
     const unsubscribeSite = onSnapshot(doc(db, "settings", "site"), async (snap) => {
       if (snap.exists()) {
@@ -729,7 +737,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["site"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] site settings error (non-fatal):", err));
+    }, (err) => handleFirestoreError("site settings", err));
 
     // 2. PRODUCTS LIVE SYNC
     const unsubscribeProducts = onSnapshot(collection(db, "products"), async (snap) => {
@@ -775,7 +783,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["products"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] products error (non-fatal):", err));
+    }, (err) => handleFirestoreError("products", err));
 
     // 3. BLOG ARTICLES LIVE SYNC
     const unsubscribeBlogs = onSnapshot(collection(db, "blogArticles"), async (snap) => {
@@ -800,7 +808,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["blogs"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] blogs error (non-fatal):", err));
+    }, (err) => handleFirestoreError("blogs", err));
 
     // 4. COUPONS LIVE SYNC
     const unsubscribeCoupons = onSnapshot(collection(db, "coupons"), async (snap) => {
@@ -829,7 +837,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["coupons"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] coupons error (non-fatal):", err));
+    }, (err) => handleFirestoreError("coupons", err));
 
     // 5. REVIEWS LIVE SYNC
     const unsubscribeReviews = onSnapshot(collection(db, "reviews"), async (snap) => {
@@ -854,7 +862,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["reviews"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] reviews error (non-fatal):", err));
+    }, (err) => handleFirestoreError("reviews", err));
 
     // 6. ORDERS LIVE SYNC
     const unsubscribeOrders = onSnapshot(collection(db, "orders"), async (snap) => {
@@ -866,7 +874,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         });
         setOrders(list);
       }
-    }, (err) => console.warn("[Firestore] orders error (non-fatal):", err));
+    }, (err) => handleFirestoreError("orders", err));
 
     // 7. FOUNDERS LIVE SYNC
     const unsubscribeFounders = onSnapshot(doc(db, "settings", "founders"), async (snap) => {
@@ -908,7 +916,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["founders"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] founders error (non-fatal):", err));
+    }, (err) => handleFirestoreError("founders", err));
 
     // 8. COLLECTIONS LIVE SYNC
     const unsubscribeCollections = onSnapshot(doc(db, "settings", "collections"), async (snap) => {
@@ -933,7 +941,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["collections"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] collections error (non-fatal):", err));
+    }, (err) => handleFirestoreError("collections", err));
 
     // 9. COVER & HERO VIDEO LIVE SYNC
     const unsubscribeCoverAndHero = onSnapshot(doc(db, "settings", "assets"), async (snap) => {
@@ -954,7 +962,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["assets"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] assets error (non-fatal):", err));
+    }, (err) => handleFirestoreError("assets", err));
 
     // 10. USERS REGISTER LIVE SYNC
     const unsubscribeUsers = onSnapshot(collection(db, "users"), async (snap) => {
@@ -991,7 +999,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           initPendingRef.current["users"] = false;
         }
       }
-    }, (err) => console.warn("[Firestore] users error (non-fatal):", err));
+    }, (err) => handleFirestoreError("users", err));
 
     return () => {
       unsubscribeSite();
@@ -1006,6 +1014,14 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       unsubscribeUsers();
     };
   }, []);
+
+  const handleFirestoreWriteCatch = (err: any, entity: string) => {
+    console.error(`Firestore ${entity} sync error: `, err);
+    if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
+      setFirestorePermissionError(true);
+      showToast("Firebase permissions denied. Please enable Firestore Security Rules to sync live changes to all users.", "error");
+    }
+  };
 
   // Write wrappers to push updates incrementally to Firestore
   const updateSiteSettings = async (newVal: SiteSettings | ((prev: SiteSettings) => SiteSettings)) => {
@@ -1023,7 +1039,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     try {
       await withTimeout(setDoc(doc(db, "settings", "site"), sanitized));
     } catch (e) {
-      console.error("Firestore settings sync error: ", e);
+      handleFirestoreWriteCatch(e, "settings");
     } finally {
       setTimeout(() => { writeLockRef.current["site"] = false; }, 1000);
     }
@@ -1044,7 +1060,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     try {
       await withTimeout(setDoc(doc(db, "settings", "founders"), { list: sanitized }));
     } catch (e) {
-      console.error("Firestore founders sync error: ", e);
+      handleFirestoreWriteCatch(e, "founders");
     } finally {
       setTimeout(() => { writeLockRef.current["founders"] = false; }, 1000);
     }
@@ -1065,7 +1081,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     try {
       await withTimeout(setDoc(doc(db, "settings", "collections"), { list: sanitized }));
     } catch (e) {
-      console.error("Firestore collections sync error: ", e);
+      handleFirestoreWriteCatch(e, "collections");
     } finally {
       setTimeout(() => { writeLockRef.current["collections"] = false; }, 1000);
     }
@@ -1079,7 +1095,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     try {
       await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true }));
     } catch (e) {
-      console.error("Firestore cover photo sync error: ", e);
+      handleFirestoreWriteCatch(e, "cover photo");
     } finally {
       setTimeout(() => { writeLockRef.current["assets"] = false; }, 1000);
     }
@@ -1093,7 +1109,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     try {
       await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }));
     } catch (e) {
-      console.error("Firestore hero video sync error: ", e);
+      handleFirestoreWriteCatch(e, "hero video");
     } finally {
       setTimeout(() => { writeLockRef.current["assets"] = false; }, 1000);
     }
@@ -1124,7 +1140,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
       await withTimeout(batch.commit());
     } catch (e) {
-      console.error("Firestore products sync error: ", e);
+      handleFirestoreWriteCatch(e, "products");
     } finally {
       setTimeout(() => { writeLockRef.current["products"] = false; }, 1000);
     }
@@ -1155,7 +1171,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
       await withTimeout(batch.commit());
     } catch (e) {
-      console.error("Firestore blog sync error: ", e);
+      handleFirestoreWriteCatch(e, "blogs");
     } finally {
       setTimeout(() => { writeLockRef.current["blogs"] = false; }, 1000);
     }
@@ -1186,7 +1202,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
       await withTimeout(batch.commit());
     } catch (e) {
-      console.error("Firestore coupon sync error: ", e);
+      handleFirestoreWriteCatch(e, "coupons");
     } finally {
       setTimeout(() => { writeLockRef.current["coupons"] = false; }, 1000);
     }
@@ -1217,7 +1233,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
       await withTimeout(batch.commit());
     } catch (e) {
-      console.error("Firestore reviews sync error: ", e);
+      handleFirestoreWriteCatch(e, "reviews");
     } finally {
       setTimeout(() => { writeLockRef.current["reviews"] = false; }, 1000);
     }
@@ -1248,7 +1264,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
       await withTimeout(batch.commit());
     } catch (e) {
-      console.error("Firestore orders sync error: ", e);
+      handleFirestoreWriteCatch(e, "orders");
     } finally {
       setTimeout(() => { writeLockRef.current["orders"] = false; }, 1000);
     }
@@ -1277,7 +1293,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         await setDoc(doc(db, "users", u.email.toLowerCase()), u);
       }
     } catch (e) {
-      console.error("Firestore users sync error: ", e);
+      handleFirestoreWriteCatch(e, "users");
     } finally {
       setTimeout(() => { writeLockRef.current["users"] = false; }, 1500);
     }
@@ -3303,6 +3319,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         setCollections={updateCollections}
         reviews={reviews}
         setReviews={updateReviews}
+        firestorePermissionError={firestorePermissionError}
       />
 
 
