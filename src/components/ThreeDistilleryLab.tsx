@@ -55,7 +55,8 @@ export const ThreeDistilleryLab: React.FC = () => {
 
     // SCENE SETUP
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x050403, 0.04);
+    scene.background = new THREE.Color(0xfcfbf9);
+    scene.fog = new THREE.FogExp2(0xfcfbf9, 0.025);
 
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 1.8, 6.5);
@@ -71,26 +72,31 @@ export const ThreeDistilleryLab: React.FC = () => {
 
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0xfcfbf9, 1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
+    renderer.toneMappingExposure = 1.35;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
     // LIGHTING
-    const ambientLight = new THREE.AmbientLight(0xfffaed, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xfffaed, 1.15);
     scene.add(ambientLight);
 
-    const goldKeyLight = new THREE.SpotLight(0xd4af37, 3.5, 20, Math.PI / 4, 0.3);
+    const goldKeyLight = new THREE.SpotLight(0xd4af37, 3.8, 22, Math.PI / 4, 0.3);
     goldKeyLight.position.set(3, 5, 4);
     goldKeyLight.castShadow = true;
     scene.add(goldKeyLight);
 
-    const blueCondenserLight = new THREE.PointLight(0x38bdf8, 2, 8);
+    const fillLight = new THREE.DirectionalLight(0xfff7ee, 0.9);
+    fillLight.position.set(-3, 4, 2);
+    scene.add(fillLight);
+
+    const blueCondenserLight = new THREE.PointLight(0x38bdf8, 2.2, 8);
     blueCondenserLight.position.set(2, 0.5, 0.5);
     scene.add(blueCondenserLight);
 
-    const heatLight = new THREE.PointLight(0xff5500, 4, 6);
+    const heatLight = new THREE.PointLight(0xff5500, 4.5, 6);
     heatLight.position.set(-1.8, -0.6, 0);
     scene.add(heatLight);
     animRefs.current.heatLight = heatLight;
@@ -139,16 +145,28 @@ export const ThreeDistilleryLab: React.FC = () => {
     animRefs.current.copperGroup = labGroup;
     scene.add(labGroup);
 
+    // Light circular atelier pedestal base
+    const pedestalGeo = new THREE.CylinderGeometry(3.6, 3.8, 0.12, 48);
+    const pedestalMat = new THREE.MeshStandardMaterial({
+      color: 0xf1ebe1,
+      roughness: 0.5,
+      metalness: 0.05
+    });
+    const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
+    pedestal.position.set(0, -1.35, 0);
+    pedestal.receiveShadow = true;
+    labGroup.add(pedestal);
+
     // 1. CLAY & BRICK OVEN FURNACE (BHATTI)
     const furnaceGeo = new THREE.CylinderGeometry(1.2, 1.4, 0.8, 24);
-    const furnaceMat = new THREE.MeshStandardMaterial({ color: 0x271e1b, roughness: 0.9 });
+    const furnaceMat = new THREE.MeshStandardMaterial({ color: 0xc4a896, roughness: 0.85 });
     const furnace = new THREE.Mesh(furnaceGeo, furnaceMat);
     furnace.position.set(-1.8, -0.9, 0);
     labGroup.add(furnace);
 
     // Furnace Opening for Fire
     const archGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.4, 16, 1, false, 0, Math.PI);
-    const archMat = new THREE.MeshBasicMaterial({ color: 0x0a0502 });
+    const archMat = new THREE.MeshBasicMaterial({ color: 0x6e4b37 });
     const arch = new THREE.Mesh(archGeo, archMat);
     arch.position.set(-1.8, -0.85, 1.25);
     arch.rotation.x = Math.PI / 2;
@@ -177,7 +195,7 @@ export const ThreeDistilleryLab: React.FC = () => {
 
     // Traditional Clay/Mud Seal band (Gilkari)
     const sealGeo = new THREE.TorusGeometry(0.56, 0.08, 12, 32);
-    const sealMat = new THREE.MeshStandardMaterial({ color: 0x6e4b37, roughness: 0.95 });
+    const sealMat = new THREE.MeshStandardMaterial({ color: 0x8c6246, roughness: 0.95 });
     const seal = new THREE.Mesh(sealGeo, sealMat);
     seal.rotation.x = Math.PI / 2;
     seal.position.y = 1.25;
@@ -200,11 +218,11 @@ export const ThreeDistilleryLab: React.FC = () => {
     // 4. WATER CONDENSER TANK (GANDA KUND)
     const tankGeo = new THREE.CylinderGeometry(1.1, 1.1, 1.5, 24);
     const tankMat = new THREE.MeshStandardMaterial({
-      color: 0x1f2937,
-      metalness: 0.4,
-      roughness: 0.6,
+      color: 0x93c5fd,
+      metalness: 0.2,
+      roughness: 0.3,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.55
     });
     const waterTank = new THREE.Mesh(tankGeo, tankMat);
     waterTank.position.set(1.6, -0.4, 0);
@@ -439,27 +457,27 @@ export const ThreeDistilleryLab: React.FC = () => {
   }, [botanicalType]);
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-b from-[#090807] via-[#120f0c] to-[#090807] border border-[#d4af37]/30 shadow-2xl p-4 md:p-8">
+    <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-b from-white via-stone-50 to-white border border-stone-200 shadow-xl p-4 md:p-8">
       {/* 3D Canvas Container */}
-      <div className="relative w-full h-[420px] md:h-[520px] rounded-xl overflow-hidden cursor-grab active:cursor-grabbing">
+      <div className="relative w-full h-[420px] md:h-[520px] rounded-xl overflow-hidden cursor-grab active:cursor-grabbing border border-stone-100 shadow-inner">
         <div ref={mountRef} className="w-full h-full" />
 
         {/* 3D Spatial Tag Overlay */}
-        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#d4af37]/40 flex items-center gap-2 text-xs text-[#d4af37] tracking-widest uppercase">
+        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#d4af37]/40 shadow flex items-center gap-2 text-xs text-[#b8972e] tracking-widest uppercase">
           <Sparkles className="w-3.5 h-3.5 text-[#d4af37] animate-pulse" />
           <span>Live 3D Deg-Bhapka Alembic Simulation</span>
         </div>
 
-        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-stone-700/50 flex items-center gap-2 text-xs text-stone-300">
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-stone-200 shadow flex items-center gap-2 text-xs text-stone-600">
           <Compass className="w-3.5 h-3.5 text-[#d4af37]" />
-          <span>Click & Drag to Rotate 360°</span>
+          <span>Click &amp; Drag to Rotate 360°</span>
         </div>
 
         {/* Real-time Telemetry Overlay */}
-        <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-80 bg-black/75 backdrop-blur-xl border border-[#d4af37]/30 rounded-xl p-4 text-stone-200">
-          <div className="flex items-center justify-between border-b border-stone-800 pb-2 mb-3">
-            <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">Distillation Telemetry</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded font-mono ${isSimulating ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-stone-800 text-stone-400'}`}>
+        <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-80 bg-white/95 backdrop-blur-xl border border-stone-200 shadow-lg rounded-xl p-4 text-stone-800">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-2 mb-3">
+            <span className="text-xs uppercase tracking-widest text-[#b8972e] font-semibold">Distillation Telemetry</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded font-mono ${isSimulating ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}`}>
               {isSimulating ? 'ACTIVE BOIL' : 'STANDBY'}
             </span>
           </div>
@@ -467,18 +485,18 @@ export const ThreeDistilleryLab: React.FC = () => {
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div>
               <p className="text-stone-400 text-[10px] uppercase">Firebox Temp</p>
-              <p className="text-base font-serif font-bold text-amber-400">{temperature}°C</p>
+              <p className="text-base font-serif font-bold text-amber-600">{temperature}°C</p>
             </div>
             <div>
               <p className="text-stone-400 text-[10px] uppercase">Pure Yield</p>
               <div className="flex items-center gap-1">
-                <Droplets className="w-3.5 h-3.5 text-sky-400" />
-                <p className="text-base font-serif font-bold text-sky-300">{collectedDrops} drops</p>
+                <Droplets className="w-3.5 h-3.5 text-sky-500" />
+                <p className="text-base font-serif font-bold text-sky-600">{collectedDrops} drops</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-3 pt-2 border-t border-stone-800/80 text-[11px] text-stone-400 leading-snug">
+          <div className="mt-3 pt-2 border-t border-stone-100 text-[11px] text-stone-500 leading-snug">
             {botanicalInfo[botanicalType].yieldRate}
           </div>
         </div>
@@ -488,7 +506,7 @@ export const ThreeDistilleryLab: React.FC = () => {
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
         {/* Select Botanical */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-[#d4af37] mb-2 font-serif">
+          <label className="block text-xs uppercase tracking-widest text-[#b8972e] mb-2 font-serif">
             Select Botanical Essence
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -501,8 +519,8 @@ export const ThreeDistilleryLab: React.FC = () => {
                 }}
                 className={`px-3 py-2 text-xs rounded-lg font-serif transition-all text-center border ${
                   botanicalType === type
-                    ? 'bg-[#d4af37] text-black border-[#d4af37] shadow-lg font-bold'
-                    : 'bg-black/40 text-stone-300 border-stone-800 hover:border-[#d4af37]/50'
+                    ? 'bg-[#d4af37] text-white border-[#d4af37] shadow font-bold'
+                    : 'bg-white text-stone-600 border-stone-200 hover:border-[#d4af37]/50 hover:text-stone-900'
                 }`}
               >
                 {type === 'kannauj_rose' ? 'Damask Rose' : type === 'mysore_sandal' ? 'Sandalwood' : 'Wild Oud'}
@@ -514,7 +532,7 @@ export const ThreeDistilleryLab: React.FC = () => {
         {/* Temperature / Fire Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label htmlFor="furnace-temp-range" className="text-xs uppercase tracking-widest text-[#d4af37] font-serif flex items-center gap-1.5">
+            <label htmlFor="furnace-temp-range" className="text-xs uppercase tracking-widest text-[#b8972e] font-serif flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-amber-500" />
               Furnace Heat ({temperature}°C)
             </label>
@@ -531,9 +549,9 @@ export const ThreeDistilleryLab: React.FC = () => {
             max={115}
             value={temperature}
             onChange={e => setTemperature(Number(e.target.value))}
-            className="w-full h-1.5 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
+            className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
           />
-          <div className="flex justify-between text-[10px] text-stone-500 mt-1">
+          <div className="flex justify-between text-[10px] text-stone-400 mt-1">
             <span>60°C (Slow Infusion)</span>
             <span>115°C (Rapid Vapor)</span>
           </div>
@@ -545,8 +563,8 @@ export const ThreeDistilleryLab: React.FC = () => {
             onClick={() => setIsSimulating(!isSimulating)}
             className={`px-4 py-2 rounded-xl text-xs flex items-center gap-2 border font-serif tracking-wider transition-all ${
               isSimulating
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30'
-                : 'bg-stone-800 text-stone-300 border-stone-700 hover:bg-stone-700'
+                ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
+                : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
             }`}
           >
             {isSimulating ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
@@ -555,7 +573,7 @@ export const ThreeDistilleryLab: React.FC = () => {
 
           <button
             onClick={() => setRotationSpeed(prev => (prev === 0 ? 0.003 : 0))}
-            className="p-2.5 rounded-xl text-xs bg-stone-900 text-stone-300 border border-stone-800 hover:border-[#d4af37]/40 transition-all"
+            className="p-2.5 rounded-xl text-xs bg-white text-stone-600 border border-stone-200 hover:border-[#d4af37]/40 hover:text-stone-900 transition-all shadow-sm"
             title="Toggle Auto Rotation"
           >
             <RotateCw className={`w-4 h-4 ${rotationSpeed > 0 ? 'animate-spin' : ''}`} />
@@ -564,11 +582,11 @@ export const ThreeDistilleryLab: React.FC = () => {
       </div>
 
       {/* Botanical Profile Note */}
-      <div className="mt-4 p-4 rounded-xl bg-black/40 border border-stone-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-stone-400">
+      <div className="mt-4 p-4 rounded-xl bg-stone-50 border border-stone-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-stone-500">
         <div>
-          <span className="text-[#d4af37] font-semibold">{botanicalInfo[botanicalType].name}</span> — {botanicalInfo[botanicalType].origin}
+          <span className="text-[#b8972e] font-semibold">{botanicalInfo[botanicalType].name}</span> — {botanicalInfo[botanicalType].origin}
         </div>
-        <div className="italic text-stone-300">{botanicalInfo[botanicalType].note}</div>
+        <div className="italic text-stone-600">{botanicalInfo[botanicalType].note}</div>
       </div>
     </div>
   );

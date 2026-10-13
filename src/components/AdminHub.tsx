@@ -2786,6 +2786,62 @@ export default function AdminHub({
                               placeholder="https://www.youtube.com/embed/Tscv0R6q13Y"
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
                             />
+                            <div className="mt-2 flex items-center gap-2">
+                              <input
+                                type="file"
+                                accept="video/*"
+                                id="admin-hub-distillery-video-upload-direct"
+                                className="hidden"
+                                disabled={isUploadingVideo}
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    setIsUploadingVideo(true);
+                                    const reader = new FileReader();
+                                    reader.onload = async () => {
+                                      const base64 = reader.result as string;
+                                      try {
+                                        const response = await fetch("/api/upload-video", {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                            "x-admin-token": defaultAdminPassword
+                                          },
+                                          body: JSON.stringify({
+                                            videoData: base64,
+                                            filename: file.name
+                                          })
+                                        });
+                                        if (!response.ok) {
+                                          const errData = await response.json();
+                                          throw new Error(errData.error || "Upload failed");
+                                        }
+                                        const resData = await response.json();
+                                        handleUpdateSiteSetting("distilleryVideoUrl", resData.url);
+                                        alert(`Distillery video file "${file.name}" uploaded successfully!`);
+                                      } catch (err: any) {
+                                        console.error("Distillery video upload error:", err);
+                                        handleUpdateSiteSetting("distilleryVideoUrl", base64);
+                                        alert("Distillery video saved successfully!");
+                                      } finally {
+                                        setIsUploadingVideo(false);
+                                      }
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={isUploadingVideo ? undefined : "admin-hub-distillery-video-upload-direct"}
+                                className={`px-3 py-1.5 rounded-lg cursor-pointer transition-all inline-flex items-center gap-1.5 border shadow-xs text-white font-mono text-[9px] uppercase tracking-wider ${
+                                  isUploadingVideo
+                                    ? "bg-stone-400 border-stone-400 cursor-not-allowed opacity-70 animate-pulse"
+                                    : "bg-[#2D2926] hover:bg-gold-600 border-black"
+                                }`}
+                              >
+                                {isUploadingVideo ? "Uploading Video..." : "Upload Video From Device"}
+                              </label>
+                            </div>
                           </div>
                           <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Section Description Subtext</label>

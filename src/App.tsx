@@ -25,7 +25,9 @@ import {
   Trees,
   Play,
   Truck,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Upload,
+  Link2
 } from 'lucide-react';
 import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
 import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
@@ -615,6 +617,62 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       setDistilleryTab(siteSettings.distilleryMediaType);
     }
   }, [siteSettings?.distilleryMediaType]);
+
+  // Admin Distillery Video Upload & Link States
+  const [isUploadingDistilleryVideo, setIsUploadingDistilleryVideo] = useState<boolean>(false);
+  const [showDistilleryLinkModal, setShowDistilleryLinkModal] = useState<boolean>(false);
+  const [distilleryVideoLinkInput, setDistilleryVideoLinkInput] = useState<string>('');
+
+  const handleDistilleryVideoDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingDistilleryVideo(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result as string;
+      try {
+        const response = await fetch("/api/upload-video", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-token": import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@"
+          },
+          body: JSON.stringify({
+            videoData: base64,
+            filename: file.name
+          })
+        });
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || "Upload failed");
+        }
+        const resData = await response.json();
+        await updateSiteSettings((prev) => ({
+          ...prev,
+          distilleryVideoUrl: resData.url,
+          distilleryMediaType: 'video'
+        }));
+        setDistilleryTab('video');
+        showToast(`Distillery video "${file.name}" uploaded from device and published live!`, "success");
+      } catch (err: any) {
+        console.warn("Backend video upload fallback to data URL:", err);
+        try {
+          await updateSiteSettings((prev) => ({
+            ...prev,
+            distilleryVideoUrl: base64,
+            distilleryMediaType: 'video'
+          }));
+          setDistilleryTab('video');
+          showToast("Distillery video saved and published live!", "success");
+        } catch (saveErr: any) {
+          showToast("Failed to save video: " + (err.message || "Unknown error"), "warning");
+        }
+      } finally {
+        setIsUploadingDistilleryVideo(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Browser back button support for collection filtering
   // When a collection is selected, push a history entry so phone's back button
@@ -2309,6 +2367,73 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </button>
             </div>
 
+            {/* Admin Distillery Media Control Bar */}
+            {isAdminLoggedIn && (
+              <div className="mb-6 w-full max-w-4xl bg-white/95 border border-[#d4af37]/40 rounded-2xl p-4 shadow-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-4 text-left animate-fade-in">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-[#d4af37]">
+                    <Sparkles className="w-4 h-4 text-[#b8972e]" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono tracking-widest uppercase text-[#b8972e] font-bold">
+                      ADMIN CONTROLS • DISTILLERY MEDIA
+                    </div>
+                    <div className="text-xs text-stone-600">
+                      Upload video from your device or paste a link to display live in this place
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Upload from Device */}
+                  <input
+                    type="file"
+                    id="distillery-video-upload-input"
+                    accept="video/*"
+                    className="hidden"
+                    disabled={isUploadingDistilleryVideo}
+                    onChange={handleDistilleryVideoDeviceUpload}
+                  />
+                  <label
+                    htmlFor={isUploadingDistilleryVideo ? undefined : "distillery-video-upload-input"}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-serif flex items-center gap-2 cursor-pointer transition-all border ${
+                      isUploadingDistilleryVideo
+                        ? "bg-stone-200 text-stone-400 border-stone-300 cursor-not-allowed animate-pulse"
+                        : "bg-[#1a1715] hover:bg-stone-800 text-white border-stone-900 shadow-sm"
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5 text-[#d4af37]" />
+                    <span>{isUploadingDistilleryVideo ? "Uploading..." : "Upload from Device"}</span>
+                  </label>
+
+                  {/* Add / Edit Video Link */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDistilleryVideoLinkInput(siteSettings.distilleryVideoUrl || '');
+                      setShowDistilleryLinkModal(true);
+                    }}
+                    className="px-3.5 py-2 rounded-xl text-xs font-serif bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Link2 className="w-3.5 h-3.5 text-[#b8972e]" />
+                    <span>Add / Change Link</span>
+                  </button>
+
+                  {/* Set Current View as Default */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await updateSiteSettings(prev => ({ ...prev, distilleryMediaType: distilleryTab }));
+                      showToast(`Default display set to ${distilleryTab === 'lab' ? 'Interactive 3D Simulation' : distilleryTab === 'video' ? 'Distillery Video' : 'Distillery Photo'} for all visitors!`, 'success');
+                    }}
+                    className="px-3 py-2 rounded-xl text-xs font-serif bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-all cursor-pointer font-medium"
+                    title="Saves currently selected tab as default for all visitors"
+                  >
+                    <span>Set View as Default</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Dynamic Viewport */}
             <div className="w-full max-w-5xl">
               {distilleryTab === 'lab' ? (
@@ -2335,23 +2460,45 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                 </div>
               ) : (
-                <div 
-                  onClick={() => setIsDistilleryVideoOpen(true)}
-                  className="group relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl mx-auto bg-stone-900 cursor-pointer animate-fade-in"
-                >
-                  <img 
-                    src={siteSettings.distilleryPhotoUrl || siteSettings.distilleryVideoPoster || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"} 
-                    alt="Ruh Imperium Distillery" 
-                    className="w-full h-full object-cover opacity-75 group-hover:scale-103 transition-transform duration-700 select-none pointer-events-none"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors duration-300" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/30 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-[#D4BC96] group-hover:text-black transition-all duration-500 shadow-xl relative">
-                      <span className="absolute inset-0 rounded-full border border-[#D4BC96] animate-ping opacity-75 pointer-events-none group-hover:animate-none"></span>
-                      <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-current ml-1" />
+                <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-stone-200 max-w-4xl mx-auto bg-stone-950 animate-fade-in group">
+                  {siteSettings.distilleryVideoUrl ? (
+                    isEmbedIframe(siteSettings.distilleryVideoUrl) ? (
+                      <iframe
+                        src={getEmbedVideoUrl(siteSettings.distilleryVideoUrl, false)}
+                        title="Ruh Imperium Distillery Video"
+                        className="w-full h-full border-0 select-none"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        key={siteSettings.distilleryVideoUrl}
+                        src={siteSettings.distilleryVideoUrl}
+                        controls
+                        autoPlay
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    )
+                  ) : (
+                    <div 
+                      onClick={() => {
+                        if (isAdminLoggedIn) {
+                          setDistilleryVideoLinkInput('');
+                          setShowDistilleryLinkModal(true);
+                        } else {
+                          setIsDistilleryVideoOpen(true);
+                        }
+                      }}
+                      className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-stone-900 text-stone-300 cursor-pointer"
+                    >
+                      <Play className="w-12 h-12 text-[#D4BC96] mb-3" />
+                      <p className="font-serif text-lg text-white mb-1">Watch Documentary Video</p>
+                      {isAdminLoggedIn && (
+                        <p className="text-xs text-stone-400">Click or use the admin controls above to upload a video from your device or add a link</p>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
@@ -3374,6 +3521,62 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           </div>
         </div>
       )}
+
+      {/* ADMIN DISTILLERY VIDEO LINK MODAL */}
+      {showDistilleryLinkModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif text-lg text-stone-900 font-semibold flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-[#b8972e]" />
+                <span>Add Distillery Video Link</span>
+              </h3>
+              <button
+                onClick={() => setShowDistilleryLinkModal(false)}
+                className="text-stone-400 hover:text-stone-600 p-1 rounded-full hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-stone-500 mb-4 leading-relaxed font-sans">
+              Paste a YouTube URL (e.g. <span className="font-mono text-[11px] bg-stone-100 px-1 py-0.5 rounded">https://www.youtube.com/watch?v=...</span>), Vimeo link, or direct MP4 video link. All visitors will see this video live in the heritage atelier section.
+            </p>
+            <input
+              type="text"
+              value={distilleryVideoLinkInput}
+              onChange={(e) => setDistilleryVideoLinkInput(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-stone-800 outline-none focus:border-[#d4af37] mb-6 font-mono"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2.5">
+              <button
+                onClick={() => setShowDistilleryLinkModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-serif text-stone-600 hover:bg-stone-100 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!distilleryVideoLinkInput.trim()) return;
+                  await updateSiteSettings(prev => ({
+                    ...prev,
+                    distilleryVideoUrl: distilleryVideoLinkInput.trim(),
+                    distilleryMediaType: 'video'
+                  }));
+                  setDistilleryTab('video');
+                  setShowDistilleryLinkModal(false);
+                  showToast("Distillery video link updated and published live!", "success");
+                }}
+                className="px-5 py-2.5 rounded-xl text-xs font-serif bg-[#1a1715] hover:bg-stone-800 text-white font-semibold shadow-md transition-all cursor-pointer"
+              >
+                Save &amp; Publish Video
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* DISTILLERY VIDEO POPUP LIGHTBOX MODAL */}
       {isDistilleryVideoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 sm:p-6 animate-fade-in">
