@@ -674,6 +674,76 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     reader.readAsDataURL(file);
   };
 
+  // Admin Hero Video & Media Quick Upload States
+  const [isUploadingHeroVideo, setIsUploadingHeroVideo] = useState<boolean>(false);
+  const [showHeroLinkModal, setShowHeroLinkModal] = useState<boolean>(false);
+  const [heroVideoLinkInput, setHeroVideoLinkInput] = useState<string>('');
+
+  const handleHeroVideoDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingHeroVideo(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result as string;
+      try {
+        const response = await fetch("/api/upload-video", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-token": import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@"
+          },
+          body: JSON.stringify({
+            videoData: base64,
+            filename: file.name
+          })
+        });
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || "Upload failed");
+        }
+        const resData = await response.json();
+        await updateHeroVideoUrl(resData.url);
+        setHeroMode('video');
+        await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
+        showToast(`Hero video "${file.name}" uploaded from device and broadcasting live!`, "success");
+      } catch (err: any) {
+        console.warn("Backend hero video upload fallback to data URL:", err);
+        try {
+          await updateHeroVideoUrl(base64);
+          setHeroMode('video');
+          await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
+          showToast("Hero video saved and broadcasting live!", "success");
+        } catch (saveErr: any) {
+          showToast("Failed to save video: " + (err.message || "Unknown error"), "warning");
+        }
+      } finally {
+        setIsUploadingHeroVideo(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleHeroPhotoDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result as string;
+      await updateCoverPhoto(base64);
+      setHeroMode('photo');
+      await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'photo' }));
+      showToast("Hero cover photo updated and published live!", "success");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSwitchHeroMode = async (mode: '3d' | 'video' | 'photo') => {
+    setHeroMode(mode);
+    await updateSiteSettings(prev => ({ ...prev, heroMediaType: mode }));
+    showToast(`Hero display set to ${mode === '3d' ? '3D Interactive Flagon' : mode === 'video' ? 'Ambient Video' : 'Static Cover Photo'} for all visitors!`, "success");
+  };
+
   // Browser back button support for collection filtering
   // When a collection is selected, push a history entry so phone's back button
   // resets the filter instead of leaving the website
@@ -1740,6 +1810,112 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             className="relative min-h-[75vh] sm:min-h-[82vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
             id="hero-section"
           >
+            {/* Admin Hero Media Control Bar (Admin only) */}
+            {isAdminLoggedIn && (
+              <div className="absolute top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-3 bg-black/85 backdrop-blur-md border border-[#d4af37]/40 rounded-2xl p-3 shadow-2xl animate-fade-in pointer-events-auto">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <div>
+                    <span className="text-[10px] font-mono tracking-widest uppercase text-[#d4af37] font-bold block">
+                      ADMIN CONTROLS • HERO BANNER MEDIA
+                    </span>
+                    <span className="text-[11px] text-stone-300">
+                      Upload direct video/photo from your device or paste a link
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Mode Selector */}
+                  <div className="flex items-center bg-stone-900/90 rounded-xl p-1 border border-stone-700/60">
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchHeroMode('3d')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-serif transition-all cursor-pointer ${
+                        heroMode === '3d'
+                          ? 'bg-[#d4af37] text-black font-bold shadow'
+                          : 'text-stone-300 hover:text-white'
+                      }`}
+                    >
+                      3D Flagon
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchHeroMode('video')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-serif transition-all cursor-pointer ${
+                        heroMode === 'video'
+                          ? 'bg-[#d4af37] text-black font-bold shadow'
+                          : 'text-stone-300 hover:text-white'
+                      }`}
+                    >
+                      Video
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchHeroMode('photo')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-serif transition-all cursor-pointer ${
+                        heroMode === 'photo'
+                          ? 'bg-[#d4af37] text-black font-bold shadow'
+                          : 'text-stone-300 hover:text-white'
+                      }`}
+                    >
+                      Photo
+                    </button>
+                  </div>
+
+                  {/* Upload Direct Video from Device */}
+                  <input
+                    type="file"
+                    id="hero-direct-video-upload-file"
+                    accept="video/*"
+                    className="hidden"
+                    disabled={isUploadingHeroVideo}
+                    onChange={handleHeroVideoDeviceUpload}
+                  />
+                  <label
+                    htmlFor={isUploadingHeroVideo ? undefined : "hero-direct-video-upload-file"}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-serif flex items-center gap-2 cursor-pointer transition-all border shadow-sm ${
+                      isUploadingHeroVideo
+                        ? "bg-stone-700 text-stone-400 border-stone-600 cursor-not-allowed animate-pulse"
+                        : "bg-[#2D2926] hover:bg-stone-800 text-white border-[#d4af37]/40"
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5 text-[#d4af37]" />
+                    <span>{isUploadingHeroVideo ? "Uploading Video..." : "Upload Video from Device"}</span>
+                  </label>
+
+                  {/* Add / Edit Video Link */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHeroVideoLinkInput(heroVideoUrl || '');
+                      setShowHeroLinkModal(true);
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-serif bg-black/60 hover:bg-stone-900 text-stone-200 border border-stone-700 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Link2 className="w-3.5 h-3.5 text-[#d4af37]" />
+                    <span>Video Link</span>
+                  </button>
+
+                  {/* Upload Cover Photo from Device */}
+                  <input
+                    type="file"
+                    id="hero-direct-photo-upload-file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleHeroPhotoDeviceUpload}
+                  />
+                  <label
+                    htmlFor="hero-direct-photo-upload-file"
+                    className="px-3 py-1.5 rounded-xl text-xs font-serif bg-black/60 hover:bg-stone-900 text-stone-200 border border-stone-700 shadow-sm flex items-center gap-1.5 cursor-pointer transition-all"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 text-stone-400" />
+                    <span>Swap Photo</span>
+                  </label>
+                </div>
+              </div>
+            )}
+
             {heroMode === 'photo' ? (
               /* High-Resolution Static Cover Photo Banner */
               <div className="absolute inset-0 z-0">
@@ -3571,6 +3747,58 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 className="px-5 py-2.5 rounded-xl text-xs font-serif bg-[#1a1715] hover:bg-stone-800 text-white font-semibold shadow-md transition-all cursor-pointer"
               >
                 Save &amp; Publish Video
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN HERO VIDEO LINK MODAL */}
+      {showHeroLinkModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif text-lg text-stone-900 font-semibold flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-[#b8972e]" />
+                <span>Add Hero Scent Film Link</span>
+              </h3>
+              <button
+                onClick={() => setShowHeroLinkModal(false)}
+                className="text-stone-400 hover:text-stone-600 p-1 rounded-full hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-stone-500 mb-4 leading-relaxed font-sans">
+              Paste a YouTube URL (e.g. <span className="font-mono text-[11px] bg-stone-100 px-1 py-0.5 rounded">https://www.youtube.com/watch?v=...</span>), Vimeo link, or direct MP4 video link. It will play as the hero visual across all devices.
+            </p>
+            <input
+              type="text"
+              value={heroVideoLinkInput}
+              onChange={(e) => setHeroVideoLinkInput(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-stone-800 outline-none focus:border-[#d4af37] mb-6 font-mono"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2.5">
+              <button
+                onClick={() => setShowHeroLinkModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-serif text-stone-600 hover:bg-stone-100 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!heroVideoLinkInput.trim()) return;
+                  await updateHeroVideoUrl(heroVideoLinkInput.trim());
+                  setHeroMode('video');
+                  await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
+                  setShowHeroLinkModal(false);
+                  showToast("Hero video link updated and broadcasting live!", "success");
+                }}
+                className="px-5 py-2.5 rounded-xl text-xs font-serif bg-[#1a1715] hover:bg-stone-800 text-white font-semibold shadow-md transition-all cursor-pointer"
+              >
+                Save &amp; Broadcast Video
               </button>
             </div>
           </div>
