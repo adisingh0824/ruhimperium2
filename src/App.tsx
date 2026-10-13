@@ -3039,7 +3039,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             />
           } />
           <Route path="/our-story" element={<OurStoryPage founders={founders} siteSettings={siteSettings} />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage siteSettings={siteSettings} />} />
         </Routes>
       </main>
 
@@ -3091,7 +3091,16 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
             {/* Right Column: Large Brand Header */}
             <div className="lg:col-span-3 flex justify-start lg:justify-end items-center">
-              <div className="text-left lg:text-right space-y-1">
+              <div className="text-left lg:text-right space-y-2">
+                {siteSettings.customLogoUrl && (
+                  <div className="flex justify-start lg:justify-end mb-2">
+                    <img 
+                      src={siteSettings.customLogoUrl} 
+                      alt={siteSettings.footerBrandName || "Brand Logo"} 
+                      className="max-h-12 w-auto object-contain brightness-110 drop-shadow-md" 
+                    />
+                  </div>
+                )}
                 <h3 className="text-xl sm:text-2xl font-serif text-white tracking-[0.25em] uppercase font-bold">
                   {siteSettings.footerBrandName || "RUH IMPERIUM"}
                 </h3>

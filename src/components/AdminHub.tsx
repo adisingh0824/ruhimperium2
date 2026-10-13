@@ -1797,6 +1797,17 @@ export default function AdminHub({
                             </button>
                           )}
                         </div>
+
+                        <div className="mt-3 pt-2.5 border-t border-sand-200">
+                          <label className="text-[9px] uppercase tracking-wider text-sand-500 font-mono block mb-1">Or Paste Logo Image URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://.../brand-logo.png or SVG URL"
+                            value={siteSettings.customLogoUrl?.startsWith("data:") ? "" : siteSettings.customLogoUrl || ""}
+                            onChange={(e) => setSiteSettings(prev => ({ ...prev, customLogoUrl: e.target.value }))}
+                            className="w-full text-xs bg-white border border-sand-300 rounded-lg px-3 py-1.5 focus:border-[#D4BC96] outline-none font-mono"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

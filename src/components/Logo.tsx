@@ -17,6 +17,26 @@ export const Logo: FC<LogoProps> = ({
   const isFooter = variant === "footer";
   const isDarkBg = variant === "footer" || variant === "dark";
 
+  if (customLogoUrl) {
+    const imgHeight = isSplash 
+      ? "max-h-16 sm:max-h-20" 
+      : isFooter 
+      ? "max-h-10 sm:max-h-12" 
+      : "max-h-8 sm:max-h-10";
+    return (
+      <div 
+        className={`flex items-center justify-center select-none ${className}`} 
+        id={`logo-container-${variant}`}
+      >
+        <img 
+          src={customLogoUrl} 
+          alt="Brand Logo" 
+          className={`${imgHeight} w-auto object-contain transition-all duration-300 drop-shadow-sm`} 
+        />
+      </div>
+    );
+  }
+
   // Beautiful, high-end, responsive minimalist text logo matching ruhimperium.com
   const sizeClass = isSplash 
     ? "text-4xl sm:text-6xl tracking-[0.3em] font-medium" 

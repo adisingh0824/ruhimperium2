@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Compass, ArrowLeft, Home, Sparkles } from "lucide-react";
+import { SiteSettings } from "../types";
 
-export default function NotFoundPage() {
+export default function NotFoundPage({ siteSettings }: { siteSettings?: SiteSettings }) {
   const navigate = useNavigate();
+  const brandName = siteSettings?.footerBrandName || "Ruh Imperium";
 
   useEffect(() => {
-    document.title = "404 - Sanctuary Not Found | Ruh Imperium";
+    document.title = `404 - Sanctuary Not Found | ${brandName}`;
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
-      metaDesc.setAttribute("content", "The requested fragrance chapter or page could not be found in our Kannauj scent archives.");
+      metaDesc.setAttribute("content", `The requested fragrance chapter or page could not be found in our ${brandName} Kannauj scent archives.`);
     }
-  }, []);
+  }, [brandName]);
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center bg-[#FAF7F2] text-stone-900 px-4 py-20">
@@ -52,8 +54,15 @@ export default function NotFoundPage() {
           </button>
         </div>
 
-        <div className="pt-4 border-t border-stone-150 text-[10px] uppercase tracking-widest text-stone-400 font-mono">
-          Ruh Imperium Scent House • Kannauj, India
+        <div className="pt-4 border-t border-stone-150 flex flex-col items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-stone-400 font-mono">
+          {siteSettings?.customLogoUrl && (
+            <img 
+              src={siteSettings.customLogoUrl} 
+              alt={brandName} 
+              className="max-h-8 w-auto object-contain mb-1" 
+            />
+          )}
+          <span>{brandName} Scent House • Kannauj, India</span>
         </div>
       </div>
     </div>
