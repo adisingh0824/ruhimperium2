@@ -1786,63 +1786,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 </button>
               </div>
               )}
-
-              {siteSettings.heroTagline && (
-                <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#D4BC96] font-mono mb-2 block font-semibold pointer-events-auto">
-                  {siteSettings.heroTagline}
-                </span>
-              )}
-
-              <h1 
-                className="text-3xl sm:text-5xl md:text-6xl font-serif text-white tracking-wide leading-tight mb-4 max-w-3xl pointer-events-auto font-light"
-                style={{ textShadow: "0 4px 24px rgba(0, 0, 0, 0.85)" }}
-              >
-                {siteSettings.heroHeadline || "Luxury Indian Attars & Pure Kannauj Perfumes"}
-              </h1>
-
-              <p className="text-xs sm:text-sm text-stone-300 max-w-xl mb-6 leading-relaxed font-light pointer-events-auto">
-                {siteSettings.heroDescription || "Wrap Yourself in Luxury: Discover the Art of Indian Slow-Perfumery with our signature botanical collections."}
-              </p>
-
-              {/* Patron Social Proof Pill (Raahi Parfums Style) */}
-              <div className="inline-flex items-center gap-3 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/15 mb-8 pointer-events-auto shadow-xl">
-                <div className="flex -space-x-2 overflow-hidden">
-                  <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" alt="Patron" />
-                  <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120" alt="Patron" />
-                  <img className="inline-block h-6 w-6 rounded-full ring-2 ring-stone-900 object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120" alt="Patron" />
-                  <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#15803d] text-[9px] font-bold text-white ring-2 ring-stone-900">
-                    +5k
-                  </div>
-                </div>
-                <div className="text-left">
-                  <div className="flex items-center gap-1 text-[#D4BC96] text-xs leading-none">
-                    <span aria-hidden="true">★★★★★</span>
-                    <span className="sr-only">Rated 4.9 out of 5 stars</span>
-                    <span className="font-mono text-white/90 ml-1 font-bold">4.9/5</span>
-                  </div>
-                  <span className="text-xs text-stone-200 font-light block mt-0.5">Loved by 10,000+ patrons across India</span>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap items-center justify-center gap-4 w-full pointer-events-auto">
-                <button
-                  type="button"
-                  onClick={() => handleSectionNavigate("shop")}
-                  className="px-8 sm:px-10 py-3.5 bg-white hover:bg-stone-200 text-stone-950 text-xs uppercase tracking-[0.2em] font-bold transition-all duration-300 cursor-pointer shadow-xl rounded-full hover:scale-103"
-                >
-                  Shop Attars
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (handleSelectCategory) handleSelectCategory("Discovery Set");
-                    handleSectionNavigate("shop");
-                  }}
-                  className="px-8 sm:px-10 py-3.5 bg-black/80 hover:bg-[#D4BC96] text-[#D4BC96] hover:text-stone-950 border-2 border-[#D4BC96] text-xs uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer backdrop-blur-md rounded-full hover:scale-103 shadow-lg"
-                >
-                  Discovery Sets
-                </button>
-              </div>
             </div>
 
             {/* Ambient Video Control Toggle Badge (When in video mode) — ADMIN ONLY */}
