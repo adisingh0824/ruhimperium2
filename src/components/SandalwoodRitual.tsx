@@ -10,7 +10,7 @@ interface SandalwoodRitualProps {
 export default function SandalwoodRitual({ onExplore, siteSettings }: SandalwoodRitualProps) {
   const stickImage = siteSettings?.sandalwoodStickImage || "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=1200";
   const stickTitle = siteSettings?.sandalwoodStickTitle || "Sandalwood Stick + Rubbing Stone";
-  const stickText = siteSettings?.sandalwoodStickText || "Spa treatment from nature – calming your mind, pampering your skin, and making you smell divine all at once. When modern life feels overwhelming, trust this ancient remedy to restore your inner balance.";
+  const stickText = siteSettings?.sandalwoodStickText || "Ayurveda's natural sedative. A spa ritual drawn from nature — calming your mind, cooling your skin, and centering your thoughts. Hand-crafted from original Mysore Sandalwood blocks.";
 
   return (
     <section className="bg-white py-16 sm:py-24 border-b border-sand-200/70 overflow-hidden" id="sandalwood-ritual-section">

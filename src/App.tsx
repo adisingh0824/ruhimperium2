@@ -1653,7 +1653,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           }}
           className="w-full py-2.5 bg-[#C47265] hover:bg-[#B36256] text-white transition-all text-xs uppercase tracking-wider font-semibold focus:outline-none rounded-xl shadow-xs hover:shadow-md cursor-pointer"
         >
-          {prod.variants && prod.variants.length > 1 ? "Choose Option" : "Add to cart"}
+          {prod.variants && prod.variants.length > 1 ? "Select Size" : "Add to cart"}
         </button>
       </div>
     );
@@ -1734,19 +1734,22 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
       {/* Main Content Body */}
       <main className="flex-1 relative z-10">
-        {/* fix #5-9 – isolate + explicit bg so contrast tools resolve the dark background correctly */}
-        {siteSettings.marqueeEnabled && siteSettings.marqueeText && (
-          <div className="bg-[#111111] text-[#D4BC96] py-1.5 overflow-hidden w-full flex border-b border-[#D4BC96]/20" style={{ isolation: 'isolate' }}>
-            <div className="animate-marquee whitespace-nowrap text-[9px] font-mono tracking-[0.2em] uppercase flex space-x-12 px-4 bg-[#111111]">
-              <span>{siteSettings.marqueeText}</span>
-              <span>{siteSettings.marqueeText}</span>
-              <span>{siteSettings.marqueeText}</span>
-              <span>{siteSettings.marqueeText}</span>
-              <span>{siteSettings.marqueeText}</span>
-              <span>{siteSettings.marqueeText}</span>
+        {/* copy fix #5 – capitalise first letter at render so admin-entered lowercase text is always polished */}
+        {siteSettings.marqueeEnabled && siteSettings.marqueeText && (() => {
+          const text = siteSettings.marqueeText.charAt(0).toUpperCase() + siteSettings.marqueeText.slice(1);
+          return (
+            <div className="bg-[#111111] text-[#D4BC96] py-1.5 overflow-hidden w-full flex border-b border-[#D4BC96]/20" style={{ isolation: 'isolate' }}>
+              <div className="animate-marquee whitespace-nowrap text-[9px] font-mono tracking-[0.2em] uppercase flex space-x-12 px-4 bg-[#111111]">
+                <span>{text}</span>
+                <span>{text}</span>
+                <span>{text}</span>
+                <span>{text}</span>
+                <span>{text}</span>
+                <span>{text}</span>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
         <Routes>
           <Route path="/" element={
             <>
@@ -2171,7 +2174,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       </div>
                     </div>
 
-                    {/* Dawn-style Choose Option Button */}
+                    {/* copy fix #2 – "Select Size" is more artisanal and specific than the generic "Choose Option" */}
                     <button
                       type="button"
                       onClick={() => {
@@ -2183,7 +2186,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       }}
                       className="w-full mt-4 py-2.5 sm:py-3 border-2 border-stone-900 bg-transparent hover:bg-stone-900 text-stone-900 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
                     >
-                      Choose Option
+                      Select Size
                     </button>
                   </div>
                 );
@@ -2345,8 +2348,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   {(activeShelfTab === "all" || activeShelfTab === "artisanal") && (
                     <div className="space-y-6 scroll-mt-24" id="shelf-artisanal">
                       <div>
+                        {/* copy fix #4 – "Fragrances" capitalised to match title case of adjacent headings */}
                         <h2 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight font-bold">
-                          Indian Artisanal fragrances
+                          Indian Artisanal Fragrances
                         </h2>
                         <p className="text-xs sm:text-sm text-stone-600 font-normal mt-1">
                           A collection of Artisan Indian Niche Perfumery
@@ -2910,7 +2914,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 sm:mb-16 border-b border-stone-200/80 pb-6">
               <div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight flex flex-wrap items-center gap-3">
-                  <span>Insights</span>
+                  {/* copy fix #3 – colon makes the heading grammatically coherent: "Insights: Handcrafted Indian Attars" */}
+                  <span>Insights:</span>
                   <span className="inline-block w-14 sm:w-18 h-7 sm:h-9 rounded-full overflow-hidden border border-stone-300 shadow-inner align-middle">
                     <img
                       src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=200"
