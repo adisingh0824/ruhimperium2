@@ -600,9 +600,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [heroMode, setHeroMode] = useState<'3d' | 'video' | 'photo'>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return 'photo';
+    }
     return siteSettings?.heroMediaType || '3d';
   });
   const [distilleryTab, setDistilleryTab] = useState<'lab' | 'video' | 'photo'>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return 'photo';
+    }
     return siteSettings?.distilleryMediaType || 'lab';
   });
 
@@ -2295,7 +2301,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 <div className="space-y-12 sm:space-y-16">
                   {/* fix #10 – sticky tab bar: users always see the 4 categories while scrolling,
                       breaking the "4 identical grids in a row" effect */}
-                  <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 border-b border-stone-200/60 shadow-sm">
+                  <div className="sticky top-16 z-20 bg-white -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 border-b border-stone-200 shadow-xs">
                     <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap" role="tablist" aria-label="Product Curations">
                     {SHELF_TABS.map((tab) => {
                       const isActive = activeShelfTab === tab.id;

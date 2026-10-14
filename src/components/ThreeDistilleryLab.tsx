@@ -70,13 +70,17 @@ export const ThreeDistilleryLab: React.FC = () => {
       return;
     }
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
     renderer.setClearColor(0xfcfbf9, 1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = !isMobile;
+    if (!isMobile) {
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
     container.appendChild(renderer.domElement);
 
     // LIGHTING
@@ -354,11 +358,16 @@ export const ThreeDistilleryLab: React.FC = () => {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
 
-    // ANIMATION LOOP
+    // ANIMATION LOOP with Viewport Visibility Gating
     let clock = new THREE.Clock();
-    let animId: number;
+    let animId: number = 0;
+    let isVisible: boolean = true;
 
     const animate = () => {
+      if (!isVisible) {
+        animId = 0;
+        return;
+      }
       animId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
       const delta = clock.getDelta();
@@ -413,7 +422,6 @@ export const ThreeDistilleryLab: React.FC = () => {
           drop.position.y -= dropSpeed;
           if (drop.position.y < -0.55) {
             drop.position.y = 0.25 + idx * 0.15;
-            setCollectedDrops(prev => prev + 1);
           }
         });
       }
@@ -432,7 +440,19 @@ export const ThreeDistilleryLab: React.FC = () => {
       renderer.render(scene, camera);
     };
 
-    animate();
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        isVisible = entry.isIntersecting;
+        if (isVisible && !animId) {
+          animate();
+        }
+      }, { threshold: 0.05 });
+      observer.observe(container);
+    } else {
+      animate();
+    }
 
     // RESIZE HANDLER
     const handleResize = () => {
@@ -444,11 +464,16 @@ export const ThreeDistilleryLab: React.FC = () => {
     window.addEventListener('resize', handleResize);
 
     return () => {
+      if (observer) {
+        observer.disconnect();
+      }
       window.removeEventListener('resize', handleResize);
       container.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
-      cancelAnimationFrame(animId);
+      if (animId) {
+        cancelAnimationFrame(animId);
+      }
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }

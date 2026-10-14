@@ -108,6 +108,11 @@ export default function ThreeAtmosphere() {
   const [flowerDensity, setFlowerDensity] = useState<'high' | 'subtle'>('high');
 
   useEffect(() => {
+    // Completely disable on mobile, tablet, and touch screens (<1024px) to preserve 60fps native scrolling
+    if (typeof window !== "undefined" && (window.innerWidth < 1024 || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0))) {
+      return;
+    }
+
     if (!containerRef.current) return;
 
     const container = containerRef.current;
@@ -437,7 +442,7 @@ export default function ThreeAtmosphere() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+      className="hidden lg:block fixed inset-0 pointer-events-none z-0 overflow-hidden"
       style={{ opacity: 0.95 }}
     />
   );

@@ -135,12 +135,16 @@ export default function ThreeBottleCanvas({
       return;
     }
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.25;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = !isMobile;
+    if (!isMobile) {
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
     container.appendChild(renderer.domElement);
 
     // --- Lighting ---
@@ -447,11 +451,16 @@ export default function ThreeBottleCanvas({
     };
     window.addEventListener("resize", handleResize);
 
-    // --- Animation Loop ---
-    let animId: number;
+    // --- Animation Loop with Viewport Visibility Gating ---
+    let animId: number = 0;
+    let isVisible: boolean = true;
     const clock = new THREE.Clock();
 
     const animate = () => {
+      if (!isVisible) {
+        animId = 0;
+        return;
+      }
       animId = requestAnimationFrame(animate);
       const delta = clock.getDelta();
 
@@ -502,9 +511,24 @@ export default function ThreeBottleCanvas({
       renderer.render(scene, camera);
     };
 
-    animate();
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        isVisible = entry.isIntersecting;
+        if (isVisible && !animId) {
+          animate();
+        }
+      }, { threshold: 0.05 });
+      observer.observe(container);
+    } else {
+      animate();
+    }
 
     return () => {
+      if (observer) {
+        observer.disconnect();
+      }
       dom.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
@@ -513,7 +537,9 @@ export default function ThreeBottleCanvas({
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("resize", handleResize);
 
-      cancelAnimationFrame(animId);
+      if (animId) {
+        cancelAnimationFrame(animId);
+      }
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }

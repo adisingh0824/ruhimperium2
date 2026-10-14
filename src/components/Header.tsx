@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, useRef, FormEvent } from "react";
 import { 
   ShoppingBag, 
   Search, 
@@ -83,28 +83,47 @@ export default function Header({
   const [useDropdownOpen, setUseDropdownOpen] = useState(false);
   const [internalBulkEnquiryOpen, setInternalBulkEnquiryOpen] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
+  const headerVisibleRef = useRef(true);
+  const scrollTickingRef = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY < 90) {
-        setHeaderVisible(true);
-      } else if (currentScrollY > lastScrollY && currentScrollY > 150) {
-        // Scrolling down -> hide header if no modal/dropdown is open
-        if (!mobileMenuOpen && !collectionsDropdownOpen && !notesDropdownOpen && !useDropdownOpen && !searchOpen) {
-          setHeaderVisible(false);
+      if (scrollTickingRef.current) return;
+      scrollTickingRef.current = true;
+
+      window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const lastY = lastScrollYRef.current;
+
+        let shouldBeVisible = true;
+        if (currentScrollY < 90) {
+          shouldBeVisible = true;
+        } else if (currentScrollY > lastY && currentScrollY > 150) {
+          // Scrolling down -> hide header if no modal/dropdown is open
+          if (!mobileMenuOpen && !collectionsDropdownOpen && !notesDropdownOpen && !useDropdownOpen && !searchOpen) {
+            shouldBeVisible = false;
+          } else {
+            shouldBeVisible = true;
+          }
+        } else if (currentScrollY < lastY) {
+          // Scrolling up -> reveal header
+          shouldBeVisible = true;
         }
-      } else if (currentScrollY < lastScrollY) {
-        // Scrolling up -> reveal header
-        setHeaderVisible(true);
-      }
-      setLastScrollY(currentScrollY);
+
+        if (headerVisibleRef.current !== shouldBeVisible) {
+          headerVisibleRef.current = shouldBeVisible;
+          setHeaderVisible(shouldBeVisible);
+        }
+
+        lastScrollYRef.current = currentScrollY;
+        scrollTickingRef.current = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, mobileMenuOpen, collectionsDropdownOpen, notesDropdownOpen, useDropdownOpen, searchOpen]);
+  }, [mobileMenuOpen, collectionsDropdownOpen, notesDropdownOpen, useDropdownOpen, searchOpen]);
   const bulkEnquiryOpen = propBulkEnquiryOpen !== undefined ? propBulkEnquiryOpen : internalBulkEnquiryOpen;
   const setBulkEnquiryOpen = propSetBulkEnquiryOpen || setInternalBulkEnquiryOpen;
 
