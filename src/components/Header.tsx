@@ -286,15 +286,18 @@ export default function Header({
               <User className="w-5 h-5 stroke-[1.5]" />
             </button>
 
-            <button
-              type="button"
-              onClick={onAdminClick}
-              className="text-sand-900 hover:text-stone-600 transition-colors p-1"
-              aria-label="Admin console"
-              title="Admin"
-            >
-              <LockKeyhole className="w-4 h-4 stroke-[1.5]" />
-            </button>
+            {/* Admin link only visible when already logged in (fix #20) */}
+            {isAdminLoggedIn && (
+              <button
+                type="button"
+                onClick={onAdminClick}
+                className="text-sand-900 hover:text-stone-600 transition-colors p-1"
+                aria-label="Admin console"
+                title="Admin"
+              >
+                <LockKeyhole className="w-4 h-4 stroke-[1.5]" />
+              </button>
+            )}
 
             <button
               type="button"
@@ -325,7 +328,7 @@ export default function Header({
           </div>
         </div>
 
-        <nav className="hidden lg:flex items-center justify-center h-12 relative border-t border-sand-200">
+        <nav className="hidden lg:flex items-center justify-between h-12 relative border-t border-sand-200">
           <ul className="flex items-center space-x-7 text-[11px] tracking-widest uppercase font-sans text-stone-900 font-semibold">
             
             {/* 1. Collections Dropdown */}
@@ -460,29 +463,25 @@ export default function Header({
               </button>
             </li>
 
-            {/* 6. For Bulk Enquiry */}
-            <li className="relative py-3">
-              <button
-                type="button"
-                onClick={() => setBulkEnquiryOpen(true)}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer"
-              >
-                Bulk Enquiry
-              </button>
-            </li>
-
-            {/* 7. Track Order */}
-            <li className="relative py-3">
-              <button
-                type="button"
-                onClick={onTrackOrderClick}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer"
-              >
-                Track Order
-              </button>
-            </li>
-
           </ul>
+
+          {/* Utility links moved to secondary position (fix #21) */}
+          <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase font-sans text-stone-400 font-semibold">
+            <button
+              type="button"
+              onClick={() => setBulkEnquiryOpen(true)}
+              className="hover:text-stone-700 transition-colors cursor-pointer"
+            >
+              Bulk Enquiry
+            </button>
+            <button
+              type="button"
+              onClick={onTrackOrderClick}
+              className="hover:text-stone-700 transition-colors cursor-pointer"
+            >
+              Track Order
+            </button>
+          </div>
         </nav>
 
       </div>

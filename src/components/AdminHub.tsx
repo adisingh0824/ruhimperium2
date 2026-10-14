@@ -27,6 +27,7 @@ import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder,
 import { storage, db, withTimeout } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { uploadVideoFile } from "../utils/mediaUpload";
 import InvoiceBill from "./InvoiceBill";
 import { safeStorage } from "../App";
 
@@ -2136,38 +2137,19 @@ export default function AdminHub({
                             disabled={isUploadingVideo}
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
-                              if (file) {
-                                setIsUploadingVideo(true);
-                                const reader = new FileReader();
-                                reader.onload = async () => {
-                                  const base64 = reader.result as string;
-                                  try {
-                                    const response = await fetch("/api/upload-video", {
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        "x-admin-token": defaultAdminPassword
-                                      },
-                                      body: JSON.stringify({
-                                        videoData: base64,
-                                        filename: file.name
-                                      })
-                                    });
-                                    if (!response.ok) {
-                                      const errData = await response.json();
-                                      throw new Error(errData.error || "Upload failed");
-                                    }
-                                    const resData = await response.json();
-                                    setHeroVideoUrl(resData.url);
-                                    alert(`Scent film file "${file.name}" uploaded to server and broadcasting successfully! All customers will now see this video live in the ambient background.`);
-                                  } catch (err: any) {
-                                    console.error("Local video upload error:", err);
-                                    alert(`Failed to upload video: ${err.message}`);
-                                  } finally {
-                                    setIsUploadingVideo(false);
-                                  }
-                                };
-                                reader.readAsDataURL(file);
+                              if (!file) return;
+                              setIsUploadingVideo(true);
+                              try {
+                                // Uses Firebase Storage → /api fallback → base64 fallback (never crashes with JSON parse error)
+                                const url = await uploadVideoFile(file, defaultAdminPassword);
+                                setHeroVideoUrl(url);
+                                alert(`Scent film "${file.name}" uploaded and broadcasting live to all customers!`);
+                              } catch (err: any) {
+                                console.error("Hero video upload error:", err);
+                                alert(err.message || "Failed to upload video. Please try a YouTube or Vimeo link instead.");
+                              } finally {
+                                setIsUploadingVideo(false);
+                                e.target.value = "";
                               }
                             }}
                           />
@@ -2795,39 +2777,18 @@ export default function AdminHub({
                                 disabled={isUploadingVideo}
                                 onChange={async (e) => {
                                   const file = e.target.files?.[0];
-                                  if (file) {
-                                    setIsUploadingVideo(true);
-                                    const reader = new FileReader();
-                                    reader.onload = async () => {
-                                      const base64 = reader.result as string;
-                                      try {
-                                        const response = await fetch("/api/upload-video", {
-                                          method: "POST",
-                                          headers: {
-                                            "Content-Type": "application/json",
-                                            "x-admin-token": defaultAdminPassword
-                                          },
-                                          body: JSON.stringify({
-                                            videoData: base64,
-                                            filename: file.name
-                                          })
-                                        });
-                                        if (!response.ok) {
-                                          const errData = await response.json();
-                                          throw new Error(errData.error || "Upload failed");
-                                        }
-                                        const resData = await response.json();
-                                        handleUpdateSiteSetting("distilleryVideoUrl", resData.url);
-                                        alert(`Distillery video file "${file.name}" uploaded successfully!`);
-                                      } catch (err: any) {
-                                        console.error("Distillery video upload error:", err);
-                                        handleUpdateSiteSetting("distilleryVideoUrl", base64);
-                                        alert("Distillery video saved successfully!");
-                                      } finally {
-                                        setIsUploadingVideo(false);
-                                      }
-                                    };
-                                    reader.readAsDataURL(file);
+                                  if (!file) return;
+                                  setIsUploadingVideo(true);
+                                  try {
+                                    // Uses Firebase Storage → /api fallback → base64 (never crashes with JSON parse error)
+                                    const url = await uploadVideoFile(file, defaultAdminPassword);
+                                    handleUpdateSiteSetting("distilleryVideoUrl", url);
+                                    alert(`Distillery video "${file.name}" uploaded and published successfully!`);
+                                  } catch (err: any) {
+                                    console.error("Distillery video upload error:", err);
+                                    alert(err.message || "Failed to upload video. Please try a YouTube or Vimeo link instead.");
+                                  } finally {
+                                    setIsUploadingVideo(false);
                                   }
                                 }}
                               />

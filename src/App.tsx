@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent, useRef } from 'react';
+import { useState, useEffect, FormEvent, useRef, ChangeEvent } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Compass, 
@@ -53,6 +53,7 @@ import ImpactNumbers from './components/ImpactNumbers';
 import FaqSection from './components/FaqSection';
 import CategorySlider from './components/CategorySlider';
 import SandalwoodRitual from './components/SandalwoodRitual';
+import { uploadVideoFile } from './utils/mediaUpload';
 
 const isEmbedIframe = (url: string): boolean => {
   if (!url) return false;
@@ -623,55 +624,26 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [showDistilleryLinkModal, setShowDistilleryLinkModal] = useState<boolean>(false);
   const [distilleryVideoLinkInput, setDistilleryVideoLinkInput] = useState<string>('');
 
-  const handleDistilleryVideoDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDistilleryVideoDeviceUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploadingDistilleryVideo(true);
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = reader.result as string;
-      try {
-        const response = await fetch("/api/upload-video", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-token": import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@"
-          },
-          body: JSON.stringify({
-            videoData: base64,
-            filename: file.name
-          })
-        });
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error || "Upload failed");
-        }
-        const resData = await response.json();
-        await updateSiteSettings((prev) => ({
-          ...prev,
-          distilleryVideoUrl: resData.url,
-          distilleryMediaType: 'video'
-        }));
-        setDistilleryTab('video');
-        showToast(`Distillery video "${file.name}" uploaded from device and published live!`, "success");
-      } catch (err: any) {
-        console.warn("Backend video upload fallback to data URL:", err);
-        try {
-          await updateSiteSettings((prev) => ({
-            ...prev,
-            distilleryVideoUrl: base64,
-            distilleryMediaType: 'video'
-          }));
-          setDistilleryTab('video');
-          showToast("Distillery video saved and published live!", "success");
-        } catch (saveErr: any) {
-          showToast("Failed to save video: " + (err.message || "Unknown error"), "warning");
-        }
-      } finally {
-        setIsUploadingDistilleryVideo(false);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Uses Firebase Storage → /api fallback → base64 fallback. Never crashes with "Unexpected end of JSON input".
+      const url = await uploadVideoFile(file, import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@");
+      await updateSiteSettings((prev) => ({
+        ...prev,
+        distilleryVideoUrl: url,
+        distilleryMediaType: 'video'
+      }));
+      setDistilleryTab('video');
+      showToast(`Distillery video "${file.name}" uploaded and published live!`, "success");
+    } catch (err: any) {
+      showToast(err.message || "Failed to upload video. Please paste a YouTube or Vimeo link instead.", "warning");
+    } finally {
+      setIsUploadingDistilleryVideo(false);
+      e.target.value = "";
+    }
   };
 
   // Admin Hero Video & Media Quick Upload States
@@ -679,52 +651,26 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [showHeroLinkModal, setShowHeroLinkModal] = useState<boolean>(false);
   const [heroVideoLinkInput, setHeroVideoLinkInput] = useState<string>('');
 
-  const handleHeroVideoDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeroVideoDeviceUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploadingHeroVideo(true);
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = reader.result as string;
-      try {
-        const response = await fetch("/api/upload-video", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-token": import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@"
-          },
-          body: JSON.stringify({
-            videoData: base64,
-            filename: file.name
-          })
-        });
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error || "Upload failed");
-        }
-        const resData = await response.json();
-        await updateHeroVideoUrl(resData.url);
-        setHeroMode('video');
-        await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
-        showToast(`Hero video "${file.name}" uploaded from device and broadcasting live!`, "success");
-      } catch (err: any) {
-        console.warn("Backend hero video upload fallback to data URL:", err);
-        try {
-          await updateHeroVideoUrl(base64);
-          setHeroMode('video');
-          await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
-          showToast("Hero video saved and broadcasting live!", "success");
-        } catch (saveErr: any) {
-          showToast("Failed to save video: " + (err.message || "Unknown error"), "warning");
-        }
-      } finally {
-        setIsUploadingHeroVideo(false);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Uses Firebase Storage → /api fallback → base64 fallback. Never crashes with "Unexpected end of JSON input".
+      const url = await uploadVideoFile(file, import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@");
+      await updateHeroVideoUrl(url);
+      setHeroMode('video');
+      await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
+      showToast(`Hero video "${file.name}" uploaded and broadcasting live!`, "success");
+    } catch (err: any) {
+      showToast(err.message || "Failed to upload video. Please paste a YouTube or Vimeo link instead.", "warning");
+    } finally {
+      setIsUploadingHeroVideo(false);
+      e.target.value = "";
+    }
   };
 
-  const handleHeroPhotoDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeroPhotoDeviceUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
@@ -1803,6 +1749,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         <Routes>
           <Route path="/" element={
             <>
+        {/* Fix #7 – visually-hidden primary heading for SEO and screen-reader users */}
+        <h1 className="sr-only">Ruh Imperium | Authentic Indian Attars &amp; Pure Kannauj Perfumes</h1>
 
         {/* QUIQ HERO BANNER CONTAINER (RAAHI PARFUMS STYLE) */}
         <div className="p-2 sm:p-3 -mt-2 sm:-mt-3 max-w-[1550px] mx-auto">
@@ -2341,7 +2289,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
               return (
                 <div className="space-y-12 sm:space-y-16">
-                  {/* Category Pill Switcher to solve cognitive overload and false floor */}
+                  {/* Category Pill Switcher — fix #22: active tab also gets border-b underline for unambiguous state */}
                   <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap pb-2 border-b border-stone-200/60" role="tablist" aria-label="Product Curations">
                     {SHELF_TABS.map((tab) => {
                       const isActive = activeShelfTab === tab.id;
@@ -2353,7 +2301,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                           onClick={() => setActiveShelfTab(tab.id)}
                           className={`px-5 py-2 rounded-full text-xs font-sans font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                             isActive
-                              ? "bg-stone-900 text-white shadow-xs"
+                              ? "bg-stone-900 text-white shadow-xs ring-2 ring-stone-900 ring-offset-1"
                               : "bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900"
                           }`}
                         >
@@ -2403,7 +2351,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                           A collection of Artisan Indian Niche Perfumery
                         </p>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                      {/* Fix #23 – use flex-wrap + justify-center so sparse rows look balanced */}
+                      <div className={`grid gap-3 sm:gap-6 ${
+                        artisanalFragrances.length < 4
+                          ? "grid-cols-2 sm:grid-cols-2"
+                          : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"
+                      }`} style={artisanalFragrances.length < 4 ? { maxWidth: artisanalFragrances.length * 260, margin: "0 auto" } : {}}>
                         {artisanalFragrances.map((prod) => renderProductCard(prod))}
                       </div>
                       <div className="flex justify-center pt-4">

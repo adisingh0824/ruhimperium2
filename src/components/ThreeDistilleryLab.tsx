@@ -517,10 +517,11 @@ export const ThreeDistilleryLab: React.FC = () => {
                   setBotanicalType(type);
                   setTemperature(botanicalInfo[type].tempOptimal);
                 }}
-                className={`px-3 py-2 text-xs rounded-lg font-serif transition-all text-center border ${
+                className={`px-3 py-2 text-xs rounded-lg font-serif transition-all text-center border-2 ${
                   botanicalType === type
                     ? 'bg-[#d4af37] text-white border-[#d4af37] shadow font-bold'
-                    : 'bg-white text-stone-600 border-stone-200 hover:border-[#d4af37]/50 hover:text-stone-900'
+                    // Fix #25 – border-2 + bg-stone-50 so unselected buttons look interactive, not disabled
+                    : 'bg-stone-50 text-stone-700 border-stone-300 hover:border-[#d4af37] hover:text-stone-900'
                 }`}
               >
                 {type === 'kannauj_rose' ? 'Damask Rose' : type === 'mysore_sandal' ? 'Sandalwood' : 'Wild Oud'}
@@ -534,24 +535,39 @@ export const ThreeDistilleryLab: React.FC = () => {
           <div className="flex justify-between items-center mb-2">
             <label htmlFor="furnace-temp-range" className="text-xs uppercase tracking-widest text-[#b8972e] font-serif flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-amber-500" />
-              Furnace Heat ({temperature}°C)
+              Furnace Heat
             </label>
-            <span className="text-[10px] text-stone-400">
-              Optimal: {botanicalInfo[botanicalType].tempOptimal}°C
+            {/* Fix #12 – Optimal value grouped with the label header, not floating alone */}
+            <span className="text-xs text-stone-500 font-mono">
+              {temperature}°C &nbsp;·&nbsp; Optimal: {botanicalInfo[botanicalType].tempOptimal}°C
             </span>
           </div>
-          <input
-            id="furnace-temp-range"
-            name="furnace-temp-range"
-            aria-label={`Furnace Heat Temperature: ${temperature}°C`}
-            type="range"
-            min={60}
-            max={115}
-            value={temperature}
-            onChange={e => setTemperature(Number(e.target.value))}
-            className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
-          />
-          <div className="flex justify-between text-[10px] text-stone-400 mt-1">
+          {/* Fix #24 – wrapper gives slider a relative context for the optimal tick marker */}
+          <div className="relative">
+            <input
+              id="furnace-temp-range"
+              name="furnace-temp-range"
+              aria-label={`Furnace Heat Temperature: ${temperature}°C`}
+              type="range"
+              min={60}
+              max={115}
+              value={temperature}
+              onChange={e => setTemperature(Number(e.target.value))}
+              className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
+            />
+            {/* Fix #24 – visual tick at the optimal temperature position on the track */}
+            <span
+              className="absolute -top-3 text-[9px] font-mono text-amber-600 pointer-events-none select-none"
+              style={{
+                left: `calc(${((botanicalInfo[botanicalType].tempOptimal - 60) / 55) * 100}% - 4px)`
+              }}
+              aria-hidden="true"
+            >
+              ▼
+            </span>
+          </div>
+          {/* Fix #6 – raised from text-[10px] to text-xs (12 px) for legibility */}
+          <div className="flex justify-between text-xs text-stone-400 mt-1">
             <span>60°C (Slow Infusion)</span>
             <span>115°C (Rapid Vapor)</span>
           </div>
@@ -571,12 +587,14 @@ export const ThreeDistilleryLab: React.FC = () => {
             <span>{isSimulating ? 'Pause Still' : 'Ignite Furnace'}</span>
           </button>
 
+          {/* Fix #26 – added "Reset" label and rectangular shape to match sibling controls */}
           <button
             onClick={() => setRotationSpeed(prev => (prev === 0 ? 0.003 : 0))}
-            className="p-2.5 rounded-xl text-xs bg-white text-stone-600 border border-stone-200 hover:border-[#d4af37]/40 hover:text-stone-900 transition-all shadow-sm"
+            className="px-3 py-2 rounded-xl text-xs bg-white text-stone-600 border border-stone-200 hover:border-[#d4af37]/40 hover:text-stone-900 transition-all shadow-sm flex items-center gap-1.5"
             title="Toggle Auto Rotation"
           >
             <RotateCw className={`w-4 h-4 ${rotationSpeed > 0 ? 'animate-spin' : ''}`} />
+            <span>Reset</span>
           </button>
         </div>
       </div>

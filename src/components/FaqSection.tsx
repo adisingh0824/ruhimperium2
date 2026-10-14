@@ -44,47 +44,33 @@ export default function FaqSection() {
     <section className="bg-white py-16 sm:py-24 border-b border-stone-200/70" id="faq-section">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         
-        {/* QUIQ CTA: FAQ HEADER (RAAHI PARFUMS STYLE) */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 border-b border-stone-200/80 pb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-[#A3483B] text-xs font-sans uppercase tracking-wider font-bold mb-3">
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>Got Questions?</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight flex flex-wrap items-center gap-3">
-              <span>Frequently Asked</span>
-              <span className="inline-block w-14 sm:w-18 h-7 sm:h-9 rounded-full overflow-hidden border border-stone-300 shadow-inner align-middle">
-                <img
-                  src="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=200"
-                  alt="Distillery Still"
-                  className="w-full h-full object-cover"
-                />
-              </span>
-              <span>Questions</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-500 font-light mt-1">
-              Everything you need to know about traditional Kannauj slow-perfumery, application rituals, and botanical pure oils.
-            </p>
+        {/* FAQ HEADER — fix #16 & #17: removed duplicate "Ask Concierge" CTA from header;
+            single contact action kept in the "Still have questions?" card below */}
+        <div className="mb-12 border-b border-stone-200/80 pb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-[#A3483B] text-xs font-sans uppercase tracking-wider font-bold mb-3">
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Got Questions?</span>
           </div>
-          <a
-            href="mailto:support@ruhimperium.com"
-            className="px-6 py-2.5 rounded-full border border-stone-900 bg-stone-900 hover:bg-[#15803d] hover:border-[#15803d] text-white text-xs font-sans uppercase tracking-wider font-semibold transition-all duration-300 cursor-pointer shadow-xs shrink-0 inline-flex items-center gap-2"
-          >
-            <span>Ask Concierge</span>
-          </a>
+          {/* Fix #27: decorative inline image removed from the heading so it doesn't disrupt reading flow */}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-500 font-light mt-2">
+            Everything you need to know about traditional Kannauj slow-perfumery, application rituals, and botanical pure oils.
+          </p>
         </div>
 
         {/* Accordion List */}
-        <div className="divide-y divide-stone-200/80 border-t border-b border-stone-200/80">
+        <div className="divide-y divide-stone-200/80 border-t border-b border-stone-200/80" role="list">
           {FAQS.map((faq, idx) => {
             const isOpen = openIndex === idx;
 
             return (
-              <div key={idx} className="py-5 transition-colors">
+              <div key={idx} className="py-5 transition-colors" role="listitem">
                 <button
                   type="button"
                   onClick={() => toggle(idx)}
-                  className="w-full text-left flex items-center justify-between gap-4 group cursor-pointer focus:outline-none"
+                  className="w-full text-left flex items-center justify-between gap-4 group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#15803d] rounded"
                   aria-expanded={isOpen}
                 >
                   <span className={`text-base sm:text-lg font-serif transition-colors ${
@@ -115,7 +101,7 @@ export default function FaqSection() {
           })}
         </div>
 
-        {/* Still have questions banner */}
+        {/* Single consolidated concierge CTA (fix #16 & #17) */}
         <div className="mt-12 p-6 rounded-2xl bg-[#FAF8F5] border border-stone-200/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
             <h3 className="text-base font-serif font-bold text-stone-900">Still have questions?</h3>
