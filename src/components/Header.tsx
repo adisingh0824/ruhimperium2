@@ -351,6 +351,23 @@ export default function Header({
         <nav className="hidden lg:flex items-center justify-between h-12 relative border-t border-sand-200">
           <ul className="flex items-center space-x-7 text-xs tracking-widest uppercase font-sans text-stone-900 font-semibold">
             
+            {/* 0. Home Link */}
+            <li className="relative py-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (setSelectedCategory) setSelectedCategory("All");
+                  if (setSearchQuery) setSearchQuery("");
+                  onNavigate("hero");
+                }}
+                className={`transition-colors cursor-pointer hover:text-[#19a24b] ${
+                  activeSection === "hero" ? "text-[#19a24b] font-bold" : "text-stone-900"
+                }`}
+              >
+                Home
+              </button>
+            </li>
+
             {/* 1. Collections Dropdown */}
             <li 
               className="relative py-3 group"
@@ -699,6 +716,8 @@ export default function Header({
                 <button
                   type="button"
                   onClick={() => {
+                    if (setSelectedCategory) setSelectedCategory("All");
+                    if (setSearchQuery) setSearchQuery("");
                     onNavigate("hero");
                     setMobileMenuOpen(false);
                   }}
