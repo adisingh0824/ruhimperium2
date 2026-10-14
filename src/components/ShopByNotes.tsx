@@ -136,8 +136,8 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
                 </p>
               </div>
 
-              {/* Footer preview */}
-              <div className="relative z-10 pt-5 mt-4 border-t border-stone-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              {/* Footer: Notes pills + fix #7 — "Explore Family" promoted to a clear bordered pill button */}
+              <div className="relative z-10 pt-5 mt-4 border-t border-stone-200/60 space-y-3">
                 <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                   <span className="text-xs uppercase font-mono tracking-wider text-stone-600 font-semibold mr-1">Notes:</span>
                   {note.sampleFragrances.split(', ').map((frag) => (
@@ -147,9 +147,15 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
                     </span>
                   ))}
                 </div>
-                <span className="text-xs font-semibold text-stone-900 group-hover:text-[#15803d] transition-colors inline-flex items-center gap-1 font-sans shrink-0 whitespace-nowrap">
-                  Explore Family <span className="group-hover:translate-x-1 transition-transform inline-block" aria-hidden="true">→</span>
-                </span>
+                {/* Promoted from a tiny span to a full-width pill button for clear affordance */}
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-full border-2 border-stone-800 bg-transparent text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-semibold font-sans uppercase tracking-wider transition-all duration-200 cursor-pointer group-hover:border-[#15803d] group-hover:text-[#15803d] group-hover:bg-transparent"
+                  aria-label={`Explore ${note.name} family`}
+                >
+                  Explore Family
+                  <span className="group-hover:translate-x-1 transition-transform inline-block" aria-hidden="true">→</span>
+                </button>
               </div>
             </div>
             );

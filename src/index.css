@@ -26,6 +26,136 @@
   --color-sand-900: #221F1C; /* Premium dark text */
 }
 
+/* ==========================================================================
+   DESIGN SYSTEM — fix #1–4
+   Type scale  : 9 steps (xs → 6xl), all others map to nearest step
+   Colour palette: 12 semantic vars (primary/muted/accent/surface/border)
+   Radius scale: 5 values (none / sm / md / lg / full)
+   Button tokens: 5 canonical variants (primary / secondary / ghost / tab / chip)
+   ========================================================================== */
+:root {
+  /* --- Type scale (9 steps) -------------------------------------------- */
+  --text-xs:   0.6875rem; /* 11px  — micro labels, badges */
+  --text-sm:   0.75rem;   /* 12px  — captions, fine print */
+  --text-base: 0.875rem;  /* 14px  — body copy */
+  --text-md:   1rem;      /* 16px  — large body / UI labels */
+  --text-lg:   1.25rem;   /* 20px  — card headings */
+  --text-xl:   1.5rem;    /* 24px  — section subheadings */
+  --text-2xl:  2rem;      /* 32px  — section headings */
+  --text-3xl:  2.75rem;   /* 44px  — hero sub */
+  --text-4xl:  3.5rem;    /* 56px  — hero headline */
+
+  /* --- Colour palette (12 semantic tokens) -------------------------------- */
+  --clr-primary:       #19a24b; /* brand green */
+  --clr-primary-dark:  #15803d;
+  --clr-accent:        #7a5c1a; /* accessible dark gold */
+  --clr-accent-light:  #d4af37; /* decorative gold (not for text) */
+  --clr-ink:           #1c1917; /* near-black body text */
+  --clr-muted:         #57534e; /* secondary text */
+  --clr-subtle:        #78716c; /* placeholder / disabled */
+  --clr-surface:       #ffffff;
+  --clr-surface-warm:  #f7f4eb;
+  --clr-border:        #d4d0cb;
+  --clr-border-strong: #a8a29e;
+  --clr-sand-dark:     #1a1715; /* distillery dark bg */
+
+  /* --- Radius scale (5 values) ------------------------------------------- */
+  --radius-sm:   0.375rem;  /* 6px  — badges, chips */
+  --radius-md:   0.625rem;  /* 10px — inputs, small cards */
+  --radius-lg:   1rem;      /* 16px — cards */
+  --radius-xl:   1.5rem;    /* 24px — panels */
+  --radius-full: 9999px;    /* pills */
+}
+
+/* --- Button utility classes (5 canonical variants) — fix #4 -------------- */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--clr-ink);
+  color: #ffffff;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid var(--clr-ink);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover { background: var(--clr-primary); border-color: var(--clr-primary); box-shadow: 0 4px 12px rgba(25,162,75,.25); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: transparent;
+  color: var(--clr-ink);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid var(--clr-ink);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-secondary:hover { background: var(--clr-ink); color: #ffffff; }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  color: var(--clr-muted);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--clr-border-strong); color: var(--clr-ink); }
+
+.btn-tab {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: transparent;
+  color: #44403c;
+  font-size: var(--text-xs);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.btn-tab[aria-selected="true"],
+.btn-tab.is-active {
+  background: var(--clr-sand-dark);
+  color: #D4BC96;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0,0,0,.35);
+}
+
+.btn-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.5rem 1.25rem;
+  background: var(--clr-surface);
+  color: #1c1917;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-chip:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
+
 @layer base {
   html, body {
     max-width: 100%;

@@ -2293,8 +2293,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
               return (
                 <div className="space-y-12 sm:space-y-16">
-                  {/* Category Pill Switcher — fix #22: active tab also gets border-b underline for unambiguous state */}
-                  <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap pb-2 border-b border-stone-200/60" role="tablist" aria-label="Product Curations">
+                  {/* fix #10 – sticky tab bar: users always see the 4 categories while scrolling,
+                      breaking the "4 identical grids in a row" effect */}
+                  <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 border-b border-stone-200/60 shadow-sm">
+                    <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap" role="tablist" aria-label="Product Curations">
                     {SHELF_TABS.map((tab) => {
                       const isActive = activeShelfTab === tab.id;
                       return (
@@ -2313,7 +2315,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         </button>
                       );
                     })}
-                  </div>
+                    </div>
+                  </div>{/* end sticky tab bar wrapper */}
 
                   {/* Shelf 1: Authentic Indian Attars */}
                   {(activeShelfTab === "all" || activeShelfTab === "authentic-attars") && (
@@ -2450,7 +2453,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="distillery-lab-section">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
             
-            <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block mb-2 font-mono">
+            <span className="text-xs tracking-wider text-[#7A5623] font-bold block mb-2 font-mono">
               Hydro-Distillation Technology • Deg & Bhapka
             </span>
 
@@ -2461,12 +2464,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               {siteSettings.distilleryVideoText || "100% of our products are manufactured and packaged at our distillery. Watch the video of our 204 years old distillery in Kannauj, India, or interact with our live 3D copper alembic still."}
             </p>
 
-            {/* Tab Switcher: 3D Live Deg-Bhapka Simulation vs Documentary Film vs Showcase Photo */}
-            <div className="flex flex-wrap items-center justify-center gap-2 bg-stone-200/80 p-1.5 rounded-2xl mb-8 border border-stone-300/50 shadow-inner">
+            {/* fix #8 – role="tablist" + role="tab" + aria-selected communicates the segmented control semantics */}
+            <div
+              role="tablist"
+              aria-label="Distillery view mode"
+              className="flex flex-wrap items-center justify-center gap-2 bg-stone-200/80 p-1.5 rounded-2xl mb-8 border border-stone-300/50 shadow-inner"
+            >
               <button
                 type="button"
+                role="tab"
+                aria-selected={distilleryTab === 'lab'}
                 onClick={() => setDistilleryTab('lab')}
-                className={`px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                className={`btn-tab px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
                   distilleryTab === 'lab'
                     ? 'bg-[#1a1715] text-[#D4BC96] font-bold shadow-lg'
                     : 'text-stone-700 hover:text-stone-900 font-medium'
@@ -2477,8 +2486,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </button>
               <button
                 type="button"
+                role="tab"
+                aria-selected={distilleryTab === 'video'}
                 onClick={() => setDistilleryTab('video')}
-                className={`px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                className={`btn-tab px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
                   distilleryTab === 'video'
                     ? 'bg-[#1a1715] text-[#D4BC96] font-bold shadow-lg'
                     : 'text-stone-700 hover:text-stone-900 font-medium'
@@ -2489,8 +2500,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </button>
               <button
                 type="button"
+                role="tab"
+                aria-selected={distilleryTab === 'photo'}
                 onClick={() => setDistilleryTab('photo')}
-                className={`px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                className={`btn-tab px-5 py-2.5 rounded-xl text-xs font-serif tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
                   distilleryTab === 'photo'
                     ? 'bg-[#1a1715] text-[#D4BC96] font-bold shadow-lg'
                     : 'text-stone-700 hover:text-stone-900 font-medium'
@@ -3185,7 +3198,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="text-xs uppercase tracking-wider text-[#7A5623] font-bold block mb-2.5 font-mono">
+              <span className="text-xs tracking-wider text-[#7A5623] font-bold block mb-2.5 font-mono">
                 HEIRS & ARCHITECTS
               </span>
               <h2 className="text-3xl sm:text-4xl font-light font-display text-sand-900 tracking-wide">

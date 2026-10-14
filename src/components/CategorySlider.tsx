@@ -79,13 +79,13 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
           </h3>
         </div>
 
-        {/* Horizontal Slider — arrows overlaid at mid-height of the track (fix #14) */}
+        {/* Horizontal Slider — arrows overlaid at mid-height of the track */}
         <div className="relative">
-          {/* Left arrow centered on card height */}
+          {/* Left arrow — fix #9: top-1/2 (true centre) replaces top-[45%] to eliminate optical imbalance */}
           <button
             type="button"
             onClick={() => scroll("left")}
-            className="hidden sm:flex absolute left-0 top-[45%] -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-sm hover:bg-stone-50 bg-white -translate-x-4"
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-sm hover:bg-stone-50 bg-white -translate-x-4"
             aria-label="Previous categories"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -139,11 +139,11 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
             })}
           </div>
 
-          {/* Right arrow centered on card height */}
+          {/* Right arrow — fix #9: top-1/2 (true centre) replaces top-[45%] */}
           <button
             type="button"
             onClick={() => scroll("right")}
-            className="hidden sm:flex absolute right-0 top-[45%] -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-sm hover:bg-stone-50 bg-white translate-x-4"
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-sm hover:bg-stone-50 bg-white translate-x-4"
             aria-label="Next categories"
           >
             <ChevronRight className="w-5 h-5" />
