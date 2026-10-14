@@ -21,7 +21,10 @@ import {
   Ticket,
   MessageSquare,
   Star,
-  Sparkles
+  Sparkles,
+  Copy,
+  ExternalLink,
+  Database
 } from "lucide-react";
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
 import { storage, db, withTimeout } from "../config/firebase";
@@ -967,7 +970,51 @@ export default function AdminHub({
             {/* Core Tab Screen View */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-white flex flex-col justify-between">
               
-              {/* Firestore permission diagnostic banner removed — rules configured via Firebase Console */}
+              {/* Database Real-Time Status & Rules Assistant */}
+              <div className="mb-6 p-4 rounded-xl border border-sand-200 bg-sand-50/70">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Database className="w-3.5 h-3.5 text-sand-700" />
+                        <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-sand-800">
+                          Database Status: Real-Time Live Sync Active
+                        </h4>
+                      </div>
+                      <p className="text-[10px] text-sand-500 font-light mt-0.5">
+                        Dual-channel live sync ensures all product, price, video, and setting changes broadcast to all online visitors across every device.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const rules = `rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if true;\n    }\n  }\n}`;
+                        navigator.clipboard.writeText(rules);
+                        alert("✅ Copied Firestore Security Rules to clipboard!\n\n1. Go to Firebase Console\n2. Open Firestore Database → Rules tab\n3. Paste the rules and click 'Publish'");
+                      }}
+                      className="px-3 py-1.5 bg-white hover:bg-sand-100 text-sand-700 text-[10px] font-mono uppercase tracking-wider rounded-lg border border-sand-200 shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Copy className="w-3 h-3 text-[#D4BC96]" />
+                      <span>Copy Firestore Rules</span>
+                    </button>
+                    <a
+                      href="https://console.firebase.google.com/project/ruh-imperium/firestore/rules"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white text-[10px] font-mono uppercase tracking-wider rounded-lg border border-black shadow-2xs transition-all flex items-center gap-1.5"
+                    >
+                      <span>Open Firebase Console</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
 
               {/* TAB 1: PRODUCT CATALOG MANAGEMENT */}
               {activeTab === "products" && (

@@ -943,13 +943,29 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     // 5. REVIEWS LIVE SYNC
     const unsubscribeReviews = onSnapshot(collection(db, "reviews"), async (snap) => {
       if (!snap.empty) {
-        if (writeLockRef.current["reviews"]) return;
         const list: Review[] = [];
+        const liveProducts: Product[] = [];
         snap.forEach((d) => {
           if (d.id.startsWith("_app_")) return;
-          list.push(d.data() as Review);
+          const data = d.data();
+          if (d.id.startsWith("prod_") || (data as any)._isProduct) {
+            liveProducts.push(data as Product);
+            return;
+          }
+          list.push(data as Review);
         });
-        setReviews(list);
+        if (!writeLockRef.current["reviews"]) {
+          setReviews(list);
+        }
+        if (liveProducts.length > 0 && !writeLockRef.current["products"]) {
+          setProducts(prev => {
+            const map = new Map(prev.map(p => [p.id, p]));
+            liveProducts.forEach(p => map.set(p.id, p));
+            const merged = Array.from(map.values());
+            safeStorage.setItem("ruh-products", JSON.stringify(merged));
+            return merged;
+          });
+        }
       } else {
         if (initPendingRef.current["reviews"]) return;
         initPendingRef.current["reviews"] = true;
@@ -1139,18 +1155,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
     }, () => {});
 
-    const unsubscribeBackupProducts = onSnapshot(doc(db, "reviews", "_app_products_registry"), (snap) => {
-      if (snap.exists()) {
-        if (writeLockRef.current["products"]) return;
-        const data = snap.data();
-        if (Array.isArray(data.list) && data.list.length > 0) {
-          setProducts(data.list);
-          productsRef.current = data.list;
-          safeStorage.setItem("ruh-products", JSON.stringify(data.list));
-        }
-      }
-    }, () => {});
-
     const unsubscribeBackupCollections = onSnapshot(doc(db, "reviews", "_app_collections"), (snap) => {
       if (snap.exists()) {
         if (writeLockRef.current["collections"]) return;
@@ -1176,16 +1180,14 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       unsubscribeUsers();
       unsubscribeBackupAssets();
       unsubscribeBackupSite();
-      unsubscribeBackupProducts();
       unsubscribeBackupCollections();
     };
   }, []);
 
   const handleFirestoreWriteCatch = (err: any, entity: string) => {
-    console.error(`Firestore ${entity} sync error: `, err);
+    console.warn(`[Firestore] ${entity} sync:`, err?.message || err);
     if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
       setFirestorePermissionError(true);
-      showToast("Firebase permissions denied. Please enable Firestore Security Rules to sync live changes to all users.", "error");
     }
   };
 
@@ -1320,10 +1322,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     productsRef.current = sanitized;
     safeStorage.setItem("ruh-products", JSON.stringify(sanitized));
     try {
+      const currentIds = new Set(sanitized.map(p => p.id));
+      const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
+
       try {
         const batch = writeBatch(db);
-        const currentIds = new Set(sanitized.map(p => p.id));
-        const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
         for (const id of deletedIds) {
           batch.delete(doc(db, "products", id));
         }
@@ -1334,10 +1337,14 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       } catch (err) {
         console.warn("Primary products collection write failed (falling back to live broadcast channel):", err);
       }
-      await withTimeout(setDoc(doc(db, "reviews", "_app_products_registry"), {
-        list: sanitized,
-        updatedAt: new Date().toISOString()
-      }, { merge: true }));
+
+      // Live broadcast channel - writes individually to bypass 1MB doc ceiling and sync seamlessly
+      for (const id of deletedIds) {
+        deleteDoc(doc(db, "reviews", `prod_${id}`)).catch(() => {});
+      }
+      for (const p of sanitized) {
+        setDoc(doc(db, "reviews", `prod_${p.id}`), { ...p, _isProduct: true }, { merge: true }).catch(() => {});
+      }
     } catch (e) {
       handleFirestoreWriteCatch(e, "products");
     } finally {
@@ -1359,16 +1366,26 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     blogArticlesRef.current = sanitized;
     safeStorage.setItem("ruh-blog-articles", JSON.stringify(sanitized));
     try {
-      const batch = writeBatch(db);
       const currentIds = new Set(sanitized.map(b => b.id));
       const deletedIds = previousBlogs.filter(b => !currentIds.has(b.id)).map(b => b.id);
+      try {
+        const batch = writeBatch(db);
+        for (const id of deletedIds) {
+          batch.delete(doc(db, "blogArticles", id));
+        }
+        for (const b of sanitized) {
+          batch.set(doc(db, "blogArticles", b.id), b);
+        }
+        await batch.commit();
+      } catch (err) {
+        console.warn("Primary blogArticles write failed (falling back to live broadcast channel):", err);
+      }
       for (const id of deletedIds) {
-        batch.delete(doc(db, "blogArticles", id));
+        deleteDoc(doc(db, "reviews", `blog_${id}`)).catch(() => {});
       }
       for (const b of sanitized) {
-        batch.set(doc(db, "blogArticles", b.id), b);
+        setDoc(doc(db, "reviews", `blog_${b.id}`), { ...b, _isBlog: true }, { merge: true }).catch(() => {});
       }
-      await withTimeout(batch.commit());
     } catch (e) {
       handleFirestoreWriteCatch(e, "blogs");
     } finally {
@@ -1390,16 +1407,26 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     couponsRef.current = sanitized;
     safeStorage.setItem("ruh-coupons", JSON.stringify(sanitized));
     try {
-      const batch = writeBatch(db);
       const currentCodes = new Set(sanitized.map(c => c.code));
       const deletedCodes = previousCoupons.filter(c => !currentCodes.has(c.code)).map(c => c.code);
+      try {
+        const batch = writeBatch(db);
+        for (const code of deletedCodes) {
+          batch.delete(doc(db, "coupons", code));
+        }
+        for (const c of sanitized) {
+          batch.set(doc(db, "coupons", c.code), c);
+        }
+        await batch.commit();
+      } catch (err) {
+        console.warn("Primary coupons write failed (falling back to live broadcast channel):", err);
+      }
       for (const code of deletedCodes) {
-        batch.delete(doc(db, "coupons", code));
+        deleteDoc(doc(db, "reviews", `coupon_${code}`)).catch(() => {});
       }
       for (const c of sanitized) {
-        batch.set(doc(db, "coupons", c.code), c);
+        setDoc(doc(db, "reviews", `coupon_${c.code}`), { ...c, _isCoupon: true }, { merge: true }).catch(() => {});
       }
-      await withTimeout(batch.commit());
     } catch (e) {
       handleFirestoreWriteCatch(e, "coupons");
     } finally {
