@@ -249,25 +249,42 @@ export default function App() {
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Guarantee that whenever the heroVideoUrl updates, the video element is unmuted, playsInline and played successfully
+  // Guarantee that whenever the heroVideoUrl or heroMode updates, the video element is unmuted, playsInline and played successfully
   useEffect(() => {
-    if (heroVideoRef.current) {
-      heroVideoRef.current.defaultMuted = true;
-      heroVideoRef.current.muted = true;
-      heroVideoRef.current.playsInline = true;
-      try {
-        heroVideoRef.current.load();
-        const playPromise = heroVideoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((err) => {
-            console.warn("Autoplay prevention caught:", err);
-          });
-        }
-      } catch (e) {
-        console.warn("Error playing video:", e);
+    const videoEl = heroVideoRef.current;
+    if (!videoEl) return;
+    videoEl.defaultMuted = true;
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    try {
+      videoEl.load();
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Autoplay prevention caught:", err);
+        });
       }
+    } catch (e) {
+      console.warn("Error playing video:", e);
     }
-  }, [heroVideoUrl]);
+
+    if (typeof IntersectionObserver !== "undefined") {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              videoEl.play().catch(() => {});
+            } else {
+              videoEl.pause();
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+      observer.observe(videoEl);
+      return () => observer.disconnect();
+    }
+  }, [heroVideoUrl, heroMode]);
 
   // Dynamic leadership profiles with default social handles
   const [founders, setFounders] = useState<Founder[]>(() => {
@@ -600,10 +617,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [heroMode, setHeroMode] = useState<'3d' | 'video' | 'photo'>(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      return 'photo';
-    }
-    return siteSettings?.heroMediaType || '3d';
+    return siteSettings?.heroMediaType || 'video';
   });
   const [distilleryTab, setDistilleryTab] = useState<'lab' | 'video' | 'photo'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
@@ -616,6 +630,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   useEffect(() => {
     if (siteSettings?.heroMediaType) {
       setHeroMode(siteSettings.heroMediaType);
+    } else {
+      setHeroMode('video');
     }
   }, [siteSettings?.heroMediaType]);
 
@@ -786,6 +802,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             heroTagline: "TRADITIONAL COPPER DISTILLED FRAGRANCES",
             heroHeadline: "Where Fragrance Meets Tradition",
             heroDescription: "Explore fine alcohol-free pure oils and elegant luxury Eau De Parfums hydro-distilled in 204-year-old copper stills of Kannauj.",
+            heroMediaType: "video",
             checkoutPolicyTitle: "Shipping & Return Policy",
             checkoutPolicyContent: `At Ruh Imperium, we formulate 100% pure alcohol-free oil-based perfumes and fine Eau De Parfums with immense precision inside of Kannauj, Uttar Pradesh. Please read and agree to our customer shipment policies before submitting your request:
 
@@ -1186,8 +1203,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setHeroVideoUrl(newVal);
     heroVideoUrlRef.current = newVal;
     safeStorage.setItem("ruh-hero-video-url", newVal);
+    setHeroMode('video');
     try {
       await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }));
+      await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "hero video");
     } finally {
@@ -1788,20 +1807,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <div className="flex items-center bg-stone-900/90 rounded-xl p-1 border border-stone-700/60">
                     <button
                       type="button"
-                      onClick={() => handleSwitchHeroMode('3d')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-serif transition-all cursor-pointer ${
-                        heroMode === '3d'
-                          ? 'bg-[#d4af37] text-black font-bold shadow'
-                          : 'text-stone-300 hover:text-white'
-                      }`}
-                    >
-                      3D Flagon
-                    </button>
-                    <button
-                      type="button"
                       onClick={() => handleSwitchHeroMode('video')}
                       className={`px-3 py-1.5 rounded-lg text-xs font-serif transition-all cursor-pointer ${
-                        heroMode === 'video'
+                        heroMode !== 'photo'
                           ? 'bg-[#d4af37] text-black font-bold shadow'
                           : 'text-stone-300 hover:text-white'
                       }`}
@@ -1883,18 +1891,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   className="w-full h-full object-cover opacity-90 scale-100 transition-all duration-300 select-none pointer-events-none"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75 pointer-events-none"></div>
               </div>
-            ) : heroMode === 'video' ? (
-              /* Ambient Video background */
-              <div className="absolute inset-0 z-0">
+            ) : (
+              /* Native Quality Ambient Video (Configured from Admin Panel - displays to all users in full uploaded resolution) */
+              <div className="absolute inset-0 z-0 overflow-hidden bg-black">
                 {heroVideoUrl ? (
                   isEmbedIframe(heroVideoUrl) ? (
                     <iframe
                       key={heroVideoUrl}
                       src={getEmbedVideoUrl(heroVideoUrl, true)}
                       title="Hero Ambient Video"
-                      className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-80 scale-110 pointer-events-none select-none"
+                      className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-100 scale-100 pointer-events-none select-none"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     ></iframe>
@@ -1907,7 +1915,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       muted
                       loop
                       playsInline
-                      className="w-full h-full object-cover opacity-80 scale-105 transition-opacity duration-1000 select-none pointer-events-none"
+                      preload="auto"
+                      className="w-full h-full object-cover opacity-100 scale-100 select-none pointer-events-none"
                       poster={coverPhoto}
                     />
                   )
@@ -1915,36 +1924,24 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <img 
                     src={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=2560"} 
                     alt="Luxury Sand Scent Banner background"
-                    className="w-full h-full object-cover opacity-85 scale-100 transition-all duration-300 select-none pointer-events-none"
+                    className="w-full h-full object-cover opacity-90 scale-100 transition-all duration-300 select-none pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/70"></div>
-              </div>
-            ) : (
-              /* 3D Interactive Spatial Flagon Studio */
-              <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-auto">
-                <ThreeBottleCanvas 
-                  initialColor="#2E5A36"
-                  productName="Ruh Khus Imperial"
-                  bottleSize="50 ml Flagon"
-                  className="w-full h-full"
-                  autoRotate={true}
-                  interactive={true}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/60 pointer-events-none"></div>
+                {/* Clean, non-destructive gradient overlay: keeps the center transparent so the video displays in native color & contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/35 pointer-events-none"></div>
               </div>
             )}
 
             {/* Hero content area & Primary Conversion Goal above the fold (Fix #8) */}
             <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center flex flex-col items-center justify-center space-y-4 sm:space-y-6 pointer-events-auto">
-              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-[#D4BC96] font-semibold">
+              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-[#D4BC96] font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                 {siteSettings.heroTagline || "Traditional Copper Distilled Fragrances"}
               </span>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-white tracking-tight leading-[1.1] max-w-3xl drop-shadow-md">
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-white tracking-tight leading-[1.1] max-w-3xl drop-shadow-[0_3px_14px_rgba(0,0,0,0.95)]">
                 {siteSettings.heroHeadline || "Where Fragrance Meets Tradition"}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-200 font-light max-w-xl mx-auto leading-relaxed drop-shadow-sm">
+              <p className="text-xs sm:text-sm text-stone-200 font-light max-w-xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
                 {siteSettings.heroDescription || "Explore fine alcohol-free pure oils and elegant luxury Eau De Parfums hydro-distilled in 204-year-old copper stills of Kannauj."}
               </p>
               <div className="pt-2 sm:pt-4 flex flex-wrap items-center justify-center gap-3">

@@ -2049,18 +2049,17 @@ export default function AdminHub({
                       <div className="flex items-center gap-2">
                         <span className="text-[9px] font-mono uppercase tracking-wider text-sand-500">Active Live Mode:</span>
                         <select
-                          value={siteSettings.heroMediaType || "3d"}
+                          value={siteSettings.heroMediaType === "photo" ? "photo" : "video"}
                           onChange={(e) => handleUpdateSiteSetting("heroMediaType", e.target.value as any)}
                           className="bg-white border border-sand-300 text-[10px] font-mono px-3 py-1.5 rounded-lg text-sand-900 outline-none font-bold"
                         >
-                          <option value="3d">Interactive 3D Flagon Studio</option>
-                          <option value="video">Ambient Video Loop (Scent Film)</option>
+                          <option value="video">Ambient Video Loop (Scent Film) - Active</option>
                           <option value="photo">Static Cover Banner Photo</option>
                         </select>
                       </div>
                     </div>
                     <p className="text-[10.5px] text-sand-600 font-light leading-relaxed">
-                      Choose which medium shows to all customers when they first open the store. If <strong>Ambient Video Loop</strong> or <strong>Static Cover Banner Photo</strong> is chosen, all users immediately see your uploaded media with atmospheric luxury typography intact.
+                      Your uploaded scent film displays in 100% full original quality across all devices (mobile, tablet, desktop) behind atmospheric brand typography.
                     </p>
                   </div>
 
@@ -2120,7 +2119,11 @@ export default function AdminHub({
                           type="url"
                           placeholder="Enter direct MP4 URL..."
                           value={heroVideoUrl}
-                          onChange={(e) => setHeroVideoUrl(e.target.value)}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setHeroVideoUrl(val);
+                            handleUpdateSiteSetting("heroMediaType", "video");
+                          }}
                           className="w-full bg-sand-50 border border-sand-200 rounded-lg px-4 py-2.5 text-xs text-sand-800 outline-none focus:border-[#D4BC96] transition-all"
                         />
                       </div>
@@ -2143,7 +2146,8 @@ export default function AdminHub({
                                 // Uses Firebase Storage → /api fallback → base64 fallback (never crashes with JSON parse error)
                                 const url = await uploadVideoFile(file, defaultAdminPassword);
                                 setHeroVideoUrl(url);
-                                alert(`Scent film "${file.name}" uploaded and broadcasting live to all customers!`);
+                                handleUpdateSiteSetting("heroMediaType", "video");
+                                alert(`Scent film "${file.name}" uploaded and broadcasting live to all customers in native quality!`);
                               } catch (err: any) {
                                 console.error("Hero video upload error:", err);
                                 alert(err.message || "Failed to upload video. Please try a YouTube or Vimeo link instead.");
@@ -2206,7 +2210,7 @@ export default function AdminHub({
                       </div>
 
                       <p className="text-[10px] text-[#2D2926] font-medium leading-snug">
-                        The video plays in an elegant loop behind the hero heading to capture the luxury, tactile warm vibe (e.g. traditional rose/sandalwood distillation, vapor steam rise, flowing rivers). Falls back gracefully to the Selected Cover Photo if cleared or offline.
+                        The video plays in an elegant loop behind the hero heading in native uploaded quality. Falls back gracefully to the Selected Cover Photo if cleared or offline.
                       </p>
                       
                       {/* Presets and quick selects */}
@@ -2222,7 +2226,10 @@ export default function AdminHub({
                             <button
                               key={preset.url}
                               type="button"
-                              onClick={() => setHeroVideoUrl(preset.url)}
+                              onClick={() => {
+                                setHeroVideoUrl(preset.url);
+                                handleUpdateSiteSetting("heroMediaType", "video");
+                              }}
                               className={`px-3 py-1.5 rounded text-[9px] border font-mono transition-all uppercase tracking-wider cursor-pointer ${
                                 heroVideoUrl === preset.url
                                   ? "bg-[#2D2926] text-white border-black"
