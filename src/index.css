@@ -161,17 +161,51 @@
     max-width: 100%;
     overflow-x: hidden;
     position: relative;
+    /* Prevent overscroll bounce on iOS that can make page feel broken */
+    overscroll-behavior-x: none;
   }
   body {
     background-color: var(--color-sand-50);
     color: var(--color-sand-900);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    /* Remove tap flash on Android Chrome */
+    -webkit-tap-highlight-color: transparent;
+    /* Safe-area padding for iPhone notch / home bar */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
   #root {
     max-width: 100vw;
     overflow-x: hidden;
   }
+
+  /* Fluid images — never break their container */
+  img, video, iframe, canvas {
+    max-width: 100%;
+  }
+
+  /* Minimum 44×44 px tap targets for buttons and links */
+  button, [role="button"], a {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  /* Exception: decorative / icon-only elements inside larger click areas */
+  button svg, a svg { pointer-events: none; }
+
+  /* Respect reduced-motion — disable all animations & transitions */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Safe-area bottom padding for fixed bottom bars (checkout, cart) */
+  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .mb-safe { margin-bottom: env(safe-area-inset-bottom); }
 }
 
 /* Custom gorgeous thin scrollbar of luxury */
@@ -447,4 +481,149 @@
   .hiw-step__title {
     font-size: 22px;
   }
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE FIXES
+   ========================================================================== */
+
+/* ── Hero section: safe min-height on tiny phones ── */
+@media (max-width: 374px) {
+  #hero-section {
+    min-height: 88svh;
+    border-radius: 16px !important;
+  }
+  .p-2.sm\:p-3 {
+    padding: 6px !important;
+  }
+}
+
+/* ── Prevent horizontal overflow from .animate-marquee children ── */
+.animate-marquee-wrapper {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* ── hiw-step: single column on all phones ── */
+@media (max-width: 767px) {
+  .hiw-step {
+    grid-template-columns: 1fr !important;
+  }
+  .hiw-compact__inner {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+  }
+  .hiw-compact__left {
+    position: relative !important;
+    top: auto !important;
+  }
+  .hiw-step__media {
+    height: 200px !important;
+    min-height: unset !important;
+  }
+  .hiw-step__content {
+    padding: 20px 16px !important;
+  }
+}
+
+/* ── Product grid: ensure 2 columns minimum down to 320px ── */
+@media (max-width: 374px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}
+
+/* ── Modal: full-screen on phones ── */
+@media (max-width: 767px) {
+  /* Product Details modal */
+  [id^="product-modal-"] {
+    border-radius: 16px !important;
+    margin: 0 !important;
+    max-height: 95dvh !important;
+  }
+
+  /* Cart Drawer: full-width slide-in */
+  .cart-drawer-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* ── Cart / Checkout sticky footer CTA ── */
+.cart-sticky-footer {
+  position: sticky;
+  bottom: 0;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  background: white;
+}
+
+/* ── Touch-friendly qty steppers: 44px minimum ── */
+.qty-stepper button {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+/* ── Category Slider: prevent horizontal page overflow ── */
+#category-slider-section {
+  max-width: 100vw;
+  overflow: hidden;
+}
+#category-slider-section .relative {
+  overflow: hidden;
+}
+/* let the inner scroller overflow horizontally — it uses scrollbar-none */
+#category-slider-section [role="region"] {
+  overflow-x: auto !important;
+  overflow-y: hidden;
+}
+
+/* ── Shop-by-Notes cards: full-width on smallest phones ── */
+@media (max-width: 480px) {
+  #shop-by-notes-section .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Sticky shelf tab bar: ensure it doesn't cover the header on short viewports ── */
+@media (max-height: 600px) {
+  .sticky.top-16 { position: static !important; }
+}
+
+/* ── ThreeDistilleryLab: hide 3D canvas on small phones, show video/photo fallback ── */
+@media (max-width: 374px) {
+  #distillery-lab-section canvas {
+    max-height: 260px !important;
+  }
+}
+
+/* ── Smooth scrolling (only when motion is OK) ── */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* ── Landscape orientation fixes ── */
+@media (orientation: landscape) and (max-height: 500px) {
+  #hero-section {
+    min-height: 100svw !important; /* rotate the axis */
+  }
+  .hiw-step-wrapper:nth-child(1),
+  .hiw-step-wrapper:nth-child(2),
+  .hiw-step-wrapper:nth-child(3) {
+    position: relative !important;
+    top: auto !important;
+  }
+}
+
+/* ── Focus-visible ring for keyboard / switch navigation ── */
+:focus-visible {
+  outline: 2px solid var(--clr-primary, #19a24b);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
 }

@@ -346,8 +346,8 @@ export default function CartDrawer({
       {/* Click outside backdrop close toggle */}
       <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
 
-      {/* Cart Container Drawer */}
-      <div className="relative w-full max-w-[400px] bg-white h-full p-5 shadow-2xl flex flex-col justify-between overflow-y-auto">
+      {/* Cart Container Drawer — full-width on phones, max-[400px] on sm+ */}
+      <div className="cart-drawer-panel relative w-full sm:max-w-[400px] bg-white h-full p-4 sm:p-5 shadow-2xl flex flex-col justify-between overflow-y-auto" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
         
         {/* Header section */}
         <div className="flex items-center justify-between pb-4 mb-4">

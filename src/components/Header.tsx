@@ -248,9 +248,9 @@ export default function Header({
                 <Search className="w-5 h-5 stroke-[1.5]" />
               </button>
               
-              {/* Sliding Luxury Search Bar */}
+              {/* Sliding Luxury Search Bar — full-width on mobile to prevent off-screen overflow */}
               {searchOpen && (
-                <div className="absolute right-8 top-1/2 -translate-y-1/2 bg-white border border-stone-200 rounded-full px-4 py-1.5 flex items-center shadow-md w-64 sm:w-72 z-40 animate-fade-in">
+                <div className="absolute left-0 sm:left-auto sm:right-8 right-0 top-full sm:top-1/2 sm:-translate-y-1/2 bg-white border border-stone-200 rounded-none sm:rounded-full px-4 py-2.5 sm:py-1.5 flex items-center shadow-md sm:w-72 z-40 animate-fade-in">
                   <input
                     type="text"
                     placeholder="Search notes, ingredients, attars..."
@@ -259,7 +259,8 @@ export default function Header({
                       if (setSearchQuery) setSearchQuery(e.target.value);
                       onNavigate("shop");
                     }}
-                    className="bg-transparent text-xs text-stone-800 focus:outline-none w-full placeholder-stone-400 font-light"
+                    className="bg-transparent text-sm sm:text-xs text-stone-800 focus:outline-none w-full placeholder-stone-400 font-light"
+                    style={{ fontSize: '16px' }}
                     autoFocus
                   />
                   <button 
@@ -489,11 +490,11 @@ export default function Header({
 
       {/* LUXURY INTERACTIVE BULK ENQUIRY FORM MODAL */}
       {bulkEnquiryOpen && (
-        <div className="fixed inset-0 bg-stone-950/70 backdrop-blur-md z-[99999] flex items-center justify-center p-4">
-          <div className="bg-white max-w-xl w-full rounded-2xl overflow-hidden shadow-2xl border border-stone-100 animate-scale-up relative">
+        <div className="fixed inset-0 bg-stone-950/70 backdrop-blur-md z-[99999] flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white max-w-xl w-full rounded-2xl overflow-hidden shadow-2xl border border-stone-100 animate-scale-up relative max-h-[92vh] flex flex-col my-auto">
             
             {/* Header segment with handdrawn feel */}
-            <div className="bg-[#1C1917] p-6 text-[#FAFAFA] relative">
+            <div className="bg-[#1C1917] p-5 sm:p-6 text-[#FAFAFA] relative shrink-0">
               <button
                 type="button"
                 onClick={() => setBulkEnquiryOpen(false)}
@@ -502,7 +503,7 @@ export default function Header({
                 <X className="w-5 h-5 stroke-[1.25]" />
               </button>
               <p className="text-[9px] uppercase tracking-[0.25em] text-gold-400 font-semibold mb-1">Catering & Corporate Bespoke Commissioning</p>
-              <h3 className="text-2xl font-serif tracking-wide" style={{ fontFamily: "Cinzel, Georgia, serif" }}>Ruh Imperium Bulk Inquiry</h3>
+              <h3 className="text-xl sm:text-2xl font-serif tracking-wide" style={{ fontFamily: "Cinzel, Georgia, serif" }}>Ruh Imperium Bulk Inquiry</h3>
               <p className="text-xs text-stone-300 font-light mt-1.5 leading-relaxed">
                 Connect with our head nose to craft signature Wedding Favors, Corporate Monographed Chests, or Custom Compound Gifting Suites.
               </p>
@@ -510,7 +511,7 @@ export default function Header({
 
             {/* Inner Content */}
             {bulkSubmitted ? (
-              <div className="p-8 text-center text-stone-800 flex flex-col items-center justify-center space-y-4">
+              <div className="p-6 sm:p-8 text-center text-stone-800 flex flex-col items-center justify-center space-y-4 overflow-y-auto">
                 <CheckCircle className="w-14 h-14 text-emerald-500" />
                 <h4 className="text-xl font-serif">Inquiry Lodged at Royal Registry</h4>
                 <p className="text-xs text-stone-500 font-light max-w-md mx-auto leading-relaxed">
@@ -521,8 +522,8 @@ export default function Header({
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleBulkSubmit} className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleBulkSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Your Full Name *</label>
                     <input
@@ -547,7 +548,7 @@ export default function Header({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Telephone Number *</label>
                     <input
@@ -571,7 +572,7 @@ export default function Header({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Inquiry Category</label>
                     <select

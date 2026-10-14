@@ -42,7 +42,7 @@ export const Logo: FC<LogoProps> = ({
     ? "text-4xl sm:text-6xl tracking-[0.3em] font-medium" 
     : isFooter 
     ? "text-2xl tracking-[0.25em]" 
-    : "text-lg sm:text-xl md:text-2xl tracking-[0.25em]";
+    : "text-xs sm:text-lg md:text-xl lg:text-2xl tracking-[0.14em] sm:tracking-[0.25em] whitespace-nowrap";
 
   return (
     <div 

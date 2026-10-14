@@ -107,9 +107,9 @@ export default function ProductDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D0B0A]/75 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center sm:p-4 bg-[#0D0B0A]/75 backdrop-blur-sm overflow-y-auto">
       <div 
-        className="relative w-full max-w-5xl bg-sand-50 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden my-8 max-h-[90vh] md:max-h-none overflow-y-auto"
+        className="relative w-full max-w-5xl bg-sand-50 rounded-none sm:rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden sm:my-8 min-h-screen sm:min-h-0 sm:max-h-[90vh] md:max-h-[88vh] overflow-y-auto"
         id={`product-modal-${product.id}`}
       >
         {/* Close Button top-right */}
@@ -123,7 +123,7 @@ export default function ProductDetailsModal({
         </button>
 
         {/* Left Side: Dynamic Fragrance Visuals (LHS - 5 cols equivalent on desktop) */}
-        <div className="md:w-5/12 bg-sand-100 p-6 sm:p-10 flex flex-col justify-between border-b md:border-b-0 md:border-r border-sand-200">
+        <div className="md:w-5/12 bg-sand-100 p-4 sm:p-6 md:p-10 flex flex-col justify-between border-b md:border-b-0 md:border-r border-sand-200">
           <div>
             <div className="flex items-center space-x-1.5 text-[9.5px] uppercase tracking-widest text-[#D4BC96] font-semibold mb-3">
               <Award className="w-3.5 h-3.5" />

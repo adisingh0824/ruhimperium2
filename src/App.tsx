@@ -1949,7 +1949,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             >
               <img 
                 src={siteSettings.activeAdBannerImg} 
-                alt="Promotion" 
+                loading="lazy" decoding="async" alt="Promotion" 
                 className="w-full h-auto max-h-[360px] object-cover" 
               />
             </a>
@@ -2590,7 +2590,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               ) : distilleryTab === 'photo' ? (
                 <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-sand-200 max-w-4xl mx-auto bg-stone-900 animate-fade-in group">
                   <img 
-                    src={siteSettings.distilleryPhotoUrl || siteSettings.distilleryVideoPoster || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"} 
+                    loading="lazy" decoding="async" src={siteSettings.distilleryPhotoUrl || siteSettings.distilleryVideoPoster || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"} 
                     alt="Ruh Imperium Heritage Distillery in Kannauj" 
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 select-none"
                     referrerPolicy="no-referrer"
@@ -2763,7 +2763,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                   <div className="hiw-step__media">
                     <img 
-                      src={siteSettings.story01Image || "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900"} 
+                      loading="lazy" decoding="async" src={siteSettings.story01Image || "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900"} 
                       alt="The Art Of Perfume Making" 
                       className="hiw-step__img"
                       referrerPolicy="no-referrer"
@@ -2793,7 +2793,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                   <div className="hiw-step__media">
                     <img 
-                      src={siteSettings.story02Image || "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900"} 
+                      loading="lazy" decoding="async" src={siteSettings.story02Image || "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900"} 
                       alt="Experience True Botanical Luxury" 
                       className="hiw-step__img"
                       referrerPolicy="no-referrer"
@@ -2823,7 +2823,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   </div>
                   <div className="hiw-step__media">
                     <img 
-                      src={siteSettings.story03Image || "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"} 
+                      loading="lazy" decoding="async" src={siteSettings.story03Image || "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"} 
                       alt="Our Story" 
                       className="hiw-step__img"
                       referrerPolicy="no-referrer"
@@ -3295,7 +3295,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             {/* Left Column: Khus Attar Image Card */}
             <div className="lg:col-span-3 aspect-[4/3] max-h-[260px] rounded-2xl overflow-hidden relative border border-white/10 group shadow-lg self-center">
               <img 
-                src={siteSettings.footerImage || "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=600"} 
+                loading="lazy" decoding="async" src={siteSettings.footerImage || "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=600"} 
                 alt="Khus Botanical Attar Sourcing" 
                 className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105 select-none pointer-events-none"
                 referrerPolicy="no-referrer"
