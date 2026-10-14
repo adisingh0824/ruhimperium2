@@ -284,7 +284,7 @@ export default function App() {
       observer.observe(videoEl);
       return () => observer.disconnect();
     }
-  }, [heroVideoUrl, heroMode]);
+  }, [heroVideoUrl]);
 
   // Dynamic leadership profiles with default social handles
   const [founders, setFounders] = useState<Founder[]>(() => {
