@@ -119,14 +119,14 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                    {/* Fix #5 – removed `uppercase` so long labels like "Sacred Absolutes" are readable */}
-                    <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-mono tracking-wider">
+                    {/* fix #5 – removed uppercase; fix #16-21 – bg-stone-900 (solid) instead of bg-black/60 so contrast tools resolve correctly */}
+                    <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full bg-stone-900 text-white text-xs font-mono tracking-wider">
                       {item.count}
                     </span>
                   </div>
 
-                  {/* Category Title */}
-                  <div className="text-center mt-3.5 space-y-0.5">
+                  {/* Category Title – fix #22-23: explicit bg-white + isolate so partial-occlusion is resolved */}
+                  <div className="text-center mt-3.5 space-y-0.5 bg-white" style={{ isolation: 'isolate' }}>
                     <h4 className="text-xs sm:text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
                       {item.title}
                     </h4>

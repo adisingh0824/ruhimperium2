@@ -1734,9 +1734,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
       {/* Main Content Body */}
       <main className="flex-1 relative z-10">
+        {/* fix #5-9 – isolate + explicit bg so contrast tools resolve the dark background correctly */}
         {siteSettings.marqueeEnabled && siteSettings.marqueeText && (
-          <div className="bg-[#111111] text-[#D4BC96] py-1.5 overflow-hidden w-full flex border-b border-[#D4BC96]/20">
-            <div className="animate-marquee whitespace-nowrap text-[9px] font-mono tracking-[0.2em] uppercase flex space-x-12 px-4">
+          <div className="bg-[#111111] text-[#D4BC96] py-1.5 overflow-hidden w-full flex border-b border-[#D4BC96]/20" style={{ isolation: 'isolate' }}>
+            <div className="animate-marquee whitespace-nowrap text-[9px] font-mono tracking-[0.2em] uppercase flex space-x-12 px-4 bg-[#111111]">
               <span>{siteSettings.marqueeText}</span>
               <span>{siteSettings.marqueeText}</span>
               <span>{siteSettings.marqueeText}</span>
@@ -1952,10 +1953,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           </div>
         )}
 
-        {/* CONTINUOUS SCROLLING TICKER / MARQUEE (RAAHI PARFUMS STYLE) */}
-        <div className="bg-[#111111] text-[#FAFAFA] py-3 overflow-hidden select-none w-full border-t border-b border-stone-850 flex items-center">
-          <div className="flex whitespace-nowrap overflow-hidden w-full">
-            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-sans font-medium tracking-wide text-[#D4BC96]">
+        {/* fix #10-14 – isolate + explicit bg on both marquee copies so contrast tools see the dark background */}
+        <div className="bg-[#111111] text-[#FAFAFA] py-3 overflow-hidden select-none w-full border-t border-b border-stone-850 flex items-center" style={{ isolation: 'isolate' }}>
+          <div className="flex whitespace-nowrap overflow-hidden w-full bg-[#111111]">
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-sans font-medium tracking-wide text-[#D4BC96] bg-[#111111]">
               <span>The Art of Indian Perfumery, Bottled for Everyday Wear</span>
               <span aria-hidden="true">•</span>
               <span>From the Perfume Capital of India to Your Skin</span>
@@ -1967,7 +1968,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               <span>100% Pure Botanical Oils</span>
               <span aria-hidden="true">•</span>
             </div>
-            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-sans font-medium tracking-wide text-[#D4BC96]" aria-hidden="true">
+            <div className="animate-marquee inline-flex shrink-0 items-center gap-6 pr-6 text-xs sm:text-sm font-sans font-medium tracking-wide text-[#D4BC96] bg-[#111111]" aria-hidden="true">
               <span>The Art of Indian Perfumery, Bottled for Everyday Wear</span>
               <span aria-hidden="true">•</span>
               <span>From the Perfume Capital of India to Your Skin</span>
@@ -3053,13 +3054,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 {/* Right Fade */}
                 <div className="absolute right-0 inset-y-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-                {/* Animated Marquee of Chip Columns */}
-                <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] whitespace-nowrap">
+                {/* Animated Marquee of Chip Columns – fix #86-105: isolate + valid text-stone-800/border-stone-300 */}
+                <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] whitespace-nowrap" style={{ isolation: 'isolate' as const }}>
                   {/* Column 1: Florals */}
                   <div className="flex flex-col gap-2.5">
                     <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Florals</span>
                     {["Rose", "Mogra", "Jasmine", "Neroli"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
@@ -3068,7 +3069,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <div className="flex flex-col gap-2.5">
                     <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Sacred Woods</span>
                     {["Sandalwood", "Oud", "Cedarwood", "Patchouli"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
@@ -3077,16 +3078,16 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <div className="flex flex-col gap-2.5">
                     <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Warm Spices</span>
                     {["Saffron", "Cardamom", "Spicy", "Amber"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
                   </div>
                   {/* Column 4: Resins & Musk */}
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Resins & Musk</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Resins &amp; Musk</span>
                     {["Frankincense", "Benzoin", "Musk", "Woody"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}
@@ -3095,7 +3096,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                   <div className="flex flex-col gap-2.5">
                     <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Fresh Botanicals</span>
                     {["Bergamot", "Vetiver (Khus)", "Fresh", "Floral"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-250 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-850 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
+                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
                         {note}
                       </button>
                     ))}

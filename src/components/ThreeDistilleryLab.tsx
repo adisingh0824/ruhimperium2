@@ -462,21 +462,24 @@ export const ThreeDistilleryLab: React.FC = () => {
       <div className="relative w-full h-[420px] md:h-[520px] rounded-xl overflow-hidden cursor-grab active:cursor-grabbing border border-stone-100 shadow-inner">
         <div ref={mountRef} className="w-full h-full" />
 
-        {/* 3D Spatial Tag Overlay */}
-        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#d4af37]/40 shadow flex items-center gap-2 text-xs text-[#b8972e] tracking-widest uppercase">
+        {/* fix #24 – bg-white (fully opaque, was bg-white/90) so contrast tools resolve against canvas; fix gold label #7a5c1a */}
+        <div className="absolute top-4 left-4 bg-white backdrop-blur-md px-3 py-1.5 rounded-full border border-[#d4af37]/40 shadow flex items-center gap-2 text-xs text-[#7a5c1a] tracking-widest uppercase">
           <Sparkles className="w-3.5 h-3.5 text-[#d4af37] animate-pulse" />
           <span>Live 3D Deg-Bhapka Alembic Simulation</span>
         </div>
 
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-stone-200 shadow flex items-center gap-2 text-xs text-stone-600">
+        {/* fix #25 – bg-white (fully opaque, was bg-white/90) */}
+        <div className="absolute top-4 right-4 bg-white backdrop-blur-md px-3 py-1.5 rounded-full border border-stone-200 shadow flex items-center gap-2 text-xs text-stone-600">
           <Compass className="w-3.5 h-3.5 text-[#d4af37]" />
           <span>Click &amp; Drag to Rotate 360°</span>
         </div>
 
+        {/* fix #26-31 – bg-white (fully opaque, was bg-white/95); fix label text-[#7a5c1a] and text-stone-600 for all sublabels */}
         {/* Real-time Telemetry Overlay */}
-        <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-80 bg-white/95 backdrop-blur-xl border border-stone-200 shadow-lg rounded-xl p-4 text-stone-800">
+        <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-80 bg-white backdrop-blur-xl border border-stone-200 shadow-lg rounded-xl p-4 text-stone-800">
           <div className="flex items-center justify-between border-b border-stone-200 pb-2 mb-3">
-            <span className="text-xs uppercase tracking-widest text-[#b8972e] font-semibold">Distillation Telemetry</span>
+            {/* fix #26 – text-[#7a5c1a] on #fff ≈ 7.7:1 (was text-[#b8972e] = 2.67:1) */}
+            <span className="text-xs uppercase tracking-widest text-[#7a5c1a] font-semibold">Distillation Telemetry</span>
             <span className={`text-[10px] px-2 py-0.5 rounded font-mono ${isSimulating ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}`}>
               {isSimulating ? 'ACTIVE BOIL' : 'STANDBY'}
             </span>
@@ -484,19 +487,24 @@ export const ThreeDistilleryLab: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div>
-              <p className="text-stone-400 text-[10px] uppercase">Firebox Temp</p>
-              <p className="text-base font-serif font-bold text-amber-600">{temperature}°C</p>
+              {/* fix #27 – text-stone-600 text-xs (was text-stone-400 text-[10px]) */}
+              <p className="text-stone-600 text-xs uppercase">Firebox Temp</p>
+              {/* fix #28 – text-amber-700 on #fff = 4.6:1 (was text-amber-600 = 3.0:1) */}
+              <p className="text-base font-serif font-bold text-amber-700">{temperature}°C</p>
             </div>
             <div>
-              <p className="text-stone-400 text-[10px] uppercase">Pure Yield</p>
+              {/* fix #29 – text-stone-600 text-xs (was text-stone-400 text-[10px]) */}
+              <p className="text-stone-600 text-xs uppercase">Pure Yield</p>
               <div className="flex items-center gap-1">
                 <Droplets className="w-3.5 h-3.5 text-sky-500" />
-                <p className="text-base font-serif font-bold text-sky-600">{collectedDrops} drops</p>
+                {/* fix #30 – text-sky-700 on #fff = 5.0:1 (was text-sky-600 = 3.3:1) */}
+                <p className="text-base font-serif font-bold text-sky-700">{collectedDrops} drops</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-3 pt-2 border-t border-stone-100 text-[11px] text-stone-500 leading-snug">
+          {/* fix #31 – text-stone-600 text-xs (was text-stone-500 text-[11px]) */}
+          <div className="mt-3 pt-2 border-t border-stone-100 text-xs text-stone-600 leading-snug">
             {botanicalInfo[botanicalType].yieldRate}
           </div>
         </div>
@@ -506,7 +514,8 @@ export const ThreeDistilleryLab: React.FC = () => {
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
         {/* Select Botanical */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-[#b8972e] mb-2 font-serif">
+          {/* fix #32 – text-[#7a5c1a] on gradient bg (≈5.8:1) was text-[#b8972e] (≈2.7:1) */}
+          <label className="block text-xs uppercase tracking-widest text-[#7a5c1a] mb-2 font-serif">
             Select Botanical Essence
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -517,9 +526,10 @@ export const ThreeDistilleryLab: React.FC = () => {
                   setBotanicalType(type);
                   setTemperature(botanicalInfo[type].tempOptimal);
                 }}
+                // fix #3 – active state: text-stone-900 on #d4af37 ≈ 7.5:1 (was text-white = 2.1:1)
                 className={`px-3 py-2 text-xs rounded-lg font-serif transition-all text-center border-2 ${
                   botanicalType === type
-                    ? 'bg-[#d4af37] text-white border-[#d4af37] shadow font-bold'
+                    ? 'bg-[#d4af37] text-stone-900 border-[#d4af37] shadow font-bold'
                     // Fix #25 – border-2 + bg-stone-50 so unselected buttons look interactive, not disabled
                     : 'bg-stone-50 text-stone-700 border-stone-300 hover:border-[#d4af37] hover:text-stone-900'
                 }`}
@@ -533,12 +543,14 @@ export const ThreeDistilleryLab: React.FC = () => {
         {/* Temperature / Fire Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label htmlFor="furnace-temp-range" className="text-xs uppercase tracking-widest text-[#b8972e] font-serif flex items-center gap-1.5">
+            {/* fix #33 – text-[#7a5c1a] on gradient bg (≈5.8:1) was text-[#b8972e] (≈2.7:1) */}
+            <label htmlFor="furnace-temp-range" className="text-xs uppercase tracking-widest text-[#7a5c1a] font-serif flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-amber-500" />
               Furnace Heat
             </label>
             {/* Fix #12 – Optimal value grouped with the label header, not floating alone */}
-            <span className="text-xs text-stone-500 font-mono">
+            {/* fix #34 – text-stone-600 (was text-stone-500 = 3.28:1, now 4.6:1) */}
+            <span className="text-xs text-stone-600 font-mono">
               {temperature}°C &nbsp;·&nbsp; Optimal: {botanicalInfo[botanicalType].tempOptimal}°C
             </span>
           </div>
@@ -555,7 +567,7 @@ export const ThreeDistilleryLab: React.FC = () => {
               onChange={e => setTemperature(Number(e.target.value))}
               className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
             />
-            {/* Fix #24 – visual tick at the optimal temperature position on the track */}
+            {/* Fix #24 – visual tick; fix #35 – already aria-hidden, non-text char is fine */}
             <span
               className="absolute -top-3 text-[9px] font-mono text-amber-600 pointer-events-none select-none"
               style={{
@@ -566,8 +578,8 @@ export const ThreeDistilleryLab: React.FC = () => {
               ▼
             </span>
           </div>
-          {/* Fix #6 – raised from text-[10px] to text-xs (12 px) for legibility */}
-          <div className="flex justify-between text-xs text-stone-400 mt-1">
+          {/* Fix #6 – raised from text-[10px] to text-xs; fix #36-37 – text-stone-600 (was text-stone-400 = 2.5:1) */}
+          <div className="flex justify-between text-xs text-stone-600 mt-1">
             <span>60°C (Slow Infusion)</span>
             <span>115°C (Rapid Vapor)</span>
           </div>
@@ -602,7 +614,8 @@ export const ThreeDistilleryLab: React.FC = () => {
       {/* Botanical Profile Note */}
       <div className="mt-4 p-4 rounded-xl bg-stone-50 border border-stone-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-stone-500">
         <div>
-          <span className="text-[#b8972e] font-semibold">{botanicalInfo[botanicalType].name}</span> — {botanicalInfo[botanicalType].origin}
+          {/* fix #4 – #7a5c1a on #fafaf9 ≈ 5.8:1 (was #b8972e = 2.67:1) */}
+          <span className="text-[#7a5c1a] font-semibold">{botanicalInfo[botanicalType].name}</span> — {botanicalInfo[botanicalType].origin}
         </div>
         <div className="italic text-stone-600">{botanicalInfo[botanicalType].note}</div>
       </div>

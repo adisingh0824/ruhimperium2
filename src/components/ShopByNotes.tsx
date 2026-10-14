@@ -11,7 +11,8 @@ export const AROMA_NOTES = [
     name: "Floral",
     icon: Flower2,
     description: "Soft, romantic, and graceful. Floral notes capture the beauty of blooming petals—Kannauj Rose, Royal Mogra, and Jasmine—for timeless elegance.",
-    gradient: "from-rose-50/80 to-pink-50/40",
+    /* fix #38-45 – removed /80 and /40 opacity so axe resolves a solid background for contrast checks */
+    gradient: "from-rose-50 to-pink-50",
     border: "hover:border-rose-300",
     badge: "text-rose-700 bg-rose-50",
     sampleFragrances: "Gulab EDP, Mogra Attar, Aarzoo"
@@ -21,7 +22,8 @@ export const AROMA_NOTES = [
     name: "Woody",
     icon: Trees,
     description: "Deep, warm, and grounded. Woody compositions bring rich forest-inspired tones—Mysore Sandalwood, Himalayan Cedarwood, and Assam Dark Agarwood.",
-    gradient: "from-amber-50/80 to-stone-50/40",
+    /* fix #46-53 – removed /80 and /40 opacity */
+    gradient: "from-amber-50 to-stone-50",
     border: "hover:border-amber-300",
     badge: "text-amber-800 bg-amber-50",
     sampleFragrances: "Sandalwood Attar, Musafir EDP, Dahn al Oud"
@@ -31,7 +33,8 @@ export const AROMA_NOTES = [
     name: "Fresh",
     icon: Wind,
     description: "Crisp, clean, and uplifting. Fresh fragrances energize the senses with airy brightness, Italian bergamot, sea salt, and coastal desert winds.",
-    gradient: "from-sky-50/80 to-teal-50/40",
+    /* fix #54-61 – removed /80 and /40 opacity */
+    gradient: "from-sky-50 to-teal-50",
     border: "hover:border-sky-300",
     badge: "text-sky-800 bg-sky-50",
     sampleFragrances: "Safar EDP, Zara EDP, Forest Rush"
@@ -41,7 +44,8 @@ export const AROMA_NOTES = [
     name: "Musky",
     icon: Sparkles,
     description: "Smooth, sensual, and unforgettable. Musky notes add intimacy and mysterious warmth, leaving behind a magnetic trail that feels bold yet polished.",
-    gradient: "from-purple-50/80 to-stone-50/40",
+    /* fix #62-69 – removed /80 and /40 opacity */
+    gradient: "from-purple-50 to-stone-50",
     border: "hover:border-purple-300",
     badge: "text-purple-800 bg-purple-50",
     sampleFragrances: "Black Musk, Aarzoo Attar, Modern Musk"
@@ -51,7 +55,8 @@ export const AROMA_NOTES = [
     name: "Gourmand",
     icon: Coffee,
     description: "Delicious, creamy, and addictive. Gourmand scents blend sweet edible-inspired notes—wild Sidr mountain honey, golden caramel, and rich vanilla nectar.",
-    gradient: "from-orange-50/80 to-amber-50/40",
+    /* fix #70-77 – removed /80 and /40 opacity */
+    gradient: "from-orange-50 to-amber-50",
     border: "hover:border-orange-300",
     badge: "text-orange-800 bg-orange-50",
     sampleFragrances: "Musafir EDP, Safar EDP, Sweet Amber"
@@ -61,7 +66,8 @@ export const AROMA_NOTES = [
     name: "Oriental",
     icon: Flame,
     description: "Rich, opulent, and magnetic. Oriental blends unite precious Kashmiri saffron, warm amber, and exotic spices for a statement-making scent experience.",
-    gradient: "from-yellow-50/80 to-red-50/40",
+    /* fix #78-85 – removed /80 and /40 opacity */
+    gradient: "from-yellow-50 to-red-50",
     border: "hover:border-yellow-400",
     badge: "text-yellow-800 bg-yellow-50",
     sampleFragrances: "Saffron Attar (Kesar), Dahn al Oud, Raat ki Rani"
@@ -94,55 +100,58 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
             const isSelected = activeNote?.toLowerCase() === note.id.toLowerCase();
 
             return (
+              // fix #38-85 – isolation:isolate prevents the watermark icon from confusing axe's bg resolver
               <div
                 key={note.id}
                 onClick={() => onSelectNote(note.id)}
                 className={`group relative rounded-3xl p-8 border transition-all duration-400 cursor-pointer flex flex-col justify-between overflow-hidden bg-gradient-to-br ${note.gradient} ${
-                  isSelected 
-                    ? "border-[#19a24b] shadow-lg ring-2 ring-[#19a24b]/30" 
+                  isSelected
+                    ? "border-[#19a24b] shadow-lg ring-2 ring-[#19a24b]/30"
                     : `border-stone-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1.5 ${note.border}`
                 }`}
+                style={{ isolation: 'isolate' as const }}
               >
-                {/* Background watermarked floral/leaf icon */}
-                <Icon className="absolute -right-4 -bottom-4 w-32 h-32 opacity-5 text-stone-900 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+              {/* Background watermarked floral/leaf icon */}
+              <Icon className="absolute -right-4 -bottom-4 w-32 h-32 opacity-5 text-stone-900 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
 
-                <div className="relative z-10 space-y-4">
-                  {/* Icon Badge */}
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-stone-200/60 shadow-xs flex items-center justify-center text-stone-850 group-hover:scale-110 group-hover:bg-[#111111] group-hover:text-[#D4BC96] transition-all duration-300">
-                      <Icon className="w-5 h-5 stroke-[1.6]" />
-                    </div>
-                    <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full font-bold ${note.badge}`}>
-                      Note Family
-                    </span>
+              <div className="relative z-10 space-y-4">
+                {/* Icon Badge */}
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-stone-200/60 shadow-xs flex items-center justify-center text-stone-800 group-hover:scale-110 group-hover:bg-[#111111] group-hover:text-[#D4BC96] transition-all duration-300">
+                    <Icon className="w-5 h-5 stroke-[1.6]" />
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-2xl font-serif font-bold text-stone-900 tracking-tight group-hover:text-stone-950 transition-colors">
-                    {note.name}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-xs text-stone-600 font-light leading-relaxed">
-                    {note.description}
-                  </p>
-                </div>
-
-                {/* Footer preview */}
-                <div className="relative z-10 pt-5 mt-4 border-t border-stone-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                    <span className="text-xs uppercase font-mono tracking-wider text-stone-600 font-semibold mr-1">Notes:</span>
-                    {note.sampleFragrances.split(', ').map((frag) => (
-                      <span key={frag} className="px-2 py-0.5 rounded-md bg-white/90 border border-stone-300 text-stone-800 text-xs font-sans font-medium">
-                        {frag}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="text-xs font-semibold text-stone-900 group-hover:text-[#15803d] transition-colors inline-flex items-center gap-1 font-sans shrink-0 whitespace-nowrap">
-                    Explore Family <span className="group-hover:translate-x-1 transition-transform inline-block" aria-hidden="true">→</span>
+                  <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full font-bold ${note.badge}`}>
+                    Note Family
                   </span>
                 </div>
+
+                {/* Title */}
+                <h3 className="text-2xl font-serif font-bold text-stone-900 tracking-tight group-hover:text-stone-950 transition-colors">
+                  {note.name}
+                </h3>
+
+                {/* Description */}
+                <p className="text-xs text-stone-600 font-light leading-relaxed">
+                  {note.description}
+                </p>
               </div>
+
+              {/* Footer preview */}
+              <div className="relative z-10 pt-5 mt-4 border-t border-stone-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                  <span className="text-xs uppercase font-mono tracking-wider text-stone-600 font-semibold mr-1">Notes:</span>
+                  {note.sampleFragrances.split(', ').map((frag) => (
+                    // fix #41-85 – bg-white (opaque) was bg-white/90; axe can now resolve contrast
+                    <span key={frag} className="px-2 py-0.5 rounded-md bg-white border border-stone-300 text-stone-800 text-xs font-sans font-medium">
+                      {frag}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs font-semibold text-stone-900 group-hover:text-[#15803d] transition-colors inline-flex items-center gap-1 font-sans shrink-0 whitespace-nowrap">
+                  Explore Family <span className="group-hover:translate-x-1 transition-transform inline-block" aria-hidden="true">→</span>
+                </span>
+              </div>
+            </div>
             );
           })}
         </div>

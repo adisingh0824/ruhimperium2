@@ -466,7 +466,8 @@ export default function Header({
           </ul>
 
           {/* Utility links moved to secondary position (fix #21) */}
-          <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase font-sans text-stone-400 font-semibold">
+          {/* fix #1, #2 – text-stone-600 (#57534e on #fff = 7:1 contrast, passes 4.5:1) */}
+          <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase font-sans text-stone-600 font-semibold">
             <button
               type="button"
               onClick={() => setBulkEnquiryOpen(true)}
