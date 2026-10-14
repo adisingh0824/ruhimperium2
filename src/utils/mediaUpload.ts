@@ -1,25 +1,30 @@
 import { storage } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+export interface VideoUploadOutcome {
+  url: string;
+  isCloudHosted: boolean;
+  message?: string;
+}
+
 /**
  * Robust video upload helper for Ruh Imperium
- * 1. Attempts direct upload to Firebase Cloud Storage (bypasses server payload limits, works on Vercel/production)
- * 2. If Firebase Storage fails, attempts backend /api/upload-video with safe text/json parsing (never throws "Unexpected end of JSON input")
- * 3. If file is small (< 800KB) and cloud fails, falls back to base64 Data URL
- * 4. Otherwise throws a clear, user-friendly error with instructions
+ *
+ * 1. Attempts direct upload to Firebase Cloud Storage with a 4-second timeout.
+ * 2. If Cloud Storage is not provisioned (or fails), safely falls back to an instant
+ *    local Blob URL so the admin can immediately preview the video in native quality
+ *    without the UI ever freezing or hanging.
  */
-export async function uploadVideoFile(file: File, adminPassword?: string): Promise<string> {
+export async function uploadVideoFile(file: File, _adminPassword?: string): Promise<VideoUploadOutcome> {
   if (!file) {
     throw new Error("No video file selected.");
   }
 
-  // 1. Try Firebase Cloud Storage first (Best for production / Vercel SPA)
-  let storageError: any = null;
+  // 1. Try Firebase Cloud Storage with a 4-second timeout
   try {
     const cleanName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const uniquePath = `videos/${Date.now()}_${cleanName}`;
     const storageRef = ref(storage, uniquePath);
-
     const metadata = {
       contentType: file.type || "video/mp4",
       customMetadata: {
@@ -28,81 +33,33 @@ export async function uploadVideoFile(file: File, adminPassword?: string): Promi
       }
     };
 
-    const snapshot = await uploadBytes(storageRef, file, metadata);
-    const downloadUrl = await getDownloadURL(snapshot.ref);
+    const uploadPromise = uploadBytes(storageRef, file, metadata).then((snap) =>
+      getDownloadURL(snap.ref)
+    );
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Firebase Storage request timed out (bucket not provisioned or offline)")), 4000)
+    );
+
+    const downloadUrl = await Promise.race([uploadPromise, timeoutPromise]);
     if (downloadUrl) {
-      return downloadUrl;
+      return {
+        url: downloadUrl,
+        isCloudHosted: true,
+        message: `Scent film "${file.name}" uploaded to cloud and broadcasting live to all customers in native quality!`
+      };
     }
   } catch (err: any) {
-    console.warn("Firebase Storage video upload attempt failed, trying backend fallback:", err);
-    storageError = err;
+    console.warn("Cloud storage attempt timed out or failed (bucket may not be provisioned):", err?.message);
   }
 
-  // 2. Try backend /api/upload-video (when running express server)
-  let apiError: any = null;
-  try {
-    const base64 = await readFileAsDataURL(file);
-    const token = adminPassword || (typeof window !== "undefined" && (window as any).VITE_ADMIN_PASSWORD) || "Adi19983@@";
-
-    const response = await fetch("/api/upload-video", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-token": token
-      },
-      body: JSON.stringify({
-        videoData: base64,
-        filename: file.name
-      })
-    });
-
-    const responseText = await response.text();
-    let data: any = null;
-    if (responseText && responseText.trim().length > 0) {
-      try {
-        data = JSON.parse(responseText);
-      } catch {
-        // Not valid JSON (e.g. HTML 404 or Vercel static rewrite)
-      }
-    }
-
-    if (response.ok && data?.url) {
-      return data.url;
-    }
-
-    if (data?.error) {
-      apiError = new Error(data.error);
-    } else {
-      apiError = new Error(`Server returned HTTP ${response.status} (non-JSON response)`);
-    }
-  } catch (err: any) {
-    console.warn("Backend /api/upload-video attempt failed:", err);
-    apiError = err;
-  }
-
-  // 3. Fallback to base64 Data URL only if file is small enough for Firestore (< 800 KB)
-  if (file.size <= 800 * 1024) {
-    try {
-      const base64 = await readFileAsDataURL(file);
-      return base64;
-    } catch (err: any) {
-      console.warn("Base64 encoding fallback failed:", err);
-    }
-  }
-
-  // 4. If all fail, provide a clear, actionable message to the user
-  const reasons: string[] = [];
-  if (storageError?.message) {
-    reasons.push(`Cloud storage: ${storageError.message}`);
-  }
-  if (apiError?.message) {
-    reasons.push(`Backend API: ${apiError.message}`);
-  }
-
-  const detail = reasons.length > 0 ? reasons.join(" | ") : "Serverless upload unavailable";
-  throw new Error(
-    `Unable to upload video directly (${detail}). For larger videos, please paste a YouTube, Vimeo, or direct video link using the "Video Link" button.`
-  );
+  // 2. Safe local playback fallback (plays immediately, never hangs)
+  const localBlobUrl = URL.createObjectURL(file);
+  return {
+    url: localBlobUrl,
+    isCloudHosted: false,
+    message: `Video "${file.name}" loaded and playing in your hero banner! To broadcast permanently to ALL customers worldwide, paste a YouTube, Vimeo, or direct .mp4 URL into the Direct Video URL field above.`
+  };
 }
 
 /**

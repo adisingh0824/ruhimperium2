@@ -2130,7 +2130,7 @@ export default function AdminHub({
 
                       {/* Direct File Upload Option */}
                       <div className="pt-1.5 pb-1 border-t border-dashed border-sand-200">
-                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1.5">Or Direct Video File Upload</label>
+                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1.5">Or Direct Video File Upload <span className="normal-case text-sand-300">(max 50 MB)</span></label>
                         <div className="flex flex-wrap items-center gap-3">
                           <input
                             type="file"
@@ -2141,16 +2141,21 @@ export default function AdminHub({
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
+                              const MAX_MB = 50;
+                              if (file.size > MAX_MB * 1024 * 1024) {
+                                alert(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — files larger than ${MAX_MB} MB cannot be embedded directly.\n\nPlease upload your video to YouTube or Vimeo and paste the link using the "Video Link" button.`);
+                                e.target.value = "";
+                                return;
+                              }
                               setIsUploadingVideo(true);
                               try {
-                                // Uses Firebase Storage → /api fallback → base64 fallback (never crashes with JSON parse error)
-                                const url = await uploadVideoFile(file, defaultAdminPassword);
-                                setHeroVideoUrl(url);
+                                const outcome = await uploadVideoFile(file, defaultAdminPassword);
+                                setHeroVideoUrl(outcome.url);
                                 handleUpdateSiteSetting("heroMediaType", "video");
-                                alert(`Scent film "${file.name}" uploaded and broadcasting live to all customers in native quality!`);
+                                alert(outcome.message || `✅ Scent film "${file.name}" loaded and broadcasting live!`);
                               } catch (err: any) {
                                 console.error("Hero video upload error:", err);
-                                alert(err.message || "Failed to upload video. Please try a YouTube or Vimeo link instead.");
+                                alert(`Upload failed: ${err.message || "Unknown error."}\n\nTip: For videos larger than 50 MB, use the "Video Link" button and paste a YouTube, Vimeo, or direct .mp4 URL.`);
                               } finally {
                                 setIsUploadingVideo(false);
                                 e.target.value = "";
@@ -2787,10 +2792,9 @@ export default function AdminHub({
                                   if (!file) return;
                                   setIsUploadingVideo(true);
                                   try {
-                                    // Uses Firebase Storage → /api fallback → base64 (never crashes with JSON parse error)
-                                    const url = await uploadVideoFile(file, defaultAdminPassword);
-                                    handleUpdateSiteSetting("distilleryVideoUrl", url);
-                                    alert(`Distillery video "${file.name}" uploaded and published successfully!`);
+                                    const outcome = await uploadVideoFile(file, defaultAdminPassword);
+                                    handleUpdateSiteSetting("distilleryVideoUrl", outcome.url);
+                                    alert(outcome.message || `Distillery video "${file.name}" uploaded and published successfully!`);
                                   } catch (err: any) {
                                     console.error("Distillery video upload error:", err);
                                     alert(err.message || "Failed to upload video. Please try a YouTube or Vimeo link instead.");

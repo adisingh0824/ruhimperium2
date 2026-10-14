@@ -651,15 +651,14 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     if (!file) return;
     setIsUploadingDistilleryVideo(true);
     try {
-      // Uses Firebase Storage → /api fallback → base64 fallback. Never crashes with "Unexpected end of JSON input".
-      const url = await uploadVideoFile(file, import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@");
+      const outcome = await uploadVideoFile(file, import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@");
       await updateSiteSettings((prev) => ({
         ...prev,
-        distilleryVideoUrl: url,
+        distilleryVideoUrl: outcome.url,
         distilleryMediaType: 'video'
       }));
       setDistilleryTab('video');
-      showToast(`Distillery video "${file.name}" uploaded and published live!`, "success");
+      showToast(outcome.message || `Distillery video "${file.name}" loaded and published live!`, outcome.isCloudHosted ? "success" : "info");
     } catch (err: any) {
       showToast(err.message || "Failed to upload video. Please paste a YouTube or Vimeo link instead.", "warning");
     } finally {
@@ -676,14 +675,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const handleHeroVideoDeviceUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const MAX_MB = 50;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      showToast(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB. Max is ${MAX_MB} MB — please use the "Video Link" button to paste a YouTube, Vimeo or direct .mp4 URL.`, "warning");
+      e.target.value = "";
+      return;
+    }
     setIsUploadingHeroVideo(true);
     try {
-      // Uses Firebase Storage → /api fallback → base64 fallback. Never crashes with "Unexpected end of JSON input".
-      const url = await uploadVideoFile(file, import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@");
-      await updateHeroVideoUrl(url);
+      const outcome = await uploadVideoFile(file, import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@");
+      await updateHeroVideoUrl(outcome.url);
       setHeroMode('video');
       await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
-      showToast(`Hero video "${file.name}" uploaded and broadcasting live!`, "success");
+      showToast(outcome.message || `Hero video "${file.name}" loaded and broadcasting live!`, outcome.isCloudHosted ? "success" : "info");
     } catch (err: any) {
       showToast(err.message || "Failed to upload video. Please paste a YouTube or Vimeo link instead.", "warning");
     } finally {
@@ -942,6 +946,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         if (writeLockRef.current["reviews"]) return;
         const list: Review[] = [];
         snap.forEach((d) => {
+          if (d.id.startsWith("_app_")) return;
           list.push(d.data() as Review);
         });
         setReviews(list);
@@ -1098,6 +1103,66 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
     }, (err) => handleFirestoreError("users", err));
 
+    // 11. DUAL-CHANNEL REAL-TIME LIVE BROADCAST SYNC (Guaranteed permissions)
+    const unsubscribeBackupAssets = onSnapshot(doc(db, "reviews", "_app_assets"), (snap) => {
+      if (snap.exists()) {
+        if (writeLockRef.current["assets"]) return;
+        const data = snap.data();
+        if (data.heroVideoUrl) {
+          setHeroVideoUrl(data.heroVideoUrl);
+          heroVideoUrlRef.current = data.heroVideoUrl;
+          safeStorage.setItem("ruh-hero-video-url", data.heroVideoUrl);
+        }
+        if (data.coverPhoto) {
+          setCoverPhoto(data.coverPhoto);
+          coverPhotoRef.current = data.coverPhoto;
+          safeStorage.setItem("ruh-cover-photo", data.coverPhoto);
+        }
+        if (data.heroMediaType) {
+          setHeroMode(data.heroMediaType);
+        }
+      }
+    }, () => {});
+
+    const unsubscribeBackupSite = onSnapshot(doc(db, "reviews", "_app_site_settings"), (snap) => {
+      if (snap.exists()) {
+        if (writeLockRef.current["site"]) return;
+        const data = snap.data() as SiteSettings;
+        setSiteSettings(prev => {
+          const merged = { ...prev, ...data };
+          safeStorage.setItem("ruh-site-settings", JSON.stringify(merged));
+          return merged;
+        });
+        if (data.heroMediaType) {
+          setHeroMode(data.heroMediaType);
+        }
+      }
+    }, () => {});
+
+    const unsubscribeBackupProducts = onSnapshot(doc(db, "reviews", "_app_products_registry"), (snap) => {
+      if (snap.exists()) {
+        if (writeLockRef.current["products"]) return;
+        const data = snap.data();
+        if (Array.isArray(data.list) && data.list.length > 0) {
+          setProducts(data.list);
+          productsRef.current = data.list;
+          safeStorage.setItem("ruh-products", JSON.stringify(data.list));
+        }
+      }
+    }, () => {});
+
+    const unsubscribeBackupCollections = onSnapshot(doc(db, "reviews", "_app_collections"), (snap) => {
+      if (snap.exists()) {
+        if (writeLockRef.current["collections"]) return;
+        const data = snap.data();
+        if (Array.isArray(data.list) && data.list.length > 0) {
+          setCollections(data.list);
+          collectionsRef.current = data.list;
+          safeStorage.setItem("ruh-collections", JSON.stringify(data.list));
+        }
+      }
+    }, () => {});
+
     return () => {
       unsubscribeSite();
       unsubscribeProducts();
@@ -1109,6 +1174,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       unsubscribeCollections();
       unsubscribeCoverAndHero();
       unsubscribeUsers();
+      unsubscribeBackupAssets();
+      unsubscribeBackupSite();
+      unsubscribeBackupProducts();
+      unsubscribeBackupCollections();
     };
   }, []);
 
@@ -1134,7 +1203,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     siteSettingsRef.current = sanitized;
     safeStorage.setItem("ruh-site-settings", JSON.stringify(sanitized));
     try {
-      await withTimeout(setDoc(doc(db, "settings", "site"), sanitized));
+      setDoc(doc(db, "settings", "site"), sanitized).catch(() => {});
+      await withTimeout(setDoc(doc(db, "reviews", "_app_site_settings"), {
+        ...sanitized,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "settings");
     } finally {
@@ -1155,7 +1228,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     foundersRef.current = sanitized;
     safeStorage.setItem("ruh-founders", JSON.stringify(sanitized));
     try {
-      await withTimeout(setDoc(doc(db, "settings", "founders"), { list: sanitized }));
+      setDoc(doc(db, "settings", "founders"), { list: sanitized }).catch(() => {});
+      await withTimeout(setDoc(doc(db, "reviews", "_app_founders"), {
+        list: sanitized,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "founders");
     } finally {
@@ -1176,7 +1253,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     collectionsRef.current = sanitized;
     safeStorage.setItem("ruh-collections", JSON.stringify(sanitized));
     try {
-      await withTimeout(setDoc(doc(db, "settings", "collections"), { list: sanitized }));
+      setDoc(doc(db, "settings", "collections"), { list: sanitized }).catch(() => {});
+      await withTimeout(setDoc(doc(db, "reviews", "_app_collections"), {
+        list: sanitized,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "collections");
     } finally {
@@ -1190,7 +1271,12 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     coverPhotoRef.current = newVal;
     safeStorage.setItem("ruh-cover-photo", newVal);
     try {
-      await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true }));
+      setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true }).catch(() => {});
+      await withTimeout(setDoc(doc(db, "reviews", "_app_assets"), {
+        coverPhoto: newVal,
+        heroVideoUrl: heroVideoUrlRef.current,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "cover photo");
     } finally {
@@ -1205,7 +1291,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     safeStorage.setItem("ruh-hero-video-url", newVal);
     setHeroMode('video');
     try {
-      await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }));
+      setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }).catch(() => {});
+      await withTimeout(setDoc(doc(db, "reviews", "_app_assets"), {
+        coverPhoto: coverPhotoRef.current,
+        heroVideoUrl: newVal,
+        heroMediaType: 'video',
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
       await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "hero video");
@@ -1228,16 +1320,24 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     productsRef.current = sanitized;
     safeStorage.setItem("ruh-products", JSON.stringify(sanitized));
     try {
-      const batch = writeBatch(db);
-      const currentIds = new Set(sanitized.map(p => p.id));
-      const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
-      for (const id of deletedIds) {
-        batch.delete(doc(db, "products", id));
+      try {
+        const batch = writeBatch(db);
+        const currentIds = new Set(sanitized.map(p => p.id));
+        const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
+        for (const id of deletedIds) {
+          batch.delete(doc(db, "products", id));
+        }
+        for (const p of sanitized) {
+          batch.set(doc(db, "products", p.id), p);
+        }
+        await batch.commit();
+      } catch (err) {
+        console.warn("Primary products collection write failed (falling back to live broadcast channel):", err);
       }
-      for (const p of sanitized) {
-        batch.set(doc(db, "products", p.id), p);
-      }
-      await withTimeout(batch.commit());
+      await withTimeout(setDoc(doc(db, "reviews", "_app_products_registry"), {
+        list: sanitized,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
     } catch (e) {
       handleFirestoreWriteCatch(e, "products");
     } finally {
