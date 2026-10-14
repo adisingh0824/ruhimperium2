@@ -328,7 +328,7 @@ export default function Header({
             >
               <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
               {cartTotalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-black text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartTotalItems}
                 </span>
               )}
@@ -349,7 +349,7 @@ export default function Header({
         </div>
 
         <nav className="hidden lg:flex items-center justify-between h-12 relative border-t border-sand-200">
-          <ul className="flex items-center space-x-7 text-[11px] tracking-widest uppercase font-sans text-stone-900 font-semibold">
+          <ul className="flex items-center space-x-7 text-xs tracking-widest uppercase font-sans text-stone-900 font-semibold">
             
             {/* 1. Collections Dropdown */}
             <li 
@@ -376,7 +376,7 @@ export default function Header({
                       className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
                     >
                       <span>{col.name}</span>
-                      <span className="text-[9px] text-stone-400 font-mono tracking-normal">→</span>
+                      <span className="text-xs text-stone-400 font-mono tracking-normal">→</span>
                     </button>
                   ))}
                 </div>
@@ -415,7 +415,7 @@ export default function Header({
                       className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
                     >
                       <span>{note.name}</span>
-                      <span className="text-[9px] text-stone-400 font-mono tracking-normal">Explore</span>
+                      <span className="text-xs text-stone-400 font-mono tracking-normal">Explore</span>
                     </button>
                   ))}
                 </div>
@@ -454,7 +454,7 @@ export default function Header({
                       className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
                     >
                       <span>{item.name}</span>
-                      <span className="text-[9px] text-stone-400 font-mono tracking-normal">Occasion</span>
+                      <span className="text-xs text-stone-400 font-mono tracking-normal">Occasion</span>
                     </button>
                   ))}
                 </div>
@@ -487,7 +487,7 @@ export default function Header({
 
           {/* Utility links moved to secondary position (fix #21) */}
           {/* fix #1, #2 – text-stone-600 (#57534e on #fff = 7:1 contrast, passes 4.5:1) */}
-          <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase font-sans text-stone-600 font-semibold">
+          <div className="flex items-center gap-4 text-xs tracking-widest uppercase font-sans text-stone-600 font-semibold">
             <button
               type="button"
               onClick={() => setBulkEnquiryOpen(true)}
@@ -521,7 +521,7 @@ export default function Header({
               >
                 <X className="w-5 h-5 stroke-[1.25]" />
               </button>
-              <p className="text-[9px] uppercase tracking-[0.25em] text-gold-400 font-semibold mb-1">Catering & Corporate Bespoke Commissioning</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-gold-400 font-semibold mb-1">Catering & Corporate Bespoke Commissioning</p>
               <h3 className="text-xl sm:text-2xl font-serif tracking-wide" style={{ fontFamily: "Cinzel, Georgia, serif" }}>Ruh Imperium Bulk Inquiry</h3>
               <p className="text-xs text-stone-300 font-light mt-1.5 leading-relaxed">
                 Connect with our head nose to craft signature Wedding Favors, Corporate Monographed Chests, or Custom Compound Gifting Suites.
@@ -536,7 +536,7 @@ export default function Header({
                 <p className="text-xs text-stone-500 font-light max-w-md mx-auto leading-relaxed">
                   Thank you, <strong className="text-stone-900 font-serif">{bulkForm.name}</strong>. A dedicated Imperial Concierge will coordinate your custom request for <strong className="text-stone-900">{bulkForm.quantity}</strong> of <strong className="text-stone-900">{bulkForm.type}</strong>. We will contact you at <span className="underline">{bulkForm.email}</span> within 4 business hours.
                 </p>
-                <div className="pt-4 text-[10px] tracking-widest text-[#D4BC96] uppercase animate-pulse">
+                <div className="pt-4 text-xs tracking-widest text-[#D4BC96] uppercase animate-pulse">
                   Preparing Olfactory Proposal dossier...
                 </div>
               </div>
@@ -544,7 +544,7 @@ export default function Header({
               <form onSubmit={handleBulkSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Your Full Name *</label>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">Your Full Name *</label>
                     <input
                       type="text"
                       required
@@ -555,7 +555,7 @@ export default function Header({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">E-mail Address *</label>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">E-mail Address *</label>
                     <input
                       type="email"
                       required
@@ -569,7 +569,7 @@ export default function Header({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Telephone Number *</label>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">Telephone Number *</label>
                     <input
                       type="tel"
                       required
@@ -580,7 +580,7 @@ export default function Header({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Company / House Name</label>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">Company / House Name</label>
                     <input
                       type="text"
                       value={bulkForm.company}
@@ -593,7 +593,7 @@ export default function Header({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Inquiry Category</label>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">Inquiry Category</label>
                     <select
                       value={bulkForm.type}
                       onChange={(e) => setBulkForm({...bulkForm, type: e.target.value})}
@@ -607,7 +607,7 @@ export default function Header({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Required Volume</label>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">Required Volume</label>
                     <select
                       value={bulkForm.quantity}
                       onChange={(e) => setBulkForm({...bulkForm, quantity: e.target.value})}
@@ -622,7 +622,7 @@ export default function Header({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Design Customizations Note / Event Details</label>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 font-medium mb-1">Design Customizations Note / Event Details</label>
                   <textarea
                     rows={3}
                     value={bulkForm.message}
@@ -642,7 +642,7 @@ export default function Header({
             )}
 
             {/* Quick Contact options at bottom */}
-            <div className="bg-stone-50 p-4 border-t border-stone-100 flex items-center justify-around text-[10.5px] text-stone-600 font-serif font-light">
+            <div className="bg-stone-50 p-4 border-t border-stone-100 flex items-center justify-around text-xs text-stone-600 font-serif font-light">
               <a 
                 href="tel:+919116711413" 
                 className="flex items-center gap-1.5 hover:text-stone-950 transition-colors"
@@ -711,7 +711,7 @@ export default function Header({
 
                 {/* 2. Shop Collections header / Categories */}
                 <div className="py-1">
-                  <p className="text-[10px] uppercase tracking-widest text-[#D4BC96] font-semibold mb-2">Collections</p>
+                  <p className="text-xs uppercase tracking-widest text-[#D4BC96] font-semibold mb-2">Collections</p>
                   <div className="pl-3 space-y-2.5 border-l border-stone-200">
                     {collectionsMenu.map((cat) => (
                       <button
@@ -784,7 +784,7 @@ export default function Header({
 
             {/* Mobile Footer */}
             <div className="border-t border-stone-200 pt-6 space-y-3">
-              <p className="text-[10px] tracking-widest uppercase text-stone-400">
+              <p className="text-xs tracking-widest uppercase text-stone-400">
                 Direct Imperial Concierge
               </p>
               <div className="flex flex-col space-y-2 text-xs font-serif text-stone-700">
@@ -803,7 +803,7 @@ export default function Header({
                   <span>support@ruhimperium.com</span>
                 </a>
               </div>
-              <p className="text-[11px] text-stone-500 font-light leading-relaxed font-serif pt-1">
+              <p className="text-xs text-stone-500 font-light leading-relaxed font-serif pt-1">
                 Pure copper still botanical extractions straight from Kannauj, India to your door.
               </p>
             </div>

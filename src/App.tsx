@@ -1936,7 +1936,34 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             )}
 
-            {/* Hero content area — media type controlled from Admin Hub only */}
+            {/* Hero content area & Primary Conversion Goal above the fold (Fix #8) */}
+            <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center flex flex-col items-center justify-center space-y-4 sm:space-y-6 pointer-events-auto">
+              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-[#D4BC96] font-semibold">
+                {siteSettings.heroTagline || "Traditional Copper Distilled Fragrances"}
+              </span>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-white tracking-tight leading-[1.1] max-w-3xl drop-shadow-md">
+                {siteSettings.heroHeadline || "Where Fragrance Meets Tradition"}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-200 font-light max-w-xl mx-auto leading-relaxed drop-shadow-sm">
+                {siteSettings.heroDescription || "Explore fine alcohol-free pure oils and elegant luxury Eau De Parfums hydro-distilled in 204-year-old copper stills of Kannauj."}
+              </p>
+              <div className="pt-2 sm:pt-4 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleSectionNavigate("shop")}
+                  className="px-8 py-3.5 rounded-full bg-white text-stone-950 hover:bg-[#D4BC96] hover:text-stone-950 font-serif text-xs uppercase tracking-widest font-bold transition-all shadow-lg hover:shadow-xl cursor-pointer"
+                >
+                  Explore Collections →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSectionNavigate("our-story")}
+                  className="px-6 py-3.5 rounded-full border border-white/60 text-white hover:bg-white/10 font-serif text-xs uppercase tracking-widest font-medium transition-all cursor-pointer"
+                >
+                  Our Heritage
+                </button>
+              </div>
+            </div>
           </section>
         </div>
 
@@ -2180,7 +2207,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       </div>
                     </div>
 
-                    {/* copy fix #2 – "Select Size" is more artisanal and specific than the generic "Choose Option" */}
+                    {/* fix #13 – softened outline button so product name remains primary focal point */}
                     <button
                       type="button"
                       onClick={() => {
@@ -2190,7 +2217,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         handleAddToCart(prod, defaultVariant);
                         setIsCartOpen(true);
                       }}
-                      className="w-full mt-4 py-2.5 sm:py-3 border-2 border-stone-900 bg-transparent hover:bg-stone-900 text-stone-900 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
+                      className="w-full mt-3 py-2.5 border border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-950 bg-stone-50/50 hover:bg-white rounded-lg text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer"
                     >
                       Select Size
                     </button>
@@ -3071,62 +3098,68 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 </h2>
               </div>
 
-              {/* Right Column: Flowing Chips Wall with Gradient Fade Edges */}
-              <div className="lg:col-span-6 relative overflow-hidden h-[250px] flex items-center">
-                {/* Left Fade */}
-                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-                {/* Right Fade */}
-                <div className="absolute right-0 inset-y-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-
-                {/* Animated Marquee of Chip Columns – fix #86-105: isolate + valid text-stone-800/border-stone-300 */}
-                <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] whitespace-nowrap" style={{ isolation: 'isolate' as const }}>
-                  {/* Column 1: Florals */}
-                  <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Florals</span>
-                    {["Rose", "Mogra", "Jasmine", "Neroli"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
-                        {note}
-                      </button>
-                    ))}
+              {/* Right Column: Scannable Olfactory Families Grid (Fix #12) */}
+              <div className="lg:col-span-6 bg-stone-50/70 border border-stone-200/80 rounded-2xl p-5 sm:p-6 shadow-xs">
+                <p className="text-xs uppercase tracking-widest text-[#7A5623] font-mono font-semibold mb-4">
+                  Explore by Scent Family
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {/* Family 1: Florals */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-serif font-bold text-stone-900 block border-b border-stone-200 pb-1">Florals</span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {["Rose", "Mogra", "Jasmine", "Neroli"].map(note => (
+                        <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-2.5 py-1 rounded-md bg-white border border-stone-200 hover:border-[#15803d] hover:text-[#15803d] text-stone-700 text-xs font-sans transition-colors cursor-pointer">
+                          {note}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  {/* Column 2: Sacred Woods */}
-                  <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Sacred Woods</span>
-                    {["Sandalwood", "Oud", "Cedarwood", "Patchouli"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
-                        {note}
-                      </button>
-                    ))}
+                  {/* Family 2: Sacred Woods */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-serif font-bold text-stone-900 block border-b border-stone-200 pb-1">Sacred Woods</span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {["Sandalwood", "Oud", "Cedarwood", "Patchouli"].map(note => (
+                        <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-2.5 py-1 rounded-md bg-white border border-stone-200 hover:border-[#15803d] hover:text-[#15803d] text-stone-700 text-xs font-sans transition-colors cursor-pointer">
+                          {note}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  {/* Column 3: Warm Spices */}
-                  <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Warm Spices</span>
-                    {["Saffron", "Cardamom", "Spicy", "Amber"].map(note => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
-                        {note}
-                      </button>
-                    ))}
+                  {/* Family 3: Warm Spices */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-serif font-bold text-stone-900 block border-b border-stone-200 pb-1">Warm Spices</span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {["Saffron", "Cardamom", "Spicy", "Amber"].map(note => (
+                        <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-2.5 py-1 rounded-md bg-white border border-stone-200 hover:border-[#15803d] hover:text-[#15803d] text-stone-700 text-xs font-sans transition-colors cursor-pointer">
+                          {note}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  {/* Column 4: Resins & Musk */}
-                  <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Resins &amp; Musk</span>
-                    {["Frankincense", "Benzoin", "Musk", "Woody"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
-                        {note}
-                      </button>
-                    ))}
+                  {/* Family 4: Resins & Musk */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-serif font-bold text-stone-900 block border-b border-stone-200 pb-1">Resins &amp; Musk</span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {["Frankincense", "Benzoin", "Musk", "Woody"].map(note => (
+                        <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-2.5 py-1 rounded-md bg-white border border-stone-200 hover:border-[#15803d] hover:text-[#15803d] text-stone-700 text-xs font-sans transition-colors cursor-pointer">
+                          {note}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  {/* Column 5: Fresh Botanicals */}
-                  <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-stone-600 px-2">Fresh Botanicals</span>
-                    {["Bergamot", "Vetiver (Khus)", "Fresh", "Floral"].map((note) => (
-                      <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-5 py-2 rounded-full border border-stone-300 bg-white hover:border-[#15803d] hover:text-[#15803d] text-stone-800 text-xs font-mono font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer text-center">
-                        {note}
-                      </button>
-                    ))}
+                  {/* Family 5: Fresh Botanicals */}
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <span className="text-xs font-serif font-bold text-stone-900 block border-b border-stone-200 pb-1">Fresh Botanicals</span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {["Bergamot", "Vetiver (Khus)", "Fresh", "Floral"].map(note => (
+                        <button key={note} onClick={() => { if (setSearchQuery) setSearchQuery(note); handleSectionNavigate("shop"); }} className="px-2.5 py-1 rounded-md bg-white border border-stone-200 hover:border-[#15803d] hover:text-[#15803d] text-stone-700 text-xs font-sans transition-colors cursor-pointer">
+                          {note}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
               </div>
 
             </div>
@@ -3228,38 +3261,43 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103 select-none pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute top-4 right-4 flex gap-2">
-                      {fnd.linkedin && (
-                        <a 
-                          href={fnd.linkedin} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-[#D4BC96] hover:text-black transition-colors"
-                          title="LinkedIn Profile"
-                        >
-                          <Linkedin className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      {fnd.instagram && (
-                        <a 
-                          href={fnd.instagram} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-[#D4BC96] hover:text-black transition-colors"
-                          title="Instagram Profile"
-                        >
-                          <Instagram className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                    </div>
                   </div>
 
-                  {/* Bio container */}
+                  {/* Bio container — social links placed cleanly below image with author details (Fix #11) */}
                   <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
-                      <span className="text-xs uppercase tracking-wider text-[#7E5B26] font-semibold font-mono block mb-1">
-                        {fnd.role}
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs uppercase tracking-wider text-[#7E5B26] font-semibold font-mono block">
+                          {fnd.role}
+                        </span>
+                        {/* Non-overlapping social profile links */}
+                        <div className="flex items-center gap-2">
+                          {fnd.linkedin && (
+                            <a 
+                              href={fnd.linkedin} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="w-7 h-7 rounded-full border border-stone-200 text-stone-600 hover:text-stone-950 hover:border-stone-900 flex items-center justify-center transition-colors shadow-2xs"
+                              title={`${fnd.name} LinkedIn Profile`}
+                              aria-label={`${fnd.name} LinkedIn`}
+                            >
+                              <Linkedin className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                          {fnd.instagram && (
+                            <a 
+                              href={fnd.instagram} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="w-7 h-7 rounded-full border border-stone-200 text-stone-600 hover:text-stone-950 hover:border-stone-900 flex items-center justify-center transition-colors shadow-2xs"
+                              title={`${fnd.name} Instagram Profile`}
+                              aria-label={`${fnd.name} Instagram`}
+                            >
+                              <Instagram className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
                       <h3 className="text-xl font-serif font-bold text-sand-900">
                         {fnd.name}
                       </h3>

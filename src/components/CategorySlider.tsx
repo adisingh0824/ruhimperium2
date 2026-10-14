@@ -69,34 +69,46 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
     <section className="bg-white py-12 sm:py-16 border-b border-stone-200/70" id="category-slider-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Header row — arrows removed; they now live on the track edges (fix #14) */}
-        <div className="mb-8 pb-4 border-b border-stone-100">
-          <span className="text-xs font-mono uppercase tracking-wider text-[#A3483B] font-bold block mb-1">
-            CURATED ARCHIVE
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight">
-            Explore by Collection
-          </h3>
+        {/* Header row with integrated navigation controls (fix #9: symmetrical, no image overlap) */}
+        <div className="mb-8 pb-4 border-b border-stone-100 flex items-end justify-between">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-wider text-[#A3483B] font-bold block mb-1">
+              CURATED ARCHIVE
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-serif text-stone-900 tracking-tight">
+              Explore by Collection
+            </h3>
+          </div>
+
+          {/* Symmetrical header navigation arrows — fix #9: positioned cleanly outside track */}
+          <div className="hidden sm:flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              className="w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 flex items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-xs hover:bg-stone-50 bg-white"
+              aria-label="Previous categories"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              className="w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 flex items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-xs hover:bg-stone-50 bg-white"
+              aria-label="Next categories"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Horizontal Slider — arrows overlaid at mid-height of the track */}
+        {/* Horizontal Slider Track */}
         <div className="relative">
-          {/* Left arrow — fix #9: top-1/2 (true centre) replaces top-[45%] to eliminate optical imbalance */}
-          <button
-            type="button"
-            onClick={() => scroll("left")}
-            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-sm hover:bg-stone-50 bg-white -translate-x-4"
-            aria-label="Previous categories"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
           <div
             ref={scrollerRef}
             tabIndex={0}
             role="region"
             aria-label="Fragrance categories slider"
-            className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth snap-x snap-mandatory pr-12 focus:outline-none focus:ring-1 focus:ring-stone-400 rounded-2xl"
+            className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth snap-x snap-mandatory pr-6 focus:outline-none focus:ring-1 focus:ring-stone-400 rounded-2xl"
           >
             {CATEGORY_ITEMS.map((item) => {
               const isSelected = selectedCategory.toLowerCase() === item.id.toLowerCase();
@@ -130,7 +142,8 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
                     <h4 className="text-xs sm:text-sm font-serif font-bold text-stone-900 tracking-wide group-hover:text-[#19a24b] transition-colors">
                       {item.title}
                     </h4>
-                    <p className="text-xs text-stone-500 font-sans tracking-normal">
+                    {/* fix #6 – font-size 12px (text-xs) and text-stone-600 */}
+                    <p className="text-xs text-stone-600 font-sans tracking-normal">
                       {item.tagline}
                     </p>
                   </div>
@@ -138,16 +151,6 @@ export default function CategorySlider({ onSelectCategory, selectedCategory }: C
               );
             })}
           </div>
-
-          {/* Right arrow — fix #9: top-1/2 (true centre) replaces top-[45%] */}
-          <button
-            type="button"
-            onClick={() => scroll("right")}
-            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-stone-300 hover:border-stone-900 items-center justify-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer shadow-sm hover:bg-stone-50 bg-white translate-x-4"
-            aria-label="Next categories"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
 
           {/* Subtle Right-edge Gradient Fade */}
           <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-14 bg-gradient-to-l from-white to-transparent hidden sm:block" aria-hidden="true" />

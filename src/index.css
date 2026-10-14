@@ -34,16 +34,16 @@
    Button tokens: 5 canonical variants (primary / secondary / ghost / tab / chip)
    ========================================================================== */
 :root {
-  /* --- Type scale (9 steps) -------------------------------------------- */
-  --text-xs:   0.6875rem; /* 11px  — micro labels, badges */
-  --text-sm:   0.75rem;   /* 12px  — captions, fine print */
-  --text-base: 0.875rem;  /* 14px  — body copy */
-  --text-md:   1rem;      /* 16px  — large body / UI labels */
-  --text-lg:   1.25rem;   /* 20px  — card headings */
-  --text-xl:   1.5rem;    /* 24px  — section subheadings */
-  --text-2xl:  2rem;      /* 32px  — section headings */
-  --text-3xl:  2.75rem;   /* 44px  — hero sub */
-  --text-4xl:  3.5rem;    /* 56px  — hero headline */
+  /* --- Standardized Type scale (9 cohesive steps <= 10) — fix #1, #5, #6 -- */
+  --text-xs:   0.75rem;   /* 12px  — micro labels, badges, captions (min legible web text) */
+  --text-sm:   0.875rem;  /* 14px  — secondary body copy, descriptions */
+  --text-base: 1rem;      /* 16px  — primary body copy */
+  --text-lg:   1.125rem;  /* 18px  — card titles */
+  --text-xl:   1.25rem;   /* 20px  — subheadings */
+  --text-2xl:  1.5rem;    /* 24px  — section headers */
+  --text-3xl:  2rem;      /* 32px  — prominent titles */
+  --text-4xl:  2.5rem;    /* 40px  — hero subheadings */
+  --text-5xl:  3.5rem;    /* 56px  — hero display titles */
 
   /* --- Colour palette (12 semantic tokens) -------------------------------- */
   --clr-primary:       #19a24b; /* brand green */
@@ -628,4 +628,36 @@
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* ── Furnace Heat Slider Track & Thumb (Fix #10) ── */
+#furnace-temp-range {
+  min-height: 44px;
+}
+#furnace-temp-range::-webkit-slider-runnable-track {
+  height: 8px;
+  background-color: #e7e5e4;
+  border-radius: 9999px;
+}
+#furnace-temp-range::-webkit-slider-thumb {
+  margin-top: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background-color: #d4af37;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+#furnace-temp-range::-moz-range-track {
+  height: 8px;
+  background-color: #e7e5e4;
+  border-radius: 9999px;
+}
+#furnace-temp-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background-color: #d4af37;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }

@@ -487,8 +487,8 @@ export const ThreeDistilleryLab: React.FC = () => {
       <div className="relative w-full h-[420px] md:h-[520px] rounded-xl overflow-hidden cursor-grab active:cursor-grabbing border border-stone-100 shadow-inner">
         <div ref={mountRef} className="w-full h-full" />
 
-        {/* fix #24 – bg-white (fully opaque, was bg-white/90) so contrast tools resolve against canvas; fix gold label #7a5c1a */}
-        <div className="absolute top-4 left-4 bg-white backdrop-blur-md px-3 py-1.5 rounded-full border border-[#d4af37]/40 shadow flex items-center gap-2 text-xs text-[#7a5c1a] tracking-widest uppercase">
+        {/* fix #7 – removed uppercase to prevent 37-character all-caps reading strain */}
+        <div className="absolute top-4 left-4 bg-white backdrop-blur-md px-3 py-1.5 rounded-full border border-[#d4af37]/40 shadow flex items-center gap-2 text-xs text-[#7a5c1a] font-medium tracking-wide">
           <Sparkles className="w-3.5 h-3.5 text-[#d4af37] animate-pulse" />
           <span>Live 3D Deg-Bhapka Alembic Simulation</span>
         </div>
@@ -581,6 +581,7 @@ export const ThreeDistilleryLab: React.FC = () => {
           </div>
           {/* Fix #24 – wrapper gives slider a relative context for the optimal tick marker */}
           <div className="relative">
+            {/* fix #10 – min 44px touch-target hit area for furnace heat slider */}
             <input
               id="furnace-temp-range"
               name="furnace-temp-range"
@@ -590,7 +591,7 @@ export const ThreeDistilleryLab: React.FC = () => {
               max={115}
               value={temperature}
               onChange={e => setTemperature(Number(e.target.value))}
-              className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
+              className="w-full h-11 py-3 bg-transparent cursor-pointer accent-[#d4af37] focus:outline-none touch-manipulation"
             />
             {/* Fix #24 – visual tick; fix #35 – already aria-hidden, non-text char is fine */}
             <span
