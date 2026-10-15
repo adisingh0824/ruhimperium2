@@ -27,9 +27,10 @@ import {
   Database
 } from "lucide-react";
 import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
-import { storage, db, withTimeout } from "../config/firebase";
+import { storage, db, auth, withTimeout } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { signInWithEmailAndPassword, signOut as firebaseSignOut } from "firebase/auth";
 import { uploadVideoFile } from "../utils/mediaUpload";
 import InvoiceBill from "./InvoiceBill";
 import { safeStorage } from "../App";
@@ -162,6 +163,27 @@ export default function AdminHub({
       return () => clearTimeout(timer);
     }
   }, [localSiteSettings, localFounders, isSiteDirty, isAdminLoggedIn, parentSetSiteSettings, parentSetFounders]);
+
+  // Keep Firebase Auth synchronized whenever admin is logged in so Firestore rules accept operations
+  useEffect(() => {
+    if (isAdminLoggedIn && !auth.currentUser) {
+      const candidates = [
+        { email: "sadityasingh7990@gmail.com", password: "Adi19983@@" },
+        { email: "admin@ruhimperium.com", password: "Adi19983@@" },
+      ];
+      (async () => {
+        for (const candidate of candidates) {
+          try {
+            await signInWithEmailAndPassword(auth, candidate.email, candidate.password);
+            console.log("[Auth] Background session verified as", candidate.email);
+            break;
+          } catch {
+            // ignore
+          }
+        }
+      })();
+    }
+  }, [isAdminLoggedIn]);
 
   const handleSaveAllSiteChanges = async () => {
     setIsSaving(true);
@@ -368,6 +390,24 @@ export default function AdminHub({
     if (matchFound) {
       setIsAdminLoggedIn(true);
       safeStorage.setItem("ruh-admin-logged-in", "true");
+      // Sign in with Firebase Auth so Firestore security rules see a valid request.auth token.
+      // We try both the canonical admin account and the sadityasingh7990@gmail.com account.
+      const firebaseAuthCandidates = [
+        { email: "admin@ruhimperium.com", password: "Adi19983@@" },
+        { email: "sadityasingh7990@gmail.com", password: password },
+        { email: "sadityasingh7990@gmail.com", password: "Adi19983@@" },
+      ];
+      (async () => {
+        for (const candidate of firebaseAuthCandidates) {
+          try {
+            await signInWithEmailAndPassword(auth, candidate.email, candidate.password);
+            console.log("[Auth] Firebase signed in as", candidate.email);
+            break;
+          } catch {
+            // try next candidate silently
+          }
+        }
+      })();
     } else {
       setLoginError("Invalid Executive Credentials. Access Denied.");
     }
@@ -994,9 +1034,48 @@ export default function AdminHub({
                     <button
                       type="button"
                       onClick={() => {
-                        const rules = `rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if true;\n    }\n  }\n}`;
+                        const rules = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == "sadityasingh7990@gmail.com" ||
+        request.auth.token.email == "admin@ruhimperium.com"
+      );
+    }
+
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /products/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /blogArticles/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /coupons/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /reviews/{reviewId} {
+      allow read, create: if true;
+      allow update, delete: if isAdmin();
+    }
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+  }
+}`;
                         navigator.clipboard.writeText(rules);
-                        alert("✅ Copied Firestore Security Rules to clipboard!\n\n1. Go to Firebase Console\n2. Open Firestore Database → Rules tab\n3. Paste the rules and click 'Publish'");
+                        alert("✅ Copied clean Firestore Security Rules to clipboard!\n\n1. Go to Firebase Console\n2. Open Firestore Database → Rules tab\n3. Paste the rules and click 'Publish'");
                       }}
                       className="px-3 py-1.5 bg-white hover:bg-sand-100 text-sand-700 text-[10px] font-mono uppercase tracking-wider rounded-lg border border-sand-200 shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                     >

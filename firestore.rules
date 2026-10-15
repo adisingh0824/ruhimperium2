@@ -1,7 +1,46 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == "sadityasingh7990@gmail.com" ||
+        request.auth.token.email == "admin@ruhimperium.com"
+      );
+    }
+
+    // 1. PUBLIC SITE CONTENT: Visitors can only READ. Only Admin can MODIFY or DELETE.
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /products/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /blogArticles/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /coupons/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 2. ORDERS: Visitors can CREATE orders when buying. Only Admin can view all or DELETE/MODIFY orders.
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 3. REVIEWS & LIVE BROADCAST: Visitors can read and post reviews. Admin can manage all.
+    match /reviews/{reviewId} {
+      allow read, create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // 4. USERS: Profiles for registration and checkout
+    match /users/{userId} {
       allow read, write: if true;
     }
   }

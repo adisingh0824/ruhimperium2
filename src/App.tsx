@@ -42,7 +42,7 @@ import OrderTracker from "./components/OrderTracker";
 import UserLoungeModal from "./components/UserLoungeModal";
 import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
-import { db, withTimeout } from './config/firebase';
+import { db, withTimeout, ensureAdminAuth } from './config/firebase';
 import { doc, setDoc, onSnapshot, collection, deleteDoc, writeBatch } from 'firebase/firestore';
 import ThreeAtmosphere from './components/ThreeAtmosphere';
 import ThreeBottleCanvas from './components/ThreeBottleCanvas';
@@ -513,6 +513,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   const [isAdminHubOpen, setIsAdminHubOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
+
+  // Automatically maintain Firebase Auth credentials whenever admin is logged in
+  useEffect(() => {
+    if (isAdminLoggedIn) {
+      ensureAdminAuth().then((u) => {
+        if (u) setFirestorePermissionError(false);
+      }).catch(() => {});
+    }
+  }, [isAdminLoggedIn]);
 
   // General Customer Accounts Registry & Lounge Trigger
   const [users, setUsers] = useState<UserAccount[]>(() => {
@@ -1184,10 +1193,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     };
   }, []);
 
-  const handleFirestoreWriteCatch = (err: any, entity: string) => {
+  const handleFirestoreWriteCatch = async (err: any, entity: string) => {
     console.warn(`[Firestore] ${entity} sync:`, err?.message || err);
     if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
-      setFirestorePermissionError(true);
+      const u = await ensureAdminAuth().catch(() => null);
+      if (!u) {
+        setFirestorePermissionError(true);
+      } else {
+        setFirestorePermissionError(false);
+      }
     }
   };
 
@@ -1205,11 +1219,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     siteSettingsRef.current = sanitized;
     safeStorage.setItem("ruh-site-settings", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       setDoc(doc(db, "settings", "site"), sanitized).catch(() => {});
       await withTimeout(setDoc(doc(db, "reviews", "_app_site_settings"), {
         ...sanitized,
         updatedAt: new Date().toISOString()
       }, { merge: true }));
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "settings");
     } finally {
@@ -1230,11 +1246,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     foundersRef.current = sanitized;
     safeStorage.setItem("ruh-founders", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       setDoc(doc(db, "settings", "founders"), { list: sanitized }).catch(() => {});
       await withTimeout(setDoc(doc(db, "reviews", "_app_founders"), {
         list: sanitized,
         updatedAt: new Date().toISOString()
       }, { merge: true }));
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "founders");
     } finally {
@@ -1255,11 +1273,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     collectionsRef.current = sanitized;
     safeStorage.setItem("ruh-collections", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       setDoc(doc(db, "settings", "collections"), { list: sanitized }).catch(() => {});
       await withTimeout(setDoc(doc(db, "reviews", "_app_collections"), {
         list: sanitized,
         updatedAt: new Date().toISOString()
       }, { merge: true }));
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "collections");
     } finally {
@@ -1273,12 +1293,14 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     coverPhotoRef.current = newVal;
     safeStorage.setItem("ruh-cover-photo", newVal);
     try {
+      await ensureAdminAuth();
       setDoc(doc(db, "settings", "assets"), { coverPhoto: newVal, heroVideoUrl: heroVideoUrlRef.current }, { merge: true }).catch(() => {});
       await withTimeout(setDoc(doc(db, "reviews", "_app_assets"), {
         coverPhoto: newVal,
         heroVideoUrl: heroVideoUrlRef.current,
         updatedAt: new Date().toISOString()
       }, { merge: true }));
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "cover photo");
     } finally {
@@ -1293,6 +1315,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     safeStorage.setItem("ruh-hero-video-url", newVal);
     setHeroMode('video');
     try {
+      await ensureAdminAuth();
       setDoc(doc(db, "settings", "assets"), { coverPhoto: coverPhotoRef.current, heroVideoUrl: newVal }, { merge: true }).catch(() => {});
       await withTimeout(setDoc(doc(db, "reviews", "_app_assets"), {
         coverPhoto: coverPhotoRef.current,
@@ -1301,6 +1324,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         updatedAt: new Date().toISOString()
       }, { merge: true }));
       await updateSiteSettings(prev => ({ ...prev, heroMediaType: 'video' }));
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "hero video");
     } finally {
@@ -1322,6 +1346,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     productsRef.current = sanitized;
     safeStorage.setItem("ruh-products", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       const currentIds = new Set(sanitized.map(p => p.id));
       const deletedIds = previousProducts.filter(p => !currentIds.has(p.id)).map(p => p.id);
 
@@ -1345,6 +1370,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       for (const p of sanitized) {
         setDoc(doc(db, "reviews", `prod_${p.id}`), { ...p, _isProduct: true }, { merge: true }).catch(() => {});
       }
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "products");
     } finally {
@@ -1366,6 +1392,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     blogArticlesRef.current = sanitized;
     safeStorage.setItem("ruh-blog-articles", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       const currentIds = new Set(sanitized.map(b => b.id));
       const deletedIds = previousBlogs.filter(b => !currentIds.has(b.id)).map(b => b.id);
       try {
@@ -1386,6 +1413,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       for (const b of sanitized) {
         setDoc(doc(db, "reviews", `blog_${b.id}`), { ...b, _isBlog: true }, { merge: true }).catch(() => {});
       }
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "blogs");
     } finally {
@@ -1407,6 +1435,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     couponsRef.current = sanitized;
     safeStorage.setItem("ruh-coupons", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       const currentCodes = new Set(sanitized.map(c => c.code));
       const deletedCodes = previousCoupons.filter(c => !currentCodes.has(c.code)).map(c => c.code);
       try {
@@ -1427,6 +1456,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       for (const c of sanitized) {
         setDoc(doc(db, "reviews", `coupon_${c.code}`), { ...c, _isCoupon: true }, { merge: true }).catch(() => {});
       }
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "coupons");
     } finally {
@@ -1448,6 +1478,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     reviewsRef.current = sanitized;
     safeStorage.setItem("ruh-reviews", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       const batch = writeBatch(db);
       const currentIds = new Set(sanitized.map(r => r.id));
       const deletedIds = previousReviews.filter(r => !currentIds.has(r.id)).map(r => r.id);
@@ -1458,6 +1489,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         batch.set(doc(db, "reviews", r.id), r);
       }
       await withTimeout(batch.commit());
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "reviews");
     } finally {
@@ -1479,6 +1511,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     ordersRef.current = sanitized;
     safeStorage.setItem("ruh-orders", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       const batch = writeBatch(db);
       const currentIds = new Set(sanitized.map(o => o.id));
       const deletedIds = previousOrders.filter(o => !currentIds.has(o.id)).map(o => o.id);
@@ -1489,6 +1522,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         batch.set(doc(db, "orders", o.id), o);
       }
       await withTimeout(batch.commit());
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "orders");
     } finally {
@@ -1510,6 +1544,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     usersRef.current = sanitized;
     safeStorage.setItem("ruh-users", JSON.stringify(sanitized));
     try {
+      await ensureAdminAuth();
       const currentEmails = new Set(sanitized.map(u => u.email.toLowerCase()));
       const deletedEmails = previousUsers.filter(u => !currentEmails.has(u.email.toLowerCase())).map(u => u.email);
       for (const email of deletedEmails) {
@@ -1518,6 +1553,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       for (const u of sanitized) {
         await setDoc(doc(db, "users", u.email.toLowerCase()), u);
       }
+      setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "users");
     } finally {
