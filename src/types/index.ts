@@ -226,6 +226,7 @@ export interface Collection {
   icon?: string;
   isBold?: boolean;
   image?: string; // custom cover photo URL or uploaded path
+  count?: string; // e.g. "Sacred Absolutes", "7 Blends"
 }
 
 export interface Founder {

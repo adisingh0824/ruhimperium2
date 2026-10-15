@@ -4056,6 +4056,20 @@ service cloud.firestore {
                                 </div>
                                 
                                 <div>
+                                  <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-0.5">Card Badge / Count</label>
+                                  <input
+                                    type="text"
+                                    value={col.count || ""}
+                                    placeholder="e.g. Sacred Absolutes"
+                                    onChange={(e) => {
+                                      const updatedCount = e.target.value;
+                                      setCollections(prev => prev.map(c => c.id === col.id ? { ...c, count: updatedCount } : c));
+                                    }}
+                                    className="w-full bg-sand-50/60 border border-sand-200 px-2.5 py-1.5 text-xs rounded text-sand-800 outline-none focus:bg-white focus:ring-1 focus:ring-[#D4BC96]"
+                                  />
+                                </div>
+                                
+                                <div>
                                   <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-0.5">Edit Emoji Label</label>
                                   <input
                                     type="text"
@@ -4083,7 +4097,19 @@ service cloud.firestore {
 
                                 <div className="sm:col-span-2">
                                   <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-0.5">Edit Scent Photo Cover (Direct URL or upload file)</label>
-                                  <div className="flex gap-2">
+                                  <div className="flex items-center gap-3">
+                                    {col.image && (
+                                      <div className="w-10 h-12 rounded-md overflow-hidden bg-stone-100 border border-stone-200 shrink-0">
+                                        <img
+                                          src={col.image}
+                                          alt={col.name}
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => {
+                                            e.currentTarget.src = "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800";
+                                          }}
+                                        />
+                                      </div>
+                                    )}
                                     <input
                                       type="text"
                                       value={col.image || ""}
