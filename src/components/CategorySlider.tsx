@@ -83,7 +83,7 @@ export default function CategorySlider({ collections = [], onSelectCategory, sel
         title: adminCol.name || defaultItem.title,
         tagline: adminCol.tag || defaultItem.tagline,
         image: adminCol.image || defaultItem.image,
-        count: adminCol.count || adminCol.tag || defaultItem.count
+        count: adminCol.count || defaultItem.count
       };
     }
     return defaultItem;
@@ -105,7 +105,7 @@ export default function CategorySlider({ collections = [], onSelectCategory, sel
       title: c.name,
       tagline: c.tag || "Bespoke Collection",
       image: c.image || FALLBACK_IMAGE,
-      count: c.count || c.tag || "Signature Blend"
+      count: c.count || "Signature Blend"
     }));
 
   const allItems = [...dynamicItems, ...extraCollections];
