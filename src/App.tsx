@@ -81,6 +81,79 @@ const isEmbedIframe = (url: string): boolean => {
   );
 };
 
+export const DEFAULT_COLLECTIONS: Collection[] = [
+  {
+    id: "Authentic Indian Attars",
+    name: "Authentic Indian Attars",
+    tag: "Copper Still Hydro-Distilled",
+    icon: "🏺",
+    image: "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800",
+    count: "7 Blends",
+    isBold: false
+  },
+  {
+    id: "Eau De Parfum",
+    name: "Eau De Parfum",
+    tag: "Fine Luminous Mists",
+    icon: "🧪",
+    image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800",
+    count: "4 Creations",
+    isBold: false
+  },
+  {
+    id: "Modern Attars",
+    name: "Modern Attars",
+    tag: "Next-Gen Scent Profiles",
+    icon: "🌸",
+    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800",
+    count: "5 Blends",
+    isBold: true
+  },
+  {
+    id: "Indian Artisanal fragrances",
+    name: "Indian Artisanal fragrances",
+    tag: "Small-Batch Masterpieces",
+    icon: "⚜️",
+    image: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800",
+    count: "4 Signatures",
+    isBold: true
+  },
+  {
+    id: "Discovery Set",
+    name: "Discovery Sets",
+    tag: "Travel Coffrets & Gift Sets",
+    icon: "🎁",
+    image: "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?auto=format&fit=crop&q=80&w=800",
+    count: "Curated Sets",
+    isBold: false
+  },
+  {
+    id: "Ruh / Absolute Oil",
+    name: "Ruh | Absolute Oils",
+    tag: "Pure Uncut Extracts",
+    icon: "💧",
+    image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800",
+    count: "Sacred Absolutes",
+    isBold: false
+  }
+];
+
+export const mergeWithDefaultCollections = (list: Collection[]): Collection[] => {
+  if (!Array.isArray(list) || list.length === 0) return DEFAULT_COLLECTIONS;
+  const existingIds = new Set(list.map(c => c.id.toLowerCase()));
+  const missingDefaults = DEFAULT_COLLECTIONS.filter(d => 
+    !existingIds.has(d.id.toLowerCase()) && 
+    !list.some(c => c.name.toLowerCase() === d.name.toLowerCase())
+  );
+  const fixed = list.map(c => {
+    if (c.image && (c.image.includes("photo-1595151830531-2974eb3a13d7") || c.image.includes("1595151830531"))) {
+      return { ...c, image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" };
+    }
+    return c;
+  });
+  return [...fixed, ...missingDefaults];
+};
+
 export const safeStorage = {
   getItem: (key: string): string | null => {
     try {
@@ -207,85 +280,18 @@ export default function App() {
 
   // Dynamic Collections/Categories with working default luxury images
   const [collections, setCollections] = useState<Collection[]>(() => {
-    const defaultList: Collection[] = [
-      {
-        id: "Authentic Indian Attars",
-        name: "Authentic Indian Attars",
-        tag: "Copper Still Hydro-Distilled",
-        icon: "🏺",
-        image: "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=800",
-        count: "7 Blends",
-        isBold: false
-      },
-      {
-        id: "Eau De Parfum",
-        name: "Eau De Parfum",
-        tag: "Fine Luminous Mists",
-        icon: "🧪",
-        image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800",
-        count: "4 Creations",
-        isBold: false
-      },
-      {
-        id: "Modern Attars",
-        name: "Modern Attars",
-        tag: "Next-Gen Scent Profiles",
-        icon: "🌸",
-        image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800",
-        count: "5 Blends",
-        isBold: true
-      },
-      {
-        id: "Indian Artisanal fragrances",
-        name: "Indian Artisanal fragrances",
-        tag: "Small-Batch Masterpieces",
-        icon: "⚜️",
-        image: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=800",
-        count: "4 Signatures",
-        isBold: true
-      },
-      {
-        id: "Discovery Set",
-        name: "Discovery Sets",
-        tag: "Travel Coffrets & Gift Sets",
-        icon: "🎁",
-        image: "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?auto=format&fit=crop&q=80&w=800",
-        count: "Curated Sets",
-        isBold: false
-      },
-      {
-        id: "Ruh / Absolute Oil",
-        name: "Ruh | Absolute Oils",
-        tag: "Pure Uncut Extracts",
-        icon: "💧",
-        image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800",
-        count: "Sacred Absolutes",
-        isBold: false
-      }
-    ];
-
     const cached = safeStorage.getItem("ruh-collections");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Merge to ensure "Ruh / Absolute Oil" and all categories are available for admin editing
-          const existingIds = new Set(parsed.map(c => c.id.toLowerCase()));
-          const missingDefaults = defaultList.filter(d => !existingIds.has(d.id.toLowerCase()));
-          // Also fix broken image url in any existing saved items
-          const fixedParsed = parsed.map(c => {
-            if (c.image && c.image.includes("photo-1595151830531-2974eb3a13d7")) {
-              return { ...c, image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" };
-            }
-            return c;
-          });
-          return [...fixedParsed, ...missingDefaults];
+          return mergeWithDefaultCollections(parsed);
         }
       } catch (e) {
         // Fallback default
       }
     }
-    return defaultList;
+    return DEFAULT_COLLECTIONS;
   });
 
   useEffect(() => {
@@ -1115,7 +1121,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       if (snap.exists()) {
         if (writeLockRef.current["collections"]) return;
         const data = snap.data().list as Collection[];
-        setCollections(data);
+        const merged = mergeWithDefaultCollections(data);
+        setCollections(merged);
+        collectionsRef.current = merged;
+        safeStorage.setItem("ruh-collections", JSON.stringify(merged));
       } else {
         if (initPendingRef.current["collections"]) return;
         initPendingRef.current["collections"] = true;
@@ -1234,9 +1243,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         if (writeLockRef.current["collections"]) return;
         const data = snap.data();
         if (Array.isArray(data.list) && data.list.length > 0) {
-          setCollections(data.list);
-          collectionsRef.current = data.list;
-          safeStorage.setItem("ruh-collections", JSON.stringify(data.list));
+          const merged = mergeWithDefaultCollections(data.list);
+          setCollections(merged);
+          collectionsRef.current = merged;
+          safeStorage.setItem("ruh-collections", JSON.stringify(merged));
         }
       }
     }, () => {});
