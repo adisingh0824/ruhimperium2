@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { 
   ShoppingBag, 
   Search, 
@@ -93,6 +94,29 @@ export default function Header({
   const lastScrollYRef = useRef(0);
   const headerVisibleRef = useRef(true);
   const scrollTickingRef = useRef(false);
+  const navContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close any open dropdowns when clicking or tapping outside
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      if (navContainerRef.current && !navContainerRef.current.contains(event.target as Node)) {
+        setCollectionsDropdownOpen(false);
+        setNotesDropdownOpen(false);
+        setUseDropdownOpen(false);
+        setActiveMobileDropdown(null);
+      }
+    };
+
+    if (collectionsDropdownOpen || notesDropdownOpen || useDropdownOpen || activeMobileDropdown) {
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("touchstart", handleOutsideClick, { passive: true });
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [collectionsDropdownOpen, notesDropdownOpen, useDropdownOpen, activeMobileDropdown]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -230,7 +254,7 @@ export default function Header({
       </div>
 
       {/* Main Luxury Header Area */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div ref={navContainerRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* TOP ROW: Search | Logo | Profile & Bag */}
         <div className="grid grid-cols-3 h-24 items-center border-b border-stone-50">
@@ -383,11 +407,17 @@ export default function Header({
             >
               <button
                 type="button"
-                onClick={() => handleCategorySelect("All")}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider"
+                onClick={() => {
+                  setCollectionsDropdownOpen((prev) => !prev);
+                  setNotesDropdownOpen(false);
+                  setUseDropdownOpen(false);
+                }}
+                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider ${
+                  collectionsDropdownOpen ? "text-[#19a24b]" : "text-stone-900"
+                }`}
               >
                 <span>Collections</span>
-                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${collectionsDropdownOpen ? "rotate-180 text-[#19a24b]" : "group-hover:rotate-180"}`} />
               </button>
 
               {collectionsDropdownOpen && (
@@ -396,8 +426,11 @@ export default function Header({
                     <button
                       key={col.id}
                       type="button"
-                      onClick={() => handleCategorySelect(col.id)}
-                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                      onClick={() => {
+                        handleCategorySelect(col.id);
+                        setCollectionsDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between cursor-pointer"
                     >
                       <span>{col.name}</span>
                       <span className="text-sm text-stone-400 font-mono tracking-normal">→</span>
@@ -416,13 +449,16 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => {
-                  const el = document.getElementById("shop-by-notes-section");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                  setNotesDropdownOpen((prev) => !prev);
+                  setCollectionsDropdownOpen(false);
+                  setUseDropdownOpen(false);
                 }}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider"
+                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider ${
+                  notesDropdownOpen ? "text-[#19a24b]" : "text-stone-900"
+                }`}
               >
                 <span>Shop by Notes</span>
-                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${notesDropdownOpen ? "rotate-180 text-[#19a24b]" : "group-hover:rotate-180"}`} />
               </button>
 
               {notesDropdownOpen && (
@@ -436,7 +472,7 @@ export default function Header({
                         onNavigate("shop");
                         setNotesDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between cursor-pointer"
                     >
                       <span>{note.name}</span>
                       <span className="text-xs text-stone-400 font-mono tracking-normal">Explore</span>
@@ -455,13 +491,16 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => {
-                  const el = document.getElementById("shop-by-use-section");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                  setUseDropdownOpen((prev) => !prev);
+                  setCollectionsDropdownOpen(false);
+                  setNotesDropdownOpen(false);
                 }}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider"
+                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider ${
+                  useDropdownOpen ? "text-[#19a24b]" : "text-stone-900"
+                }`}
               >
                 <span>Shop By Use</span>
-                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${useDropdownOpen ? "rotate-180 text-[#19a24b]" : "group-hover:rotate-180"}`} />
               </button>
 
               {useDropdownOpen && (
@@ -475,7 +514,7 @@ export default function Header({
                         onNavigate("shop");
                         setUseDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between cursor-pointer"
                     >
                       <span>{item.name}</span>
                       <span className="text-xs text-stone-400 font-mono tracking-normal">Occasion</span>
@@ -529,8 +568,8 @@ export default function Header({
         </nav>
 
         {/* MOBILE HORIZONTAL NAVIGATION STRIP (Visible on mobile/tablet screens < 1024px) */}
-        <nav className="lg:hidden w-full border-t border-sand-200 bg-white">
-          <ul className="flex items-center space-x-6 overflow-x-auto scrollbar-none px-4 py-3 text-sm tracking-wider uppercase font-sans text-stone-900 font-bold whitespace-nowrap">
+        <nav className="lg:hidden w-full border-t border-sand-200 bg-white relative z-40">
+          <ul className="flex items-center space-x-5 sm:space-x-6 overflow-x-auto scrollbar-none px-4 py-3 text-xs sm:text-sm tracking-wider uppercase font-sans text-stone-900 font-bold whitespace-nowrap touch-manipulation">
             
             {/* 0. Home Link */}
             <li>
@@ -542,8 +581,8 @@ export default function Header({
                   onNavigate("hero");
                   setActiveMobileDropdown(null);
                 }}
-                className={`transition-colors cursor-pointer text-sm tracking-wider ${
-                  activeSection === "hero" ? "text-[#19a24b] font-bold" : "text-stone-900 hover:text-[#19a24b]"
+                className={`transition-colors cursor-pointer text-xs sm:text-sm tracking-wider py-1.5 px-2 rounded-md active:scale-95 ${
+                  activeSection === "hero" ? "text-[#19a24b] font-bold bg-emerald-50/60" : "text-stone-900 hover:text-[#19a24b]"
                 }`}
               >
                 Home
@@ -555,12 +594,14 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => setActiveMobileDropdown(activeMobileDropdown === "collections" ? null : "collections")}
-                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1 text-sm tracking-wider ${
-                  activeMobileDropdown === "collections" ? "text-[#19a24b]" : "text-stone-900"
+                className={`transition-colors cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm tracking-wider py-1.5 px-2.5 rounded-md active:scale-95 ${
+                  activeMobileDropdown === "collections" 
+                    ? "text-[#19a24b] bg-emerald-50 font-bold ring-1 ring-emerald-200" 
+                    : "text-stone-900 hover:text-[#19a24b]"
                 }`}
               >
                 <span>Collections</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMobileDropdown === "collections" ? "rotate-180 text-[#19a24b]" : ""}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeMobileDropdown === "collections" ? "rotate-180 text-[#19a24b]" : ""}`} />
               </button>
             </li>
 
@@ -569,12 +610,14 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => setActiveMobileDropdown(activeMobileDropdown === "notes" ? null : "notes")}
-                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1 text-sm tracking-wider ${
-                  activeMobileDropdown === "notes" ? "text-[#19a24b]" : "text-stone-900"
+                className={`transition-colors cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm tracking-wider py-1.5 px-2.5 rounded-md active:scale-95 ${
+                  activeMobileDropdown === "notes" 
+                    ? "text-[#19a24b] bg-emerald-50 font-bold ring-1 ring-emerald-200" 
+                    : "text-stone-900 hover:text-[#19a24b]"
                 }`}
               >
                 <span>Shop by Notes</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMobileDropdown === "notes" ? "rotate-180 text-[#19a24b]" : ""}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeMobileDropdown === "notes" ? "rotate-180 text-[#19a24b]" : ""}`} />
               </button>
             </li>
 
@@ -583,12 +626,14 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => setActiveMobileDropdown(activeMobileDropdown === "use" ? null : "use")}
-                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1 text-sm tracking-wider ${
-                  activeMobileDropdown === "use" ? "text-[#19a24b]" : "text-stone-900"
+                className={`transition-colors cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm tracking-wider py-1.5 px-2.5 rounded-md active:scale-95 ${
+                  activeMobileDropdown === "use" 
+                    ? "text-[#19a24b] bg-emerald-50 font-bold ring-1 ring-emerald-200" 
+                    : "text-stone-900 hover:text-[#19a24b]"
                 }`}
               >
                 <span>Shop By Use</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMobileDropdown === "use" ? "rotate-180 text-[#19a24b]" : ""}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeMobileDropdown === "use" ? "rotate-180 text-[#19a24b]" : ""}`} />
               </button>
             </li>
 
@@ -600,7 +645,7 @@ export default function Header({
                   handleCategorySelect("Discovery Set");
                   setActiveMobileDropdown(null);
                 }}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer text-sm tracking-wider text-stone-900"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer text-xs sm:text-sm tracking-wider text-stone-900 py-1.5 px-2 rounded-md active:scale-95"
               >
                 Discovery Sets
               </button>
@@ -614,8 +659,8 @@ export default function Header({
                   onNavigate("our-story");
                   setActiveMobileDropdown(null);
                 }}
-                className={`transition-colors cursor-pointer text-sm tracking-wider ${
-                  activeSection === "our-story" ? "text-[#19a24b] font-bold" : "text-stone-900 hover:text-[#19a24b]"
+                className={`transition-colors cursor-pointer text-xs sm:text-sm tracking-wider py-1.5 px-2 rounded-md active:scale-95 ${
+                  activeSection === "our-story" ? "text-[#19a24b] font-bold bg-emerald-50/60" : "text-stone-900 hover:text-[#19a24b]"
                 }`}
               >
                 Our Story
@@ -630,7 +675,7 @@ export default function Header({
                   setBulkEnquiryOpen(true);
                   setActiveMobileDropdown(null);
                 }}
-                className="text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-sm tracking-wider font-semibold"
+                className="text-stone-700 hover:text-stone-900 transition-colors cursor-pointer text-xs sm:text-sm tracking-wider font-semibold py-1.5 px-2 rounded-md active:scale-95"
               >
                 Bulk Enquiry
               </button>
@@ -644,96 +689,90 @@ export default function Header({
                   onTrackOrderClick();
                   setActiveMobileDropdown(null);
                 }}
-                className="text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-sm tracking-wider font-semibold"
+                className="text-stone-700 hover:text-stone-900 transition-colors cursor-pointer text-xs sm:text-sm tracking-wider font-semibold py-1.5 px-2 rounded-md active:scale-95"
               >
                 Track Order
               </button>
             </li>
 
           </ul>
+
+          {/* MOBILE EXPANDED DROPDOWN PANEL (directly in flow, 100% immune to transform/clipping bugs) */}
+          {activeMobileDropdown && (
+            <div className="w-full bg-[#FAF9F5] border-t border-sand-200 shadow-xl px-4 py-3 animate-fade-in">
+              <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-sand-200">
+                <span className="text-[11px] uppercase font-mono font-bold text-[#b58c53] tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#b58c53]" />
+                  {activeMobileDropdown === "collections" && "Select Collection"}
+                  {activeMobileDropdown === "notes" && "Shop By Olfactory Note"}
+                  {activeMobileDropdown === "use" && "Shop By Occasion / Wear"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveMobileDropdown(null)}
+                  className="p-1 rounded-md text-stone-400 hover:text-stone-800 hover:bg-sand-200/50 transition-colors cursor-pointer"
+                  aria-label="Close dropdown"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto pr-0.5">
+                {activeMobileDropdown === "collections" && collectionsMenu.map((col) => (
+                  <button
+                    key={col.id}
+                    type="button"
+                    onClick={() => {
+                      handleCategorySelect(col.id);
+                      setActiveMobileDropdown(null);
+                    }}
+                    className="flex items-center justify-between text-left p-2.5 rounded-xl bg-white hover:bg-stone-900 hover:text-white border border-sand-200/80 shadow-xs transition-all active:scale-[0.98] group cursor-pointer"
+                  >
+                    <span className="font-serif text-xs font-medium text-stone-800 group-hover:text-white line-clamp-1">{col.name}</span>
+                    <span className="text-xs text-[#b58c53] font-mono group-hover:text-white shrink-0 ml-1">→</span>
+                  </button>
+                ))}
+
+                {activeMobileDropdown === "notes" && notesMenu.map((note) => (
+                  <button
+                    key={note.id}
+                    type="button"
+                    onClick={() => {
+                      if (setSelectedCategory) setSelectedCategory(note.id);
+                      onNavigate("shop");
+                      setActiveMobileDropdown(null);
+                    }}
+                    className="flex items-center justify-between text-left p-2.5 rounded-xl bg-white hover:bg-stone-900 hover:text-white border border-sand-200/80 shadow-xs transition-all active:scale-[0.98] group cursor-pointer"
+                  >
+                    <span className="font-serif text-xs font-medium text-stone-800 group-hover:text-white line-clamp-1">{note.name}</span>
+                    <span className="text-[10px] text-[#b58c53] font-mono uppercase group-hover:text-white shrink-0 ml-1">Note</span>
+                  </button>
+                ))}
+
+                {activeMobileDropdown === "use" && useMenu.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => {
+                      if (setSearchQuery) setSearchQuery(u.id.replace(" Wear", ""));
+                      onNavigate("shop");
+                      setActiveMobileDropdown(null);
+                    }}
+                    className="flex items-center justify-between text-left p-2.5 rounded-xl bg-white hover:bg-stone-900 hover:text-white border border-sand-200/80 shadow-xs transition-all active:scale-[0.98] group cursor-pointer"
+                  >
+                    <span className="font-serif text-xs font-medium text-stone-800 group-hover:text-white line-clamp-1">{u.name}</span>
+                    <span className="text-[10px] text-[#b58c53] font-mono uppercase group-hover:text-white shrink-0 ml-1">Wear</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
 
       </div>
 
-      {/* MOBILE POPUP DROPDOWN MENU */}
-      {activeMobileDropdown && (
-        <div 
-          className="lg:hidden fixed inset-0 z-[998] bg-black/40 backdrop-blur-xs flex flex-col justify-start pt-32 px-4 animate-fade-in" 
-          onClick={() => setActiveMobileDropdown(null)}
-        >
-          <div 
-            className="bg-white rounded-2xl shadow-2xl border border-sand-200 overflow-hidden max-h-[70vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-sand-200 bg-sand-50/80">
-              <span className="text-xs uppercase font-mono font-bold text-[#D4BC96] tracking-widest">
-                {activeMobileDropdown === "collections" && "Select Collection"}
-                {activeMobileDropdown === "notes" && "Select Scent Note"}
-                {activeMobileDropdown === "use" && "Select Occasion / Use"}
-              </span>
-              <button
-                type="button"
-                onClick={() => setActiveMobileDropdown(null)}
-                className="p-1 text-sand-400 hover:text-sand-700 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-2 overflow-y-auto divide-y divide-sand-100">
-              {activeMobileDropdown === "collections" && collectionsMenu.map(col => (
-                <button
-                  key={col.id}
-                  type="button"
-                  onClick={() => {
-                    handleCategorySelect(col.id);
-                    setActiveMobileDropdown(null);
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-serif text-stone-800 hover:bg-sand-50 hover:text-[#19a24b] transition-colors flex items-center justify-between cursor-pointer"
-                >
-                  <span className="font-medium">{col.name}</span>
-                  <span className="text-xs text-sand-400 font-mono">→</span>
-                </button>
-              ))}
-
-              {activeMobileDropdown === "notes" && notesMenu.map(note => (
-                <button
-                  key={note.id}
-                  type="button"
-                  onClick={() => {
-                    if (setSelectedCategory) setSelectedCategory(note.id);
-                    onNavigate("shop");
-                    setActiveMobileDropdown(null);
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-serif text-stone-800 hover:bg-sand-50 hover:text-[#19a24b] transition-colors flex items-center justify-between cursor-pointer"
-                >
-                  <span className="font-medium">{note.name}</span>
-                  <span className="text-xs text-[#D4BC96] uppercase font-mono">Explore</span>
-                </button>
-              ))}
-
-              {activeMobileDropdown === "use" && useMenu.map(u => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => {
-                    if (setSearchQuery) setSearchQuery(u.id.replace(" Wear", ""));
-                    onNavigate("shop");
-                    setActiveMobileDropdown(null);
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-serif text-stone-800 hover:bg-sand-50 hover:text-[#19a24b] transition-colors flex items-center justify-between cursor-pointer"
-                >
-                  <span className="font-medium">{u.name}</span>
-                  <span className="text-xs text-[#D4BC96] uppercase font-mono">Occasion</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* LUXURY INTERACTIVE BULK ENQUIRY FORM MODAL */}
-      {bulkEnquiryOpen && (
+      {typeof document !== "undefined" && bulkEnquiryOpen && createPortal(
         <div className="fixed inset-0 bg-stone-950/70 backdrop-blur-md z-[99999] flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div className="bg-white max-w-xl w-full rounded-2xl overflow-hidden shadow-2xl border border-stone-100 animate-scale-up relative max-h-[92vh] flex flex-col my-auto">
             
@@ -887,11 +926,12 @@ export default function Header({
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* MOBILE REACTION SIDEBAR */}
-      {mobileMenuOpen && (
+      {typeof document !== "undefined" && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999] flex lg:hidden bg-stone-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setMobileMenuOpen(false)}>
           <div className="w-[85%] max-w-sm bg-stone-50 h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div>
@@ -1077,7 +1117,8 @@ export default function Header({
               </p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
