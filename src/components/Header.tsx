@@ -354,8 +354,8 @@ export default function Header({
           </div>
         </div>
 
-        <nav className="hidden lg:flex items-center justify-between h-12 relative border-t border-sand-200">
-          <ul className="flex items-center space-x-7 text-xs tracking-widest uppercase font-sans text-stone-900 font-semibold">
+        <nav className="hidden lg:flex items-center justify-between h-14 relative border-t border-sand-200">
+          <ul className="flex items-center space-x-8 text-sm tracking-wider uppercase font-sans text-stone-900 font-bold">
             
             {/* 0. Home Link */}
             <li className="relative py-3">
@@ -366,7 +366,7 @@ export default function Header({
                   if (setSearchQuery) setSearchQuery("");
                   onNavigate("hero");
                 }}
-                className={`transition-colors cursor-pointer hover:text-[#19a24b] ${
+                className={`transition-colors cursor-pointer hover:text-[#19a24b] text-sm tracking-wider ${
                   activeSection === "hero" ? "text-[#19a24b] font-bold" : "text-stone-900"
                 }`}
               >
@@ -383,10 +383,10 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => handleCategorySelect("All")}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider"
               >
                 <span>Collections</span>
-                <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
               </button>
 
               {collectionsDropdownOpen && (
@@ -396,10 +396,10 @@ export default function Header({
                       key={col.id}
                       type="button"
                       onClick={() => handleCategorySelect(col.id)}
-                      className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
                     >
                       <span>{col.name}</span>
-                      <span className="text-xs text-stone-400 font-mono tracking-normal">→</span>
+                      <span className="text-sm text-stone-400 font-mono tracking-normal">→</span>
                     </button>
                   ))}
                 </div>
@@ -418,10 +418,10 @@ export default function Header({
                   const el = document.getElementById("shop-by-notes-section");
                   if (el) el.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider"
               >
                 <span>Shop by Notes</span>
-                <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
               </button>
 
               {notesDropdownOpen && (
@@ -435,7 +435,7 @@ export default function Header({
                         onNavigate("shop");
                         setNotesDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
                     >
                       <span>{note.name}</span>
                       <span className="text-xs text-stone-400 font-mono tracking-normal">Explore</span>
@@ -457,10 +457,10 @@ export default function Header({
                   const el = document.getElementById("shop-by-use-section");
                   if (el) el.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5 text-sm tracking-wider"
               >
                 <span>Shop By Use</span>
-                <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
               </button>
 
               {useDropdownOpen && (
@@ -474,7 +474,7 @@ export default function Header({
                         onNavigate("shop");
                         setUseDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-xs font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2.5 text-sm font-serif text-stone-700 hover:text-white hover:bg-stone-900 transition-colors flex items-center justify-between"
                     >
                       <span>{item.name}</span>
                       <span className="text-xs text-stone-400 font-mono tracking-normal">Occasion</span>
@@ -489,7 +489,7 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => handleCategorySelect("Discovery Set")}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer text-sm tracking-wider"
               >
                 Discovery Sets
               </button>
@@ -500,7 +500,7 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => onNavigate("our-story")}
-                className="hover:text-[#19a24b] transition-colors cursor-pointer"
+                className="hover:text-[#19a24b] transition-colors cursor-pointer text-sm tracking-wider"
               >
                 Our Story
               </button>
@@ -509,18 +509,18 @@ export default function Header({
 
           {/* Utility links moved to secondary position (fix #21) */}
           {/* fix #1, #2 – text-stone-600 (#57534e on #fff = 7:1 contrast, passes 4.5:1) */}
-          <div className="flex items-center gap-4 text-xs tracking-widest uppercase font-sans text-stone-600 font-semibold">
+          <div className="flex items-center gap-5 text-xs sm:text-sm tracking-wider uppercase font-sans text-stone-600 font-semibold">
             <button
               type="button"
               onClick={() => setBulkEnquiryOpen(true)}
-              className="hover:text-stone-700 transition-colors cursor-pointer"
+              className="hover:text-stone-900 transition-colors cursor-pointer"
             >
               Bulk Enquiry
             </button>
             <button
               type="button"
               onClick={onTrackOrderClick}
-              className="hover:text-stone-700 transition-colors cursor-pointer"
+              className="hover:text-stone-900 transition-colors cursor-pointer"
             >
               Track Order
             </button>
@@ -726,8 +726,8 @@ export default function Header({
                     onNavigate("hero");
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif ${
-                    activeSection === "hero" ? "text-gold-600 font-semibold" : "text-stone-600"
+                  className={`text-left text-base uppercase tracking-wider border-b border-stone-200/50 pb-3 font-serif font-medium ${
+                    activeSection === "hero" ? "text-gold-600 font-bold" : "text-stone-800"
                   }`}
                 >
                   Home
@@ -735,8 +735,8 @@ export default function Header({
 
                 {/* 2. Shop Collections header / Categories */}
                 <div className="py-1">
-                  <p className="text-xs uppercase tracking-widest text-[#D4BC96] font-semibold mb-2">Collections</p>
-                  <div className="pl-3 space-y-2.5 border-l border-stone-200">
+                  <p className="text-xs uppercase tracking-widest text-[#D4BC96] font-bold mb-2.5 font-mono">Collections</p>
+                  <div className="pl-3 space-y-3 border-l-2 border-[#D4BC96]/30">
                     {collectionsMenu.map((cat) => (
                       <button
                         key={cat.id}
@@ -745,9 +745,30 @@ export default function Header({
                           handleCategorySelect(cat.id);
                           setMobileMenuOpen(false);
                         }}
-                        className="block text-left text-xs font-serif text-stone-500 hover:text-stone-900"
+                        className="block text-left text-sm font-serif text-stone-600 hover:text-stone-900 font-medium py-0.5"
                       >
                         {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Shop By Notes (Mobile) */}
+                <div className="py-1">
+                  <p className="text-xs uppercase tracking-widest text-[#D4BC96] font-bold mb-2.5 font-mono">Shop by Notes</p>
+                  <div className="pl-3 space-y-3 border-l-2 border-[#D4BC96]/30">
+                    {notesMenu.map((note) => (
+                      <button
+                        key={note.id}
+                        type="button"
+                        onClick={() => {
+                          if (setSelectedCategory) setSelectedCategory(note.id);
+                          onNavigate("shop");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block text-left text-sm font-serif text-stone-600 hover:text-stone-900 font-medium py-0.5"
+                      >
+                        {note.name}
                       </button>
                     ))}
                   </div>
@@ -761,9 +782,9 @@ export default function Header({
                     onNavigate("shop");
                     setMobileMenuOpen(false);
                   }}
-                  className="text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif text-stone-600 hover:text-stone-900"
+                  className="text-left text-base uppercase tracking-wider border-b border-stone-200/50 pb-3 font-serif text-stone-800 hover:text-stone-900 font-medium"
                 >
-                  Discovery Set
+                  Discovery Sets
                 </button>
 
                 {/* 5. For Bulk Enquiry */}
@@ -773,7 +794,7 @@ export default function Header({
                     setMobileMenuOpen(false);
                     setBulkEnquiryOpen(true);
                   }}
-                  className="text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif text-[#D4BC96] font-medium"
+                  className="text-left text-base uppercase tracking-wider border-b border-stone-200/50 pb-3 font-serif text-[#D4BC96] font-semibold"
                 >
                   For Bulk Enquiry
                 </button>
@@ -785,8 +806,8 @@ export default function Header({
                     onNavigate("our-story");
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif ${
-                    activeSection === "our-story" ? "text-gold-600 font-semibold" : "text-stone-600"
+                  className={`text-left text-base uppercase tracking-wider border-b border-stone-200/50 pb-3 font-serif font-medium ${
+                    activeSection === "our-story" ? "text-gold-600 font-bold" : "text-stone-800"
                   }`}
                 >
                   Our Story
@@ -799,7 +820,7 @@ export default function Header({
                     onTrackOrderClick();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif text-stone-600"
+                  className="text-left text-base uppercase tracking-wider border-b border-stone-200/50 pb-3 font-serif text-stone-700 font-medium"
                 >
                   Track your order
                 </button>
