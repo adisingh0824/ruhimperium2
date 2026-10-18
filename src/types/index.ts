@@ -259,7 +259,7 @@ export function getEmbedVideoUrl(url: string, isAmbient: boolean = false): strin
   if (match && match[2].length === 11) {
     const videoId = match[2];
     if (isAmbient) {
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0`;
     }
     return `https://www.youtube.com/embed/${videoId}`;
   }
@@ -270,7 +270,7 @@ export function getEmbedVideoUrl(url: string, isAmbient: boolean = false): strin
   if (vimeoMatch && vimeoMatch[3]) {
     const videoId = vimeoMatch[3];
     if (isAmbient) {
-      return `https://player.vimeo.com/video/${videoId}?autoplay=1&loop=1&muted=1&background=1&controls=0`;
+      return `https://player.vimeo.com/video/${videoId}?autoplay=1&loop=1&muted=1&background=1&controls=0&playsinline=1`;
     }
     return `https://player.vimeo.com/video/${videoId}`;
   }

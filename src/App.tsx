@@ -2225,17 +2225,40 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             ) : (
               /* Native Quality Ambient Video (Configured from Admin Panel - displays to all users in full uploaded resolution) */
-              <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+              <div className="absolute inset-0 z-0 overflow-hidden bg-black flex items-center justify-center pointer-events-none select-none">
+                {/* Fallback backdrop image while video stream initializes */}
+                {coverPhoto && (
+                  <img
+                    src={coverPhoto}
+                    alt="Hero Ambient Cover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-85 select-none pointer-events-none"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+
                 {heroVideoUrl ? (
                   isEmbedIframe(heroVideoUrl) ? (
-                    <iframe
-                      key={heroVideoUrl}
-                      src={getEmbedVideoUrl(heroVideoUrl, true)}
-                      title="Hero Ambient Video"
-                      className="absolute inset-0 w-full h-[150%] top-[-25%] border-0 opacity-100 scale-100 pointer-events-none select-none"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
+                    <div className="absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center pointer-events-none select-none">
+                      <iframe
+                        key={heroVideoUrl}
+                        src={getEmbedVideoUrl(heroVideoUrl, true)}
+                        title="Hero Ambient Video"
+                        className="absolute border-0 opacity-100 pointer-events-none select-none"
+                        style={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: "max(100%, calc(100vh * 16 / 9), 177.78vh)",
+                          height: "max(100%, calc(100vw * 9 / 16), 100vh)",
+                          minWidth: "100%",
+                          minHeight: "100%",
+                          aspectRatio: "16 / 9",
+                        }}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
                   ) : (
                     <video
                       ref={heroVideoRef}
@@ -2246,7 +2269,13 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       loop
                       playsInline
                       preload="auto"
-                      className="w-full h-full object-cover opacity-100 scale-100 select-none pointer-events-none"
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto max-w-none object-cover opacity-100 scale-100 select-none pointer-events-none"
+                      style={{
+                        minWidth: "100%",
+                        minHeight: "100%",
+                        width: "max(100%, 177.78vh)",
+                        height: "max(100%, 56.25vw)",
+                      }}
                       poster={coverPhoto}
                     />
                   )
