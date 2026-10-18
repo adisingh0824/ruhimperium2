@@ -1062,9 +1062,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         }
         if (liveOrders.length > 0 && !writeLockRef.current["orders"]) {
           setOrders(prev => {
-            const map = new Map(prev.map(o => [o.id, o]));
+            const map = new Map<string, Order>(prev.map(o => [o.id, o]));
             liveOrders.forEach(o => map.set(o.id, o));
-            const merged = Array.from(map.values()).sort((a, b) => {
+            const merged: Order[] = Array.from(map.values()).sort((a: Order, b: Order) => {
               const dateA = new Date(a.date).getTime() || 0;
               const dateB = new Date(b.date).getTime() || 0;
               if (dateA !== dateB) return dateB - dateA;
@@ -1100,9 +1100,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           list.push(d.data() as Order);
         });
         setOrders(prev => {
-          const map = new Map(prev.map(o => [o.id, o]));
+          const map = new Map<string, Order>(prev.map(o => [o.id, o]));
           list.forEach(o => map.set(o.id, o));
-          const merged = Array.from(map.values()).sort((a, b) => {
+          const merged: Order[] = Array.from(map.values()).sort((a: Order, b: Order) => {
             const dateA = new Date(a.date).getTime() || 0;
             const dateB = new Date(b.date).getTime() || 0;
             if (dateA !== dateB) return dateB - dateA;
