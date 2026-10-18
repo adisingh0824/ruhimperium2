@@ -53,6 +53,9 @@ import ImpactNumbers from './components/ImpactNumbers';
 import FaqSection from './components/FaqSection';
 import CategorySlider from './components/CategorySlider';
 import SandalwoodRitual from './components/SandalwoodRitual';
+import ScentFinderQuiz from './components/ScentFinderQuiz';
+import LayeringSalon from './components/LayeringSalon';
+import CustomBlendLab from './components/CustomBlendLab';
 import { uploadVideoFile } from './utils/mediaUpload';
 
 const isEmbedIframe = (url: string): boolean => {
@@ -672,6 +675,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [isDistilleryVideoOpen, setIsDistilleryVideoOpen] = useState(false);
   const [isBulkEnquiryOpen, setIsBulkEnquiryOpen] = useState(false);
   const setBulkEnquiryOpen = setIsBulkEnquiryOpen;
+  const [isScentFinderOpen, setIsScentFinderOpen] = useState(false);
+  const [isLayeringSalonOpen, setIsLayeringSalonOpen] = useState(false);
+  const [isCustomBlendLabOpen, setIsCustomBlendLabOpen] = useState(false);
 
   // Expanded Blog Article state
   const [selectedArticle, setSelectedArticle] = useState<BlogArticle | null>(null);
@@ -1990,6 +1996,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         siteSettings={siteSettings}
         bulkEnquiryOpen={isBulkEnquiryOpen}
         setBulkEnquiryOpen={setIsBulkEnquiryOpen}
+        onOpenScentFinder={() => setIsScentFinderOpen(true)}
+        onOpenLayeringSalon={() => setIsLayeringSalonOpen(true)}
+        onOpenCustomBlendLab={() => setIsCustomBlendLabOpen(true)}
       />
 
       {/* 3D Ambient Scent Atmosphere Particle Engine */}
@@ -2300,34 +2309,97 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             {(() => {
               // Internal logic to filter products
               const filteredList = products.filter((p) => {
+                const catLower = selectedCategory.toLowerCase();
+                const allNotes = [
+                  ...(p.notes?.top || []),
+                  ...(p.notes?.heart || []),
+                  ...(p.notes?.base || [])
+                ].map(n => n.toLowerCase());
+
                 const matchesCategory = selectedCategory === "All" || 
-                  p.category === selectedCategory ||
+                  p.category.toLowerCase() === catLower ||
+                  (selectedCategory === "Floral" && (
+                    p.category.toLowerCase().includes("floral") ||
+                    p.description.toLowerCase().includes("floral") ||
+                    p.description.toLowerCase().includes("rose") ||
+                    p.description.toLowerCase().includes("jasmine") ||
+                    p.description.toLowerCase().includes("mogra") ||
+                    p.ingredients.some(i => /floral|rose|jasmine|mogra|tiare|gardenia|flower|petal|gulab/i.test(i)) ||
+                    allNotes.some(n => /floral|rose|jasmine|mogra|tiare|gardenia|flower|petal|gulab/i.test(n)) ||
+                    /rose|gulab|mogra|aarzoo|zara/i.test(p.name)
+                  )) ||
+                  (selectedCategory === "Woody" && (
+                    p.category.toLowerCase().includes("wood") ||
+                    p.description.toLowerCase().includes("wood") ||
+                    p.description.toLowerCase().includes("sandalwood") ||
+                    p.description.toLowerCase().includes("cedar") ||
+                    p.ingredients.some(i => /wood|sandalwood|cedar|oud|agarwood|patchouli|vetiver|khus/i.test(i)) ||
+                    allNotes.some(n => /wood|sandalwood|cedar|oud|agarwood|patchouli|vetiver|khus/i.test(n)) ||
+                    /sandal|wood|oud|musafir/i.test(p.name)
+                  )) ||
+                  (selectedCategory === "Fresh" && (
+                    p.description.toLowerCase().includes("fresh") ||
+                    p.description.toLowerCase().includes("citrus") ||
+                    p.description.toLowerCase().includes("bergamot") ||
+                    p.description.toLowerCase().includes("ocean") ||
+                    p.ingredients.some(i => /fresh|citrus|bergamot|salt|marine|mandarin|neroli|water/i.test(i)) ||
+                    allNotes.some(n => /fresh|citrus|bergamot|salt|marine|mandarin|neroli|water/i.test(n)) ||
+                    /safar|zara|forest/i.test(p.name)
+                  )) ||
+                  (selectedCategory === "Musky" && (
+                    p.description.toLowerCase().includes("musk") ||
+                    p.ingredients.some(i => /musk|ambergris|velvet/i.test(i)) ||
+                    allNotes.some(n => /musk|ambergris|velvet/i.test(n)) ||
+                    /musk|aarzoo/i.test(p.name)
+                  )) ||
                   (selectedCategory === "Gourmand" && (
                     p.description.toLowerCase().includes("vanilla") || 
                     p.description.toLowerCase().includes("chocolate") || 
                     p.description.toLowerCase().includes("spic") || 
                     p.description.toLowerCase().includes("sweet") || 
-                    p.ingredients.some(i => i.toLowerCase().includes("spice") || i.toLowerCase().includes("vanilla"))
+                    p.description.toLowerCase().includes("caramel") ||
+                    p.description.toLowerCase().includes("honey") ||
+                    p.ingredients.some(i => /spice|vanilla|honey|caramel|sweet|tonka/i.test(i)) ||
+                    allNotes.some(n => /spice|vanilla|honey|caramel|sweet|tonka/i.test(n)) ||
+                    /safar|musafir/i.test(p.name)
                   )) ||
                   (selectedCategory === "Oriental" && (
                     p.description.toLowerCase().includes("oud") || 
                     p.description.toLowerCase().includes("sandalwood") || 
                     p.description.toLowerCase().includes("amber") || 
                     p.description.toLowerCase().includes("woody") ||
-                    p.ingredients.some(i => i.toLowerCase().includes("oud") || i.toLowerCase().includes("sandalwood") || i.toLowerCase().includes("amber"))
+                    p.description.toLowerCase().includes("saffron") ||
+                    p.ingredients.some(i => /oud|sandalwood|amber|saffron|kesar|spic/i.test(i)) ||
+                    allNotes.some(n => /oud|sandalwood|amber|saffron|kesar|spic/i.test(n)) ||
+                    /oud|saffron|kesar|raat/i.test(p.name)
                   )) ||
                   (selectedCategory === "Wellness" && (
                     p.category.toLowerCase().includes("attar") || 
                     p.description.toLowerCase().includes("botanical") || 
                     p.description.toLowerCase().includes("sooth") || 
                     p.description.toLowerCase().includes("relax") ||
-                    p.ingredients.some(i => i.toLowerCase().includes("rose") || i.toLowerCase().includes("sandalwood") || i.toLowerCase().includes("mitti"))
-                  ));
+                    p.ingredients.some(i => /rose|sandalwood|mitti/i.test(i))
+                  )) ||
+                  (selectedCategory === "Sandalwood" && (
+                    p.name.toLowerCase().includes("sandal") ||
+                    p.description.toLowerCase().includes("sandal") ||
+                    p.ingredients.some(i => i.toLowerCase().includes("sandal")) ||
+                    allNotes.some(n => n.toLowerCase().includes("sandal"))
+                  )) ||
+                  // Generic fallback: check if product name, description, ingredients, or notes contain the category name
+                  p.name.toLowerCase().includes(catLower) ||
+                  p.tagline.toLowerCase().includes(catLower) ||
+                  p.description.toLowerCase().includes(catLower) ||
+                  p.ingredients.some(i => i.toLowerCase().includes(catLower)) ||
+                  allNotes.some(n => n.toLowerCase().includes(catLower));
+
                 const matchesKeyword = searchQuery === "" || 
                   p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   p.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  p.ingredients.some((ing) => ing.toLowerCase().includes(searchQuery.toLowerCase()));
+                  p.ingredients.some((ing) => ing.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                  allNotes.some((n) => n.toLowerCase().includes(searchQuery.toLowerCase()));
+
                 return matchesCategory && matchesKeyword;
               });
 
@@ -3266,7 +3338,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
 
         {/* SHOP BY USE SECTION (OCCASIONS GRID) */}
-        <section className="bg-sand-50 py-20 sm:py-28 border-b border-sand-200/50">
+        <section className="bg-sand-50 py-20 sm:py-28 border-b border-sand-200/50" id="shop-by-use-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
             
             <div className="text-center max-w-xl mx-auto">
@@ -3559,7 +3631,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               products={products}
             />
           } />
-          <Route path="/our-story" element={<OurStoryPage founders={founders} siteSettings={siteSettings} />} />
+          <Route path="/our-story" element={
+            <OurStoryPage 
+              founders={founders} 
+              siteSettings={siteSettings} 
+              products={products}
+              onSelectProduct={(p) => {
+                setSelectedProduct(p);
+                setIsModalOpen(true);
+              }}
+            />
+          } />
           <Route path="*" element={<NotFoundPage siteSettings={siteSettings} />} />
         </Routes>
       </main>
@@ -3794,6 +3876,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           setIsModalOpen(true);
         }}
         onAddCustomToCart={handleAddCustomToCart}
+        onOpenCustomLab={() => {
+          setIsLoungeOpen(false);
+          setIsCustomBlendLabOpen(true);
+        }}
       />
 
 
@@ -4052,6 +4138,57 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                 Save &amp; Broadcast Video
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SCENT FINDER QUIZ OVERLAY MODAL */}
+      {isScentFinderOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-6 overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-5xl bg-[#FAF9F5] rounded-3xl overflow-hidden shadow-2xl border border-stone-200 my-auto max-h-[92vh] overflow-y-auto">
+            <ScentFinderQuiz
+              products={products}
+              onSelectProduct={(p) => {
+                setSelectedProduct(p);
+                setIsModalOpen(true);
+                setIsScentFinderOpen(false);
+              }}
+              onAddToCart={handleAddToCart}
+              onClose={() => setIsScentFinderOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* LAYERING SALON OVERLAY MODAL */}
+      {isLayeringSalonOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-6 overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-5xl bg-[#FAF9F5] rounded-3xl overflow-hidden shadow-2xl border border-stone-200 my-auto max-h-[92vh] overflow-y-auto">
+            <LayeringSalon
+              products={products}
+              onAddToCart={handleAddToCart}
+              onOpenCart={() => {
+                setIsLayeringSalonOpen(false);
+                setIsCartOpen(true);
+              }}
+              onClose={() => setIsLayeringSalonOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOM BESPOKE BLEND LAB OVERLAY MODAL */}
+      {isCustomBlendLabOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-6 overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-4xl bg-[#FAF9F5] rounded-3xl overflow-hidden shadow-2xl border border-stone-200 my-auto max-h-[92vh] overflow-y-auto">
+            <CustomBlendLab
+              onAddCustomToCart={(customProduct) => {
+                handleAddCustomToCart(customProduct);
+                setIsCustomBlendLabOpen(false);
+                setIsCartOpen(true);
+              }}
+              onClose={() => setIsCustomBlendLabOpen(false)}
+            />
           </div>
         </div>
       )}

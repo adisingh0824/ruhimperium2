@@ -279,8 +279,9 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
   const originalPrice = selectedVariant ? selectedVariant.price : product.price;
 
   const handleAddToCartClick = () => {
+    const sizeToUse = selectedSize || product.variants?.[0]?.size || product.size;
     for (let i = 0; i < quantity; i++) {
-      onAddToCart(product, selectedSize);
+      onAddToCart(product, sizeToUse);
     }
     setIsCartOpen(true);
   };
@@ -783,7 +784,7 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
           onClick={handleBuyItNow}
           className="flex-1 py-3.5 bg-[#2D2926] text-white font-semibold tracking-widest uppercase text-[11px] rounded-sm cursor-pointer"
         >
-          Buy {selectedSize}
+          Buy {selectedSize || product.variants?.[0]?.size || product.size}
         </button>
       </div>
 

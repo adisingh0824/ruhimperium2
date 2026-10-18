@@ -38,6 +38,7 @@ interface UserLoungeModalProps {
   onLogoutAdmin: () => void;
   onSelectProduct: (p: Product) => void;
   onAddCustomToCart: (customProduct: Product) => void;
+  onOpenCustomLab?: () => void;
   customLogoutAction?: () => void;
 }
 
@@ -55,6 +56,7 @@ export function TraditionalUserLoungeModal({
   onLogoutAdmin,
   onSelectProduct,
   onAddCustomToCart,
+  onOpenCustomLab,
   customLogoutAction
 }: UserLoungeModalProps) {
   // Modal view states: "login" | "register" | "dashboard"
@@ -836,9 +838,39 @@ export function TraditionalUserLoungeModal({
                         <Sparkles className="w-10 h-10 text-[#D4BC96] mx-auto mb-3 animate-pulse" />
                         <h5 className="text-sm font-serif font-semibold text-stone-850">Your botanical cabinet is currently empty</h5>
                         <p className="text-xs text-stone-500 font-light mt-1 max-w-sm mx-auto">Create and order a customized fragrance formulation in our digital compounding lab to secure it here permanently.</p>
+                        {onOpenCustomLab && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onClose();
+                              onOpenCustomLab();
+                            }}
+                            className="mt-5 px-6 py-2.5 bg-[#1C1917] hover:bg-[#D4BC96] text-white hover:text-stone-950 font-serif text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-md font-medium cursor-pointer inline-flex items-center gap-2"
+                          >
+                            <Sparkles className="w-4 h-4 text-[#D4BC96]" />
+                            <span>Launch Compounding Lab →</span>
+                          </button>
+                        )}
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-4">
+                        {onOpenCustomLab && (
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs uppercase tracking-wider text-stone-500 font-mono">Your Saved Formulations ({savedBlends.length})</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onClose();
+                                onOpenCustomLab();
+                              }}
+                              className="px-3.5 py-1.5 bg-[#1C1917] hover:bg-[#D4BC96] text-white hover:text-stone-950 text-[10px] font-mono uppercase tracking-widest rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-[#D4BC96]" />
+                              <span>+ Compound New Blend</span>
+                            </button>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {savedBlends.map((blend) => (
                           <div key={blend.id} className="bg-stone-50/50 border border-stone-200 rounded-2xl p-4.5 flex flex-col justify-between hover:border-gold-500 hover:bg-stone-50 transition-all duration-300 group">
                             
@@ -886,6 +918,7 @@ export function TraditionalUserLoungeModal({
 
                           </div>
                         ))}
+                      </div>
                       </div>
                     )}
                   </div>

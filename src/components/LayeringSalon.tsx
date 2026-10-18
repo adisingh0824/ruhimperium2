@@ -12,7 +12,8 @@ import {
   Info,
   Clock,
   Wind,
-  Shuffle
+  Shuffle,
+  X
 } from "lucide-react";
 import { Product } from "../types";
 import { motion, AnimatePresence } from "motion/react";
@@ -21,9 +22,10 @@ interface LayeringSalonProps {
   products: Product[];
   onAddToCart: (product: Product, size: string) => void;
   onOpenCart: () => void;
+  onClose?: () => void;
 }
 
-export const LayeringSalon: FC<LayeringSalonProps> = ({ products, onAddToCart, onOpenCart }) => {
+export const LayeringSalon: FC<LayeringSalonProps> = ({ products, onAddToCart, onOpenCart, onClose }) => {
   const [selectedP1Id, setSelectedP1Id] = useState<string>("sandy-hills");
   const [selectedP2Id, setSelectedP2Id] = useState<string>("mitti-attar");
   const [isBlending, setIsBlending] = useState(false);
@@ -203,6 +205,16 @@ export const LayeringSalon: FC<LayeringSalonProps> = ({ products, onAddToCart, o
       className="bg-[#FAF9F5] py-20 sm:py-28 border-b border-sand-200 relative overflow-hidden" 
       id="layering-section"
     >
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2.5 rounded-full bg-white text-stone-500 hover:text-stone-900 border border-sand-200 shadow-sm cursor-pointer z-20 transition-all hover:bg-sand-100"
+          aria-label="Close layering salon"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
       {/* Background Watermark/Aesthetics */}
       <div className="absolute top-10 right-10 opacity-[0.03] select-none pointer-events-none hidden lg:block">
         <span className="text-[250px] font-serif leading-none">RUH</span>

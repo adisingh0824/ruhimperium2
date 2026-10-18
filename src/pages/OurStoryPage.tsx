@@ -1,14 +1,17 @@
 import React, { useEffect } from "react";
 import { ArrowRight, Star, Heart, MapPin, Compass } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Founder, SiteSettings } from "../types";
+import { Founder, SiteSettings, Product } from "../types";
+import SourcingMap from "../components/SourcingMap";
 
 interface OurStoryPageProps {
   founders?: Founder[];
   siteSettings?: SiteSettings;
+  products?: Product[];
+  onSelectProduct?: (product: Product) => void;
 }
 
-export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPageProps) {
+export default function OurStoryPage({ founders = [], siteSettings, products = [], onSelectProduct }: OurStoryPageProps) {
   const navigate = useNavigate();
 
   // Scroll to top on page load and update SEO title/meta
@@ -186,6 +189,18 @@ export default function OurStoryPage({ founders = [], siteSettings }: OurStoryPa
           </div>
         </div>
       </section>
+
+      {/* Interactive Scent Terroir & Sourcing Map */}
+      <SourcingMap
+        products={products}
+        onInteractProduct={(p) => {
+          if (onSelectProduct) {
+            onSelectProduct(p);
+          } else {
+            navigate(`/product/${p.id}`);
+          }
+        }}
+      />
 
       {/* Heirs & Leadership Section */}
       <section className="py-20 sm:py-28 bg-[#F8F6F0]">

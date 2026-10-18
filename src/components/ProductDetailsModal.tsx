@@ -656,8 +656,8 @@ export default function ProductDetailsModal({
               </div>
 
               <button
-                type="button"
-                className="px-6 py-2.5 bg-[#0D0B0A] hover:bg-gold-600 text-white text-[10px] uppercase tracking-widest font-medium rounded transition-all cursor-pointer"
+                type="submit"
+                className="px-6 py-2.5 bg-[#0D0B0A] hover:bg-[#D4BC96] text-white text-[10px] uppercase tracking-widest font-medium rounded transition-all cursor-pointer"
               >
                 SUBMIT LOG ENTRY
               </button>

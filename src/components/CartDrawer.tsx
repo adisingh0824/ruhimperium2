@@ -282,11 +282,6 @@ export default function CartDrawer({
 
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Ensure user is logged in before proceeding
-    if (!currentUser) {
-      alert("Please sign in to complete your purchase.");
-      return;
-    }
     if (!fullName || !email || !phone || !address || !pincode) return;
 
     // Check if Razorpay is enabled and key is supplied, or falls back to simulation

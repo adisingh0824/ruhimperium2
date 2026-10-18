@@ -150,6 +150,10 @@ export default function ShopByNotes({ onSelectNote, activeNote }: ShopByNotesPro
                 {/* Promoted from a tiny span to a full-width pill button for clear affordance */}
                 <button
                   type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectNote(note.name);
+                  }}
                   className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-full border-2 border-stone-800 bg-transparent text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-semibold font-sans uppercase tracking-wider transition-all duration-200 cursor-pointer group-hover:border-[#15803d] group-hover:text-[#15803d] group-hover:bg-transparent"
                   aria-label={`Explore ${note.name} family`}
                 >

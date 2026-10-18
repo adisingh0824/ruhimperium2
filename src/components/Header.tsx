@@ -39,6 +39,9 @@ interface HeaderProps {
   siteSettings?: SiteSettings;
   bulkEnquiryOpen?: boolean;
   setBulkEnquiryOpen?: (open: boolean) => void;
+  onOpenScentFinder?: () => void;
+  onOpenLayeringSalon?: () => void;
+  onOpenCustomBlendLab?: () => void;
 }
 
 export default function Header({ 
@@ -57,7 +60,10 @@ export default function Header({
   currentUser,
   siteSettings,
   bulkEnquiryOpen: propBulkEnquiryOpen,
-  setBulkEnquiryOpen: propSetBulkEnquiryOpen
+  setBulkEnquiryOpen: propSetBulkEnquiryOpen,
+  onOpenScentFinder,
+  onOpenLayeringSalon,
+  onOpenCustomBlendLab
 }: HeaderProps) {
   const announcements = siteSettings?.announcementText
     ? [siteSettings.announcementText]
@@ -500,6 +506,45 @@ export default function Header({
               </button>
             </li>
 
+            {/* 6. Scent Finder */}
+            {onOpenScentFinder && (
+              <li className="relative py-3">
+                <button
+                  type="button"
+                  onClick={onOpenScentFinder}
+                  className="hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#D4BC96]" />
+                  <span>Scent Finder</span>
+                </button>
+              </li>
+            )}
+
+            {/* 7. Layering Salon */}
+            {onOpenLayeringSalon && (
+              <li className="relative py-3">
+                <button
+                  type="button"
+                  onClick={onOpenLayeringSalon}
+                  className="hover:text-[#19a24b] transition-colors cursor-pointer"
+                >
+                  Layering Salon
+                </button>
+              </li>
+            )}
+
+            {/* 8. Bespoke Lab */}
+            {onOpenCustomBlendLab && (
+              <li className="relative py-3">
+                <button
+                  type="button"
+                  onClick={onOpenCustomBlendLab}
+                  className="hover:text-[#19a24b] transition-colors cursor-pointer"
+                >
+                  Bespoke Lab
+                </button>
+              </li>
+            )}
           </ul>
 
           {/* Utility links moved to secondary position (fix #21) */}
@@ -760,6 +805,49 @@ export default function Header({
                 >
                   Discovery Set
                 </button>
+
+                {/* Scent Finder */}
+                {onOpenScentFinder && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenScentFinder();
+                    }}
+                    className="text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif text-stone-700 hover:text-stone-900 flex items-center justify-between"
+                  >
+                    <span>Scent Finder Quiz</span>
+                    <Sparkles className="w-3.5 h-3.5 text-[#D4BC96]" />
+                  </button>
+                )}
+
+                {/* Layering Salon */}
+                {onOpenLayeringSalon && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenLayeringSalon();
+                    }}
+                    className="text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif text-stone-700 hover:text-stone-900"
+                  >
+                    Fragrance Layering Salon
+                  </button>
+                )}
+
+                {/* Bespoke Blend Lab */}
+                {onOpenCustomBlendLab && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenCustomBlendLab();
+                    }}
+                    className="text-left text-sm uppercase tracking-widest border-b border-stone-200/50 pb-2.5 font-serif text-stone-700 hover:text-stone-900"
+                  >
+                    Bespoke Scent Lab
+                  </button>
+                )}
 
                 {/* 5. For Bulk Enquiry */}
                 <button

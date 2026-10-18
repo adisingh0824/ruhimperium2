@@ -1701,12 +1701,12 @@ service cloud.firestore {
                                 <span className="font-light text-[10.5px] text-sand-500">({o.email})</span>
                               </p>
                               <div className="flex items-center gap-2 mt-1">
-                                <a href={`https://wa.me/91${o.phone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-green-600 hover:text-green-700 underline decoration-green-300 decoration-dashed underline-offset-2 font-mono flex items-center gap-1">
+                                <a href={`https://wa.me/91${(o.phone || "").replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-green-600 hover:text-green-700 underline decoration-green-300 decoration-dashed underline-offset-2 font-mono flex items-center gap-1">
                                   <span>WhatsApp</span>
                                 </a>
                                 <input 
                                   type="text" 
-                                  value={o.phone} 
+                                  value={o.phone || ""} 
                                   onChange={(e) => handleUpdateOrderPhone(o.id, e.target.value)}
                                   className="text-[10.5px] font-mono text-sand-600 bg-transparent border-b border-dashed border-sand-300 focus:outline-none focus:border-[#D4BC96] w-24 px-1"
                                 />
@@ -1773,17 +1773,18 @@ service cloud.firestore {
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                             <div className="md:col-span-8 bg-white/70 rounded-xl p-3 border border-sand-150 text-[11px] space-y-1">
                               <span className="text-[8px] uppercase tracking-widest text-[#D4BC96] font-semibold block mb-1">COMPILATION ITEMS LOG</span>
-                              {o.items.map((item, id) => {
-                                const selectedVariant = item.product.variants?.find(v => 
-                                  v.size === item.selectedSize ||
-                                  v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
-                                  (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
-                                  (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+                              {(o.items || []).map((item, id) => {
+                                const itemSize = item.selectedSize || "";
+                                const selectedVariant = item.product?.variants?.find(v => 
+                                  v.size === itemSize ||
+                                  (v.size && itemSize && v.size.toLowerCase().replace(/\s+/g, '') === itemSize.toLowerCase().replace(/\s+/g, '')) ||
+                                  (itemSize === "50 ml" && v.size === "50ML Spray") ||
+                                  (itemSize === "12 ml" && v.size === "12ML Roll On")
                                 );
-                                const activePrice = selectedVariant ? selectedVariant.salePrice : item.product.salePrice;
+                                const activePrice = selectedVariant ? selectedVariant.salePrice : (item.product?.salePrice || 0);
                                 return (
                                   <div key={id} className="flex justify-between font-mono text-sand-700">
-                                    <span>{item.product.name} ({item.selectedSize}) x {item.quantity}</span>
+                                    <span>{item.product?.name || "Bespoke Fragrance"} ({itemSize}) x {item.quantity}</span>
                                     <span className="text-sand-600 font-sans">₹{activePrice} each</span>
                                   </div>
                                 );

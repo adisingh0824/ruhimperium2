@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Sliders, FlaskConical, HelpCircle, Sparkles, Plus, Check, ShoppingBag, Wind } from "lucide-react";
+import { Sliders, FlaskConical, HelpCircle, Sparkles, Plus, Check, ShoppingBag, Wind, X } from "lucide-react";
 import { Product } from "../types";
 
 interface CustomBlendLabProps {
   onAddCustomToCart: (customProduct: Product) => void;
+  onClose?: () => void;
 }
 
-export default function CustomBlendLab({ onAddCustomToCart }: CustomBlendLabProps) {
+export default function CustomBlendLab({ onAddCustomToCart, onClose }: CustomBlendLabProps) {
   const [citrus, setCitrus] = useState(40);
   const [woods, setWoods] = useState(30);
   const [spices, setSpices] = useState(30);
@@ -100,7 +101,17 @@ export default function CustomBlendLab({ onAddCustomToCart }: CustomBlendLabProp
   };
 
   return (
-    <section className="bg-sand-50 py-16 sm:py-24 border-b border-sand-200" id="scent-lab-section">
+    <section className="bg-sand-50 py-16 sm:py-24 border-b border-sand-200 relative" id="scent-lab-section">
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2.5 rounded-full bg-white text-stone-500 hover:text-stone-900 border border-sand-200 shadow-sm cursor-pointer z-20 transition-all hover:bg-sand-100"
+          aria-label="Close custom blend lab"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

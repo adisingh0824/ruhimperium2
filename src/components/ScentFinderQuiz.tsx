@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Sparkles, ArrowRight, ArrowLeft, RefreshCw, ShoppingCart, Award, Navigation, MapPin } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, RefreshCw, ShoppingCart, Award, Navigation, MapPin, X } from "lucide-react";
 import { Product } from "../types";
 
 interface ScentFinderQuizProps {
   products: Product[];
   onSelectProduct: (product: Product) => void;
   onAddToCart: (product: Product, size: string) => void;
+  onClose?: () => void;
 }
 
 interface Question {
@@ -20,7 +21,7 @@ interface Question {
   }[];
 }
 
-export default function ScentFinderQuiz({ products, onSelectProduct, onAddToCart }: ScentFinderQuizProps) {
+export default function ScentFinderQuiz({ products, onSelectProduct, onAddToCart, onClose }: ScentFinderQuizProps) {
   const [currentStep, setCurrentStep] = useState(0); // 0: intro, 1-3: questions, 4: result
   const [points, setPoints] = useState<Record<string, number>>({
     "sandy-hills": 0,
@@ -167,7 +168,17 @@ export default function ScentFinderQuiz({ products, onSelectProduct, onAddToCart
   };
 
   return (
-    <section className="bg-sand-50 py-16 sm:py-24 border-b border-sand-200" id="scent-finder-section">
+    <section className="bg-sand-50 py-16 sm:py-24 border-b border-sand-200 relative" id="scent-finder-section">
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2.5 rounded-full bg-white text-stone-500 hover:text-stone-900 border border-sand-200 shadow-sm cursor-pointer z-20 transition-all hover:bg-sand-100"
+          aria-label="Close scent finder"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-10">
           <span className="text-[10px] uppercase tracking-[0.3em] text-[#D4BC96] font-medium block mb-2">

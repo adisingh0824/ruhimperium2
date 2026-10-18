@@ -11,14 +11,15 @@ interface InvoiceBillProps {
 export default function InvoiceBill({ order, siteSettings, onClose }: InvoiceBillProps) {
 
   // Recalculate subtotal from item prices (accurate for all orders)
-  const computedSubtotal = order.items.reduce((sum, item) => {
-    const selectedVariant = item.product.variants?.find(v =>
-      v.size === item.selectedSize ||
-      v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
-      (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
-      (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+  const computedSubtotal = (order.items || []).reduce((sum, item) => {
+    const itemSize = item.selectedSize || "";
+    const selectedVariant = item.product?.variants?.find(v =>
+      v.size === itemSize ||
+      (v.size && itemSize && v.size.toLowerCase().replace(/\s+/g, '') === itemSize.toLowerCase().replace(/\s+/g, '')) ||
+      (itemSize === "50 ml" && v.size === "50ML Spray") ||
+      (itemSize === "12 ml" && v.size === "12ML Roll On")
     );
-    const price = selectedVariant ? selectedVariant.salePrice : item.product.salePrice;
+    const price = selectedVariant ? selectedVariant.salePrice : (item.product?.salePrice || 0);
     return sum + (price * item.quantity);
   }, 0);
 
@@ -230,22 +231,23 @@ export default function InvoiceBill({ order, siteSettings, onClose }: InvoiceBil
                   </tr>
                 </thead>
                 <tbody>
-                  {order.items.map((item, idx) => {
-                    const selectedVariant = item.product.variants?.find(v =>
-                      v.size === item.selectedSize ||
-                      v.size.toLowerCase().replace(/\s+/g, '') === item.selectedSize.toLowerCase().replace(/\s+/g, '') ||
-                      (item.selectedSize === "50 ml" && v.size === "50ML Spray") ||
-                      (item.selectedSize === "12 ml" && v.size === "12ML Roll On")
+                  {(order.items || []).map((item, idx) => {
+                    const itemSize = item.selectedSize || "";
+                    const selectedVariant = item.product?.variants?.find(v =>
+                      v.size === itemSize ||
+                      (v.size && itemSize && v.size.toLowerCase().replace(/\s+/g, '') === itemSize.toLowerCase().replace(/\s+/g, '')) ||
+                      (itemSize === "50 ml" && v.size === "50ML Spray") ||
+                      (itemSize === "12 ml" && v.size === "12ML Roll On")
                     );
-                    const unitPrice = selectedVariant ? selectedVariant.salePrice : item.product.salePrice;
+                    const unitPrice = selectedVariant ? selectedVariant.salePrice : (item.product?.salePrice || 0);
                     const lineTotal = unitPrice * item.quantity;
 
                     return (
                       <tr key={idx} className="border-b border-stone-100 last:border-b-0 hover:bg-stone-50/30">
                         <td className="py-3 px-3 text-[10px] text-stone-400 font-mono">{idx + 1}</td>
                         <td className="py-3 px-3">
-                          <span className="text-[11.5px] font-medium text-stone-800 block leading-tight">{item.product.name}</span>
-                          {item.product.category && (
+                          <span className="text-[11.5px] font-medium text-stone-800 block leading-tight">{item.product?.name || "Bespoke Fragrance"}</span>
+                          {item.product?.category && (
                             <span className="text-[9px] text-stone-400 block mt-0.5">{item.product.category}</span>
                           )}
                         </td>
