@@ -2114,7 +2114,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         {/* QUIQ HERO BANNER CONTAINER (RAAHI PARFUMS STYLE) */}
         <div className="p-2 sm:p-3 -mt-2 sm:-mt-3 max-w-[1550px] mx-auto">
           <section 
-            className="relative min-h-[75vh] sm:min-h-[82vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
+            className="relative min-h-[520px] sm:min-h-[620px] lg:min-h-[80vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
             id="hero-section"
           >
             {/* Admin Hero Media Control Bar (Admin only) */}
@@ -2243,18 +2243,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                         key={heroVideoUrl}
                         src={getEmbedVideoUrl(heroVideoUrl, true)}
                         title="Hero Ambient Video"
-                        className="absolute border-0 opacity-100 pointer-events-none select-none"
-                        style={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "50%",
-                          transform: "translate(-50%, -50%)",
-                          width: "max(100%, calc(100vh * 16 / 9), 177.78vh)",
-                          height: "max(100%, calc(100vw * 9 / 16), 100vh)",
-                          minWidth: "100%",
-                          minHeight: "100%",
-                          aspectRatio: "16 / 9",
-                        }}
+                        className="hero-ambient-iframe"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       />
@@ -2269,13 +2258,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       loop
                       playsInline
                       preload="auto"
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto max-w-none object-cover opacity-100 scale-100 select-none pointer-events-none"
-                      style={{
-                        minWidth: "100%",
-                        minHeight: "100%",
-                        width: "max(100%, 177.78vh)",
-                        height: "max(100%, 56.25vw)",
-                      }}
+                      className="hero-ambient-video"
                       poster={coverPhoto}
                     />
                   )
