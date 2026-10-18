@@ -109,8 +109,9 @@ export function TraditionalUserLoungeModal({
 
   // Sync dashboard data (orders, wishlist, custom blends) live without resetting current active view
   useEffect(() => {
-    if (currentUser) {
-      const matchingOrders = orders.filter(o => o.email.toLowerCase() === currentUser.email.toLowerCase());
+    if (currentUser?.email) {
+      const userEmail = currentUser.email.toLowerCase();
+      const matchingOrders = orders.filter(o => o?.email && o.email.toLowerCase() === userEmail);
       setUserOrders(matchingOrders);
 
       // Load Wishlist from safeStorage
@@ -158,8 +159,9 @@ export function TraditionalUserLoungeModal({
     e.preventDefault();
     setLoginError("");
 
+    const cleanLoginEmail = loginEmail.trim().toLowerCase();
     const matched = users.find(
-      u => u.email.toLowerCase() === loginEmail.trim().toLowerCase() && 
+      u => u?.email && u.email.toLowerCase() === cleanLoginEmail && 
       u.password === loginPassword
     );
 
@@ -182,7 +184,8 @@ export function TraditionalUserLoungeModal({
       return;
     }
 
-    const emailInUse = users.some(u => u.email.toLowerCase() === regEmail.trim().toLowerCase());
+    const cleanRegEmail = regEmail.trim().toLowerCase();
+    const emailInUse = users.some(u => u?.email && u.email.toLowerCase() === cleanRegEmail);
     if (emailInUse) {
       setRegError("An account with this email already exists.");
       return;
@@ -190,7 +193,7 @@ export function TraditionalUserLoungeModal({
 
     const newUser: UserAccount = {
       fullName: regName.trim(),
-      email: regEmail.trim().toLowerCase(),
+      email: cleanRegEmail,
       password: regPassword,
       phone: regPhone.trim(),
       address: regAddress.trim(),
@@ -219,7 +222,7 @@ export function TraditionalUserLoungeModal({
   // Save profile edits
   const handleSaveProfile = (e: FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+    if (!currentUser?.email) return;
 
     const updatedUser: UserAccount = {
       ...currentUser,
@@ -229,7 +232,8 @@ export function TraditionalUserLoungeModal({
       pincode: editPincode.trim()
     };
 
-    setUsers(prev => prev.map(u => u.email.toLowerCase() === currentUser.email.toLowerCase() ? updatedUser : u));
+    const userEmail = currentUser.email.toLowerCase();
+    setUsers(prev => prev.map(u => u?.email && u.email.toLowerCase() === userEmail ? updatedUser : u));
     setCurrentUser(updatedUser);
     setIsEditingProfile(false);
   };
@@ -997,7 +1001,7 @@ export function ClerkUserLoungeModal(props: UserLoungeModalProps) {
     if (isLoaded && isSignedIn && user) {
       const email = user.primaryEmailAddress?.emailAddress || "";
       const fullName = user.fullName || "Member Explorer";
-      const matched = props.users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
+      const matched = email ? props.users.find((u: any) => u?.email && u.email.toLowerCase() === email.toLowerCase()) : undefined;
 
       if (matched) {
         if (!props.currentUser || props.currentUser.email !== email) {

@@ -637,8 +637,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Sync active session user details when live database is changed
   useEffect(() => {
-    if (currentUser) {
-      const latest = users.find((u) => u.email.toLowerCase() === currentUser.email.toLowerCase());
+    if (currentUser?.email) {
+      const currentEmail = currentUser.email.toLowerCase();
+      const latest = users.find((u) => u?.email && u.email.toLowerCase() === currentEmail);
       if (latest && JSON.stringify(latest) !== JSON.stringify(currentUser)) {
         setCurrentUser(latest);
       }
