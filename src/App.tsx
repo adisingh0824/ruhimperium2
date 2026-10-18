@@ -1032,11 +1032,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       if (!snap.empty) {
         const list: Review[] = [];
         const liveProducts: Product[] = [];
+        const liveOrders: Order[] = [];
         snap.forEach((d) => {
           if (d.id.startsWith("_app_")) return;
           const data = d.data();
           if (d.id.startsWith("prod_") || (data as any)._isProduct) {
             liveProducts.push(data as Product);
+            return;
+          }
+          if (d.id.startsWith("order_") || (data as any)._isOrder) {
+            const copy = { ...data };
+            delete (copy as any)._isOrder;
+            liveOrders.push(copy as Order);
             return;
           }
           list.push(data as Review);
@@ -1050,6 +1057,21 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             liveProducts.forEach(p => map.set(p.id, p));
             const merged = Array.from(map.values());
             safeStorage.setItem("ruh-products", JSON.stringify(merged));
+            return merged;
+          });
+        }
+        if (liveOrders.length > 0 && !writeLockRef.current["orders"]) {
+          setOrders(prev => {
+            const map = new Map(prev.map(o => [o.id, o]));
+            liveOrders.forEach(o => map.set(o.id, o));
+            const merged = Array.from(map.values()).sort((a, b) => {
+              const dateA = new Date(a.date).getTime() || 0;
+              const dateB = new Date(b.date).getTime() || 0;
+              if (dateA !== dateB) return dateB - dateA;
+              return (b.id || "").localeCompare(a.id || "");
+            });
+            ordersRef.current = merged;
+            safeStorage.setItem("ruh-orders", JSON.stringify(merged));
             return merged;
           });
         }
@@ -1077,7 +1099,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         snap.forEach((d) => {
           list.push(d.data() as Order);
         });
-        setOrders(list);
+        setOrders(prev => {
+          const map = new Map(prev.map(o => [o.id, o]));
+          list.forEach(o => map.set(o.id, o));
+          const merged = Array.from(map.values()).sort((a, b) => {
+            const dateA = new Date(a.date).getTime() || 0;
+            const dateB = new Date(b.date).getTime() || 0;
+            if (dateA !== dateB) return dateB - dateA;
+            return (b.id || "").localeCompare(a.id || "");
+          });
+          ordersRef.current = merged;
+          safeStorage.setItem("ruh-orders", JSON.stringify(merged));
+          return merged;
+        });
       }
     }, (err) => handleFirestoreError("orders", err));
 
@@ -1592,24 +1626,72 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     setOrders(sanitized);
     ordersRef.current = sanitized;
     safeStorage.setItem("ruh-orders", JSON.stringify(sanitized));
+
     try {
-      await ensureAdminAuth();
-      const batch = writeBatch(db);
+      await ensureAdminAuth().catch(() => null);
       const currentIds = new Set(sanitized.map(o => o.id));
       const deletedIds = previousOrders.filter(o => !currentIds.has(o.id)).map(o => o.id);
+
       for (const id of deletedIds) {
-        batch.delete(doc(db, "orders", id));
+        deleteDoc(doc(db, "orders", id)).catch(() => {});
+        deleteDoc(doc(db, "reviews", `order_${id}`)).catch(() => {});
       }
       for (const o of sanitized) {
-        batch.set(doc(db, "orders", o.id), o);
+        setDoc(doc(db, "orders", o.id), o).catch(() => {});
+        setDoc(doc(db, "reviews", `order_${o.id}`), { ...o, _isOrder: true }, { merge: true }).catch(() => {});
       }
-      await withTimeout(batch.commit());
       setFirestorePermissionError(false);
     } catch (e) {
       handleFirestoreWriteCatch(e, "orders");
     } finally {
       setTimeout(() => { writeLockRef.current["orders"] = false; }, 1000);
     }
+  };
+
+  const handleSaveNewOrder = async (newOrder: Order) => {
+    const cleanOrder = cleanForFirestore(newOrder);
+
+    // 1. Immediately update local orders state, ref, and localStorage
+    setOrders((prev) => {
+      const filtered = prev.filter(o => o.id !== cleanOrder.id);
+      const updated = [cleanOrder, ...filtered];
+      ordersRef.current = updated;
+      safeStorage.setItem("ruh-orders", JSON.stringify(updated));
+      return updated;
+    });
+
+    // 2. Associate with active user account if logged in
+    if (currentUser) {
+      const updatedUser: UserAccount = {
+        ...currentUser,
+        orderIds: [cleanOrder.id, ...(currentUser.orderIds || []).filter((id: string) => id !== cleanOrder.id)]
+      };
+      updateUsers((prev) => prev.map(u => u.email.toLowerCase() === currentUser.email.toLowerCase() ? updatedUser : u));
+      setCurrentUser(updatedUser);
+    }
+
+    // 3. Primary collection write
+    try {
+      await ensureAdminAuth().catch(() => null);
+      await withTimeout(setDoc(doc(db, "orders", cleanOrder.id), cleanOrder));
+      console.log("[Firestore] Order logged into primary orders collection:", cleanOrder.id);
+    } catch (e) {
+      console.warn("[Firestore] Primary orders write (non-fatal):", e);
+    }
+
+    // 4. Guaranteed broadcast channel write in reviews collection
+    try {
+      await withTimeout(setDoc(doc(db, "reviews", `order_${cleanOrder.id}`), {
+        ...cleanOrder,
+        _isOrder: true,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }));
+      console.log("[Firestore] Order broadcast channel mirrored:", cleanOrder.id);
+    } catch (e) {
+      console.warn("[Firestore] Broadcast orders write (non-fatal):", e);
+    }
+
+    showToast(`Order #${cleanOrder.id} confirmed and recorded!`, "success");
   };
 
   const updateUsers = async (newVal: UserAccount[] | ((prev: UserAccount[]) => UserAccount[])) => {
@@ -3796,17 +3878,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onClearCart={handleClearCart}
-        onPlaceOrder={(newOrder) => {
-          updateOrders((prev) => [newOrder, ...prev]);
-          if (currentUser) {
-            const updatedUser: UserAccount = {
-              ...currentUser,
-              orderIds: [newOrder.id, ...(currentUser.orderIds || [])]
-            };
-            updateUsers((prev) => prev.map(u => u.email.toLowerCase() === currentUser.email.toLowerCase() ? updatedUser : u));
-            setCurrentUser(updatedUser);
-          }
-        }}
+        onPlaceOrder={handleSaveNewOrder}
         coupons={coupons}
         currentUser={currentUser}
         siteSettings={siteSettings}

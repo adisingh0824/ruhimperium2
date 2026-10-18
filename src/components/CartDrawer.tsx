@@ -265,18 +265,23 @@ export default function CartDrawer({
         alert("Razorpay initialization error. Please verify your configured Key ID in settings.");
       }
     } else {
+      // Immediate order sync to ensure data is safely persisted
+      if (onPlaceOrder) {
+        try {
+          onPlaceOrder(newOrder);
+        } catch (err) {
+          console.error("Order dispatch error:", err);
+        }
+      }
+      setPlacedOrder(newOrder);
+      sendAdminNotificationEmail(newOrder);
+
       setTimeout(() => {
         setIsSubmitting(false);
         setCurrentTrackingCode(generatedTracking);
-        if (onPlaceOrder) {
-          onPlaceOrder(newOrder);
-        }
-        setPlacedOrder(newOrder);
-        sendAdminNotificationEmail(newOrder); // Send email notification
-
         setCheckoutStep("success");
         setShowPolicyModal(false);
-      }, 2800);
+      }, 700);
     }
   };
 
@@ -292,23 +297,61 @@ export default function CartDrawer({
     const orderId = `ORD-${Date.now()}`;
     const calculatedTotal = cartTotal;
 
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }) + ", " + now.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+
     const newOrder: Order = {
       id: orderId,
-      fullName,
-      email,
-      phone,
-      address,
-      pincode,
+      fullName: fullName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      pincode: pincode.trim(),
       paymentMode: (isRazorpayActive && paymentMode !== "COD") ? "Razorpay Gateway (Online)" : paymentMode,
-      items: cart.map(item => ({ ...item, product: products.find(p => p.id === item.product.id) || item.product })),
+      items: cart.map(item => {
+        const latestProd = products.find(p => p.id === item.product.id) || item.product;
+        return {
+          quantity: item.quantity,
+          selectedSize: item.selectedSize || "Standard",
+          product: {
+            id: latestProd.id,
+            name: latestProd.name || "Bespoke Perfume",
+            tagline: latestProd.tagline || "",
+            price: Number(latestProd.price) || 0,
+            salePrice: Number(latestProd.salePrice) || 0,
+            image: latestProd.image || "",
+            destination: latestProd.destination || "Kannauj",
+            destinationState: latestProd.destinationState || "Uttar Pradesh",
+            category: latestProd.category || "Fine Fragrances",
+            size: latestProd.size || item.selectedSize || "50 ml",
+            variants: latestProd.variants || [],
+            description: latestProd.description || "",
+            rating: latestProd.rating || 5,
+            reviewsCount: latestProd.reviewsCount || 1,
+            story: latestProd.story || "",
+            notes: latestProd.notes || { top: [], heart: [], base: [] },
+            ingredients: latestProd.ingredients || [],
+            longevity: latestProd.longevity || "Long lasting (8-10 hours)",
+            projection: latestProd.projection || "Moderate to strong"
+          }
+        };
+      }),
       total: calculatedTotal,
-      date: new Date().toISOString().split("T")[0],
+      date: formattedDate,
       status: "Processing",
       trackingCode: generatedTracking,
       subtotal: cartSubtotal,
       shippingFee: shippingFee,
       discountAmount: discountAmount,
-      couponCode: activeDiscount?.code || undefined
+      couponCode: activeDiscount?.code || ""
     };
 
     if (siteSettings?.checkoutPolicyEnabled && !policyAccepted) {
