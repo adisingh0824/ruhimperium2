@@ -87,6 +87,7 @@ export default function Header({
   const [collectionsDropdownOpen, setCollectionsDropdownOpen] = useState(false);
   const [notesDropdownOpen, setNotesDropdownOpen] = useState(false);
   const [useDropdownOpen, setUseDropdownOpen] = useState(false);
+  const [activeMobileDropdown, setActiveMobileDropdown] = useState<"collections" | "notes" | "use" | null>(null);
   const [internalBulkEnquiryOpen, setInternalBulkEnquiryOpen] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollYRef = useRef(0);
@@ -107,7 +108,7 @@ export default function Header({
           shouldBeVisible = true;
         } else if (currentScrollY > lastY && currentScrollY > 150) {
           // Scrolling down -> hide header if no modal/dropdown is open
-          if (!mobileMenuOpen && !collectionsDropdownOpen && !notesDropdownOpen && !useDropdownOpen && !searchOpen) {
+          if (!mobileMenuOpen && !collectionsDropdownOpen && !notesDropdownOpen && !useDropdownOpen && !searchOpen && !activeMobileDropdown) {
             shouldBeVisible = false;
           } else {
             shouldBeVisible = true;
@@ -129,7 +130,7 @@ export default function Header({
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [mobileMenuOpen, collectionsDropdownOpen, notesDropdownOpen, useDropdownOpen, searchOpen]);
+  }, [mobileMenuOpen, collectionsDropdownOpen, notesDropdownOpen, useDropdownOpen, searchOpen, activeMobileDropdown]);
   const bulkEnquiryOpen = propBulkEnquiryOpen !== undefined ? propBulkEnquiryOpen : internalBulkEnquiryOpen;
   const setBulkEnquiryOpen = propSetBulkEnquiryOpen || setInternalBulkEnquiryOpen;
 
@@ -527,7 +528,209 @@ export default function Header({
           </div>
         </nav>
 
+        {/* MOBILE HORIZONTAL NAVIGATION STRIP (Visible on mobile/tablet screens < 1024px) */}
+        <nav className="lg:hidden w-full border-t border-sand-200 bg-white">
+          <ul className="flex items-center space-x-6 overflow-x-auto scrollbar-none px-4 py-3 text-sm tracking-wider uppercase font-sans text-stone-900 font-bold whitespace-nowrap">
+            
+            {/* 0. Home Link */}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setSelectedCategory) setSelectedCategory("All");
+                  if (setSearchQuery) setSearchQuery("");
+                  onNavigate("hero");
+                  setActiveMobileDropdown(null);
+                }}
+                className={`transition-colors cursor-pointer text-sm tracking-wider ${
+                  activeSection === "hero" ? "text-[#19a24b] font-bold" : "text-stone-900 hover:text-[#19a24b]"
+                }`}
+              >
+                Home
+              </button>
+            </li>
+
+            {/* 1. Collections Dropdown */}
+            <li className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveMobileDropdown(activeMobileDropdown === "collections" ? null : "collections")}
+                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1 text-sm tracking-wider ${
+                  activeMobileDropdown === "collections" ? "text-[#19a24b]" : "text-stone-900"
+                }`}
+              >
+                <span>Collections</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMobileDropdown === "collections" ? "rotate-180 text-[#19a24b]" : ""}`} />
+              </button>
+            </li>
+
+            {/* 2. Shop by Notes Dropdown */}
+            <li className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveMobileDropdown(activeMobileDropdown === "notes" ? null : "notes")}
+                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1 text-sm tracking-wider ${
+                  activeMobileDropdown === "notes" ? "text-[#19a24b]" : "text-stone-900"
+                }`}
+              >
+                <span>Shop by Notes</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMobileDropdown === "notes" ? "rotate-180 text-[#19a24b]" : ""}`} />
+              </button>
+            </li>
+
+            {/* 3. Shop by Occasion / Use Dropdown */}
+            <li className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveMobileDropdown(activeMobileDropdown === "use" ? null : "use")}
+                className={`hover:text-[#19a24b] transition-colors cursor-pointer flex items-center gap-1 text-sm tracking-wider ${
+                  activeMobileDropdown === "use" ? "text-[#19a24b]" : "text-stone-900"
+                }`}
+              >
+                <span>Shop By Use</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMobileDropdown === "use" ? "rotate-180 text-[#19a24b]" : ""}`} />
+              </button>
+            </li>
+
+            {/* 4. Discovery Set */}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  handleCategorySelect("Discovery Set");
+                  setActiveMobileDropdown(null);
+                }}
+                className="hover:text-[#19a24b] transition-colors cursor-pointer text-sm tracking-wider text-stone-900"
+              >
+                Discovery Sets
+              </button>
+            </li>
+
+            {/* 5. Our Story */}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  onNavigate("our-story");
+                  setActiveMobileDropdown(null);
+                }}
+                className={`transition-colors cursor-pointer text-sm tracking-wider ${
+                  activeSection === "our-story" ? "text-[#19a24b] font-bold" : "text-stone-900 hover:text-[#19a24b]"
+                }`}
+              >
+                Our Story
+              </button>
+            </li>
+
+            {/* Bulk Enquiry */}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  setBulkEnquiryOpen(true);
+                  setActiveMobileDropdown(null);
+                }}
+                className="text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-sm tracking-wider font-semibold"
+              >
+                Bulk Enquiry
+              </button>
+            </li>
+
+            {/* Track Order */}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  onTrackOrderClick();
+                  setActiveMobileDropdown(null);
+                }}
+                className="text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-sm tracking-wider font-semibold"
+              >
+                Track Order
+              </button>
+            </li>
+
+          </ul>
+        </nav>
+
       </div>
+
+      {/* MOBILE POPUP DROPDOWN MENU */}
+      {activeMobileDropdown && (
+        <div 
+          className="lg:hidden fixed inset-0 z-[998] bg-black/40 backdrop-blur-xs flex flex-col justify-start pt-32 px-4 animate-fade-in" 
+          onClick={() => setActiveMobileDropdown(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl border border-sand-200 overflow-hidden max-h-[70vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-sand-200 bg-sand-50/80">
+              <span className="text-xs uppercase font-mono font-bold text-[#D4BC96] tracking-widest">
+                {activeMobileDropdown === "collections" && "Select Collection"}
+                {activeMobileDropdown === "notes" && "Select Scent Note"}
+                {activeMobileDropdown === "use" && "Select Occasion / Use"}
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveMobileDropdown(null)}
+                className="p-1 text-sand-400 hover:text-sand-700 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-2 overflow-y-auto divide-y divide-sand-100">
+              {activeMobileDropdown === "collections" && collectionsMenu.map(col => (
+                <button
+                  key={col.id}
+                  type="button"
+                  onClick={() => {
+                    handleCategorySelect(col.id);
+                    setActiveMobileDropdown(null);
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm font-serif text-stone-800 hover:bg-sand-50 hover:text-[#19a24b] transition-colors flex items-center justify-between cursor-pointer"
+                >
+                  <span className="font-medium">{col.name}</span>
+                  <span className="text-xs text-sand-400 font-mono">→</span>
+                </button>
+              ))}
+
+              {activeMobileDropdown === "notes" && notesMenu.map(note => (
+                <button
+                  key={note.id}
+                  type="button"
+                  onClick={() => {
+                    if (setSelectedCategory) setSelectedCategory(note.id);
+                    onNavigate("shop");
+                    setActiveMobileDropdown(null);
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm font-serif text-stone-800 hover:bg-sand-50 hover:text-[#19a24b] transition-colors flex items-center justify-between cursor-pointer"
+                >
+                  <span className="font-medium">{note.name}</span>
+                  <span className="text-xs text-[#D4BC96] uppercase font-mono">Explore</span>
+                </button>
+              ))}
+
+              {activeMobileDropdown === "use" && useMenu.map(u => (
+                <button
+                  key={u.id}
+                  type="button"
+                  onClick={() => {
+                    if (setSearchQuery) setSearchQuery(u.id.replace(" Wear", ""));
+                    onNavigate("shop");
+                    setActiveMobileDropdown(null);
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm font-serif text-stone-800 hover:bg-sand-50 hover:text-[#19a24b] transition-colors flex items-center justify-between cursor-pointer"
+                >
+                  <span className="font-medium">{u.name}</span>
+                  <span className="text-xs text-[#D4BC96] uppercase font-mono">Occasion</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* LUXURY INTERACTIVE BULK ENQUIRY FORM MODAL */}
       {bulkEnquiryOpen && (
@@ -769,6 +972,27 @@ export default function Header({
                         className="block text-left text-sm font-serif text-stone-600 hover:text-stone-900 font-medium py-0.5"
                       >
                         {note.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Shop By Use / Occasion (Mobile Drawer) */}
+                <div className="py-1">
+                  <p className="text-xs uppercase tracking-widest text-[#D4BC96] font-bold mb-2.5 font-mono">Shop By Use</p>
+                  <div className="pl-3 space-y-3 border-l-2 border-[#D4BC96]/30">
+                    {useMenu.map((u) => (
+                      <button
+                        key={u.id}
+                        type="button"
+                        onClick={() => {
+                          if (setSearchQuery) setSearchQuery(u.id.replace(" Wear", ""));
+                          onNavigate("shop");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block text-left text-sm font-serif text-stone-600 hover:text-stone-900 font-medium py-0.5"
+                      >
+                        {u.name}
                       </button>
                     ))}
                   </div>
