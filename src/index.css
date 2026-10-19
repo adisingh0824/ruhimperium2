@@ -492,7 +492,7 @@
 /* ── Hero section: safe min-height on tiny phones ── */
 @media (max-width: 374px) {
   #hero-section {
-    min-height: 88svh;
+    min-height: 420px;
     border-radius: 16px !important;
   }
   .p-2.sm\:p-3 {
@@ -667,27 +667,31 @@ a:focus:not(:focus-visible) {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
-  transform: translate(-50%, -50%) scale(1.18) !important;
+  transform: translate(-50%, -50%) !important;
   pointer-events: none !important;
   border: 0 !important;
   opacity: 1 !important;
+  max-width: none !important;
+  max-height: none !important;
 }
 
 @media (min-aspect-ratio: 16/9) {
   .hero-ambient-iframe {
-    width: 100vw !important;
+    width: 100% !important;
     height: 56.25vw !important;
     min-width: 100% !important;
     min-height: 100% !important;
+    transform: translate(-50%, -50%) scale(1.05) !important;
   }
 }
 
 @media (max-aspect-ratio: 16/9) {
   .hero-ambient-iframe {
-    width: 177.78vh !important;
-    height: 100vh !important;
-    min-width: 100% !important;
+    width: 300% !important;
+    min-width: 300% !important;
+    height: 100% !important;
     min-height: 100% !important;
+    transform: translate(-50%, -50%) scale(1.05) !important;
   }
 }
 
@@ -695,11 +699,11 @@ a:focus:not(:focus-visible) {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
-  transform: translate(-50%, -50%) scale(1.05) !important;
+  transform: translate(-50%, -50%) scale(1.02) !important;
   min-width: 100% !important;
   min-height: 100% !important;
-  width: auto !important;
-  height: auto !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover !important;
   pointer-events: none !important;
 }

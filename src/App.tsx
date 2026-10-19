@@ -2114,7 +2114,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         {/* QUIQ HERO BANNER CONTAINER (RAAHI PARFUMS STYLE) */}
         <div className="p-2 sm:p-3 -mt-2 sm:-mt-3 max-w-[1550px] mx-auto">
           <section 
-            className="relative min-h-[520px] sm:min-h-[620px] lg:min-h-[80vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
+            className="relative min-h-[440px] sm:min-h-[580px] lg:min-h-[80vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
             id="hero-section"
           >
             {/* Admin Hero Media Control Bar (Admin only) */}
@@ -2276,7 +2276,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             )}
 
             {/* Hero content area & Primary Conversion Goal above the fold (Fix #8) */}
-            <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center flex flex-col items-center justify-center space-y-4 sm:space-y-6 pointer-events-auto">
+            <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-24 text-center flex flex-col items-center justify-center space-y-4 sm:space-y-6 pointer-events-auto">
               <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-[#D4BC96] font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                 {siteSettings.heroTagline || "Traditional Copper Distilled Fragrances"}
               </span>
