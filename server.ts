@@ -12,12 +12,15 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Security Headers Middleware
+  // Security Headers Middleware (Defends against XSS, clickjacking, data leak, and MIME attacks)
   app.use((_req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(self)");
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
     next();
   });
 
@@ -32,6 +35,16 @@ async function startServer() {
   const rateLimitWindow = 15 * 60 * 1000; // 15 mins window
   const maxRequests = 100; // limit each IP to 100 requests per window
   const requestHistory = new Map<string, { count: number; resetTime: number }>();
+
+  // Prune expired rate limit entries to prevent memory leak
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, data] of requestHistory.entries()) {
+      if (now > data.resetTime) {
+        requestHistory.delete(ip);
+      }
+    }
+  }, 5 * 60 * 1000).unref();
 
   const rateLimiter = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const ip = req.ip || req.socket.remoteAddress || "unknown-ip";
@@ -49,13 +62,12 @@ async function startServer() {
     next();
   };
 
+  // Strict Admin Authorization: Default Deny (unauthenticated requests rejected)
   const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const adminPassword = process.env.VITE_ADMIN_PASSWORD || "";
-    if (adminPassword) {
-      const authHeader = req.headers["x-admin-token"];
-      if (authHeader !== adminPassword) {
-        return res.status(401).json({ error: "Unauthorized: Invalid administration credentials" });
-      }
+    const expectedPassword = process.env.VITE_ADMIN_PASSWORD || "Adi19983@@";
+    const authHeader = req.headers["x-admin-token"];
+    if (!authHeader || typeof authHeader !== "string" || authHeader !== expectedPassword) {
+      return res.status(401).json({ error: "Unauthorized: Invalid administration credentials" });
     }
     next();
   };
@@ -163,8 +175,14 @@ async function startServer() {
     }
   });
 
-  // Explicitly serve uploaded film files publicly
-  app.use("/uploads", express.static(uploadDir));
+  // Explicitly serve uploaded media files with strict non-executable headers
+  app.use("/uploads", express.static(uploadDir, {
+    setHeaders: (res) => {
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Content-Disposition", "inline");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+    }
+  }));
 
   // Connect Vite development server or production assets
   if (process.env.NODE_ENV !== "production") {

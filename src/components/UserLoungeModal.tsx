@@ -23,6 +23,15 @@ import {
 import { UserAccount, Order, Product } from "../types";
 import { useUser, SignIn, useClerk } from "@clerk/clerk-react";
 import { safeStorage } from "../App";
+import { db } from "../config/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+async function sha256(message: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 
 interface UserLoungeModalProps {
   isOpen: boolean;
@@ -154,27 +163,52 @@ export function TraditionalUserLoungeModal({
     setView("login");
   };
 
-  // Submit Login
-  const handleLoginSubmit = (e: FormEvent) => {
+  // Submit Login (Secure individual document authentication)
+  const handleLoginSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoginError("");
 
     const cleanLoginEmail = loginEmail.trim().toLowerCase();
-    const matched = users.find(
-      u => u?.email && u.email.toLowerCase() === cleanLoginEmail && 
-      u.password === loginPassword
-    );
+    if (!cleanLoginEmail || !loginPassword) {
+      setLoginError("Please enter your email and passcode.");
+      return;
+    }
 
-    if (matched) {
-      setCurrentUser(matched);
-      setView("dashboard");
-    } else {
-      setLoginError("Invalid emails or passcode. Please check and retry.");
+    const hashedPassword = await sha256(loginPassword);
+
+    try {
+      // 1. Check in memory / local state
+      const localMatch = users.find(
+        u => u?.email && u.email.toLowerCase() === cleanLoginEmail && 
+        (u.password === hashedPassword || u.password === loginPassword)
+      );
+
+      if (localMatch) {
+        setCurrentUser(localMatch);
+        setView("dashboard");
+        return;
+      }
+
+      // 2. Fetch specific user record from Firestore
+      const userDoc = await getDoc(doc(db, "users", cleanLoginEmail));
+      if (userDoc.exists()) {
+        const data = userDoc.data() as UserAccount;
+        if (data.password === hashedPassword || data.password === loginPassword) {
+          setCurrentUser(data);
+          setView("dashboard");
+          return;
+        }
+      }
+
+      setLoginError("Invalid email or passcode. Please check and retry.");
+    } catch (err) {
+      console.warn("User login verification:", err);
+      setLoginError("Verification failed. Please check your credentials.");
     }
   };
 
-  // Submit Register
-  const handleRegisterSubmit = (e: FormEvent) => {
+  // Submit Register (Secure account creation with hashed passwords)
+  const handleRegisterSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setRegError("");
     setRegSuccess(false);
@@ -185,42 +219,51 @@ export function TraditionalUserLoungeModal({
     }
 
     const cleanRegEmail = regEmail.trim().toLowerCase();
-    const emailInUse = users.some(u => u?.email && u.email.toLowerCase() === cleanRegEmail);
-    if (emailInUse) {
-      setRegError("An account with this email already exists.");
-      return;
-    }
 
-    const newUser: UserAccount = {
-      fullName: regName.trim(),
-      email: cleanRegEmail,
-      password: regPassword,
-      phone: regPhone.trim(),
-      address: regAddress.trim(),
-      pincode: regPincode.trim(),
-      savedBlends: [],
-      orderIds: [],
-      savedProducts: []
-    };
+    try {
+      // Ensure unique email check via direct document lookup
+      const existingDoc = await getDoc(doc(db, "users", cleanRegEmail));
+      if (existingDoc.exists() || users.some(u => u?.email && u.email.toLowerCase() === cleanRegEmail)) {
+        setRegError("An account with this email already exists.");
+        return;
+      }
 
-    setUsers(prev => [...prev, newUser]);
-    setRegSuccess(true);
-    
-    setTimeout(() => {
+      const hashedPassword = await sha256(regPassword);
+      const newUser: UserAccount = {
+        fullName: regName.trim(),
+        email: cleanRegEmail,
+        password: hashedPassword, // Store securely hashed password
+        phone: regPhone.trim(),
+        address: regAddress.trim(),
+        pincode: regPincode.trim(),
+        savedBlends: [],
+        orderIds: [],
+        savedProducts: []
+      };
+
+      await setDoc(doc(db, "users", cleanRegEmail), newUser);
+      setUsers(prev => [...prev.filter(u => u.email.toLowerCase() !== cleanRegEmail), newUser]);
       setCurrentUser(newUser);
-      setRegName("");
-      setRegEmail("");
-      setRegPassword("");
-      setRegPhone("");
-      setRegAddress("");
-      setRegPincode("");
-      setRegSuccess(false);
-      setView("dashboard");
-    }, 1500);
+      setRegSuccess(true);
+      
+      setTimeout(() => {
+        setRegName("");
+        setRegEmail("");
+        setRegPassword("");
+        setRegPhone("");
+        setRegAddress("");
+        setRegPincode("");
+        setRegSuccess(false);
+        setView("dashboard");
+      }, 1200);
+    } catch (err) {
+      console.warn("User registration:", err);
+      setRegError("Unable to complete registration. Please try again.");
+    }
   };
 
   // Save profile edits
-  const handleSaveProfile = (e: FormEvent) => {
+  const handleSaveProfile = async (e: FormEvent) => {
     e.preventDefault();
     if (!currentUser?.email) return;
 
@@ -236,6 +279,12 @@ export function TraditionalUserLoungeModal({
     setUsers(prev => prev.map(u => u?.email && u.email.toLowerCase() === userEmail ? updatedUser : u));
     setCurrentUser(updatedUser);
     setIsEditingProfile(false);
+
+    try {
+      await setDoc(doc(db, "users", userEmail), updatedUser, { merge: true });
+    } catch (err) {
+      console.warn("Profile update sync:", err);
+    }
   };
 
   // Delete custom blend formulation from cabinet

@@ -30,7 +30,7 @@ import {
   Link2
 } from 'lucide-react';
 import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
-import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl } from './types';
+import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl, isEmbedIframe, extractYouTubeId } from './types';
 import Header from "./components/Header";
 import ProductDetailsModal from "./components/ProductDetailsModal";
 import ProductPage from "./pages/ProductPage";
@@ -57,32 +57,6 @@ import ScentFinderQuiz from './components/ScentFinderQuiz';
 import LayeringSalon from './components/LayeringSalon';
 import CustomBlendLab from './components/CustomBlendLab';
 import { uploadVideoFile } from './utils/mediaUpload';
-
-const isEmbedIframe = (url: string): boolean => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  
-  // If it's a direct mp4, webm, ogg, quicktime or custom uploaded file, it is NOT an iframe embed
-  if (
-    lower.includes(".mp4") || 
-    lower.includes(".webm") || 
-    lower.includes(".ogg") || 
-    lower.startsWith("data:") || 
-    lower.startsWith("blob:") || 
-    lower.includes("/uploads/") ||
-    lower.includes("/external/") // Vimeo direct external streams
-  ) {
-    return false;
-  }
-  
-  // If it is a standard youtube or regular vimeo watch/share URL, it is an iframe embed
-  return (
-    lower.includes("youtube.com") || 
-    lower.includes("youtu.be") || 
-    (lower.includes("vimeo.com") && !lower.includes("/external/")) ||
-    lower.includes("player.vimeo.com/video")
-  );
-};
 
 export const DEFAULT_COLLECTIONS: Collection[] = [
   {
@@ -541,49 +515,41 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     safeStorage.setItem("ruh-coupons", JSON.stringify(coupons));
   }, [coupons]);
 
-  // Dynamic orders ledger
-  const [orders, setOrders] = useState<Order[]>(() => {
-    const cached = safeStorage.getItem("ruh-orders");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (e) { /* Fall through */ }
-    }
-    const generatedTracking = `RUH-38410-IN`;
-    const seedProduct = PRODUCTS[0];
-    const sampleOrder: Order = {
-      id: "ORD-1781324500123",
-      fullName: "Aditya Singh",
-      email: "saditya7990@gmail.com",
-      phone: "+91 99999 55555",
-      address: "M.G. Road, Sector 5, HQ Heights Residence",
-      pincode: "110001",
-      paymentMode: "UPI",
-      items: [
-        {
-          product: seedProduct,
-          quantity: 1,
-          selectedSize: "50 ml"
-        }
-      ],
-      total: seedProduct.salePrice,
-      date: new Date().toISOString().split("T")[0],
-      status: "In Transit",
-      trackingCode: generatedTracking
-    };
-    return [sampleOrder];
-  });
-
-  useEffect(() => {
-    safeStorage.setItem("ruh-orders", JSON.stringify(orders));
-  }, [orders]);
-
-  // Security and overlay states
+  // Security and overlay states (Determined early for data isolation)
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
     const cached = safeStorage.getItem("ruh-admin-logged-in");
     return cached === "true";
   });
+
+  // Dynamic orders ledger:
+  // - Admin sees all orders from Firestore.
+  // - Non-admin visitors only access their own orders placed on this device.
+  const [orders, setOrders] = useState<Order[]>(() => {
+    const adminCached = safeStorage.getItem("ruh-admin-logged-in") === "true";
+    if (adminCached) {
+      const cached = safeStorage.getItem("ruh-orders");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) return parsed;
+        } catch (e) {}
+      }
+    }
+    const placed = safeStorage.getItem("ruh-user-placed-orders");
+    if (placed) {
+      try {
+        const parsed = JSON.parse(placed);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {}
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (isAdminLoggedIn) {
+      safeStorage.setItem("ruh-orders", JSON.stringify(orders));
+    }
+  }, [orders, isAdminLoggedIn]);
 
   const [isAdminHubOpen, setIsAdminHubOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
@@ -594,31 +560,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       ensureAdminAuth().then((u) => {
         if (u) setFirestorePermissionError(false);
       }).catch(() => {});
+    } else {
+      // Security purge: ensure non-admin visitor browsers don't retain other customers' cached data
+      safeStorage.removeItem("ruh-orders");
+      safeStorage.removeItem("ruh-users");
     }
   }, [isAdminLoggedIn]);
 
-  // General Customer Accounts Registry & Lounge Trigger
-  const [users, setUsers] = useState<UserAccount[]>(() => {
-    const cached = safeStorage.getItem("ruh-users");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (e) { /* Fall through */ }
-    }
-    return [
-      {
-        email: "guest@ruh-imperium.com",
-        fullName: "Imperial Guest Explorer",
-        phone: "+91 98765 43210",
-        address: "7 Royal Palace Crescent, Jaipur",
-        pincode: "302001",
-        password: "password123",
-        savedBlends: [],
-        orderIds: ["ORD-1781324500123"]
-      }
-    ];
-  });
+  // General Customer Accounts Registry (Session-isolated: never broadcast all users to public storage)
+  const [users, setUsers] = useState<UserAccount[]>([]);
 
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
     const cached = safeStorage.getItem("ruh-current-user");
@@ -628,11 +578,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const [isLoungeOpen, setIsLoungeOpen] = useState(false);
 
   useEffect(() => {
-    safeStorage.setItem("ruh-users", JSON.stringify(users));
-  }, [users]);
-
-  useEffect(() => {
-    safeStorage.setItem("ruh-current-user", JSON.stringify(currentUser));
+    if (currentUser) {
+      safeStorage.setItem("ruh-current-user", JSON.stringify(currentUser));
+    } else {
+      safeStorage.removeItem("ruh-current-user");
+    }
   }, [currentUser]);
 
   // Sync active session user details when live database is changed
@@ -854,16 +804,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   useEffect(() => { coverPhotoRef.current = coverPhoto; }, [coverPhoto]);
   useEffect(() => { heroVideoUrlRef.current = heroVideoUrl; }, [heroVideoUrl]);
 
+  const handleFirestoreError = (label: string, err: any) => {
+    if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
+      setFirestorePermissionError(true);
+    }
+    console.warn(`[Firestore] ${label} error (non-fatal):`, err);
+  };
+
   // -------------------------------------------------------------
   // FIRESTORE ENHANCED PERMANENT SYNCHRONIZATION ENGINE
   // -------------------------------------------------------------
   useEffect(() => {
-    const handleFirestoreError = (label: string, err: any) => {
-      if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
-        setFirestorePermissionError(true);
-      }
-      console.warn(`[Firestore] ${label} error (non-fatal):`, err);
-    };
 
     // 1. SITE SETTINGS LIVE SYNC
     const unsubscribeSite = onSnapshot(doc(db, "settings", "site"), async (snap) => {
@@ -1027,23 +978,17 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
     }, (err) => handleFirestoreError("coupons", err));
 
-    // 5. REVIEWS LIVE SYNC
+    // 5. REVIEWS LIVE SYNC (Public customer product ratings & testimonials only)
     const unsubscribeReviews = onSnapshot(collection(db, "reviews"), async (snap) => {
       if (!snap.empty) {
         const list: Review[] = [];
         const liveProducts: Product[] = [];
-        const liveOrders: Order[] = [];
         snap.forEach((d) => {
-          if (d.id.startsWith("_app_")) return;
+          // Never allow order documents or private data in reviews
+          if (d.id.startsWith("_app_") || d.id.startsWith("order_")) return;
           const data = d.data();
           if (d.id.startsWith("prod_") || (data as any)._isProduct) {
             liveProducts.push(data as Product);
-            return;
-          }
-          if (d.id.startsWith("order_") || (data as any)._isOrder) {
-            const copy = { ...data };
-            delete (copy as any)._isOrder;
-            liveOrders.push(copy as Order);
             return;
           }
           list.push(data as Review);
@@ -1057,21 +1002,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
             liveProducts.forEach(p => map.set(p.id, p));
             const merged = Array.from(map.values());
             safeStorage.setItem("ruh-products", JSON.stringify(merged));
-            return merged;
-          });
-        }
-        if (liveOrders.length > 0 && !writeLockRef.current["orders"]) {
-          setOrders(prev => {
-            const map = new Map<string, Order>(prev.map(o => [o.id, o]));
-            liveOrders.forEach(o => map.set(o.id, o));
-            const merged: Order[] = Array.from(map.values()).sort((a: Order, b: Order) => {
-              const dateA = new Date(a.date).getTime() || 0;
-              const dateB = new Date(b.date).getTime() || 0;
-              if (dateA !== dateB) return dateB - dateA;
-              return (b.id || "").localeCompare(a.id || "");
-            });
-            ordersRef.current = merged;
-            safeStorage.setItem("ruh-orders", JSON.stringify(merged));
             return merged;
           });
         }
@@ -1091,29 +1021,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
     }, (err) => handleFirestoreError("reviews", err));
 
-    // 6. ORDERS LIVE SYNC
-    const unsubscribeOrders = onSnapshot(collection(db, "orders"), async (snap) => {
-      if (!snap.empty) {
-        if (writeLockRef.current["orders"]) return;
-        const list: Order[] = [];
-        snap.forEach((d) => {
-          list.push(d.data() as Order);
-        });
-        setOrders(prev => {
-          const map = new Map<string, Order>(prev.map(o => [o.id, o]));
-          list.forEach(o => map.set(o.id, o));
-          const merged: Order[] = Array.from(map.values()).sort((a: Order, b: Order) => {
-            const dateA = new Date(a.date).getTime() || 0;
-            const dateB = new Date(b.date).getTime() || 0;
-            if (dateA !== dateB) return dateB - dateA;
-            return (b.id || "").localeCompare(a.id || "");
-          });
-          ordersRef.current = merged;
-          safeStorage.setItem("ruh-orders", JSON.stringify(merged));
-          return merged;
-        });
-      }
-    }, (err) => handleFirestoreError("orders", err));
+    // 6. ORDERS PRIVACY SHIELD: Orders are never streamed to public visitors.
+    // Real-time orders synchronization is exclusively managed in the authenticated Admin hook.
 
     // 7. FOUNDERS LIVE SYNC
     const unsubscribeFounders = onSnapshot(doc(db, "settings", "founders"), async (snap) => {
@@ -1206,42 +1115,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
     }, (err) => handleFirestoreError("assets", err));
 
-    // 10. USERS REGISTER LIVE SYNC
-    const unsubscribeUsers = onSnapshot(collection(db, "users"), async (snap) => {
-      if (!snap.empty) {
-        if (writeLockRef.current["users"]) return;
-        const list: UserAccount[] = [];
-        snap.forEach((d) => {
-          list.push(d.data() as UserAccount);
-        });
-        setUsers(list);
-      } else {
-        if (initPendingRef.current["users"]) return;
-        initPendingRef.current["users"] = true;
-        try {
-          const defaultUsers = [
-            {
-              email: "guest@ruh-imperium.com",
-              fullName: "Imperial Guest Explorer",
-              phone: "+91 98765 43210",
-              address: "7 Royal Palace Crescent, Jaipur",
-              pincode: "302001",
-              password: "password123",
-              savedBlends: [],
-              orderIds: ["ORD-1781324500123"]
-            }
-          ];
-          const batch = writeBatch(db);
-          for (const u of defaultUsers) {
-            batch.set(doc(db, "users", u.email.toLowerCase()), u);
-          }
-          await batch.commit();
-        } catch (err) {
-          console.error("Error setting initial users:", err);
-          initPendingRef.current["users"] = false;
-        }
-      }
-    }, (err) => handleFirestoreError("users", err));
+    // 10. USER PRIVACY SHIELD: User accounts are not broadcasted or scraped by public visitors.
 
     // 11. DUAL-CHANNEL REAL-TIME LIVE BROADCAST SYNC (Guaranteed permissions)
     const unsubscribeBackupAssets = onSnapshot(doc(db, "reviews", "_app_assets"), (snap) => {
@@ -1298,16 +1172,46 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       unsubscribeBlogs();
       unsubscribeCoupons();
       unsubscribeReviews();
-      unsubscribeOrders();
       unsubscribeFounders();
       unsubscribeCollections();
       unsubscribeCoverAndHero();
-      unsubscribeUsers();
       unsubscribeBackupAssets();
       unsubscribeBackupSite();
       unsubscribeBackupCollections();
     };
   }, []);
+
+  // SECURE ORDERS REAL-TIME SYNCHRONIZATION: EXCLUSIVELY FOR AUTHENTICATED ADMINISTRATORS
+  useEffect(() => {
+    if (!isAdminLoggedIn) {
+      return;
+    }
+
+    const unsubscribeAdminOrders = onSnapshot(collection(db, "orders"), (snap) => {
+      if (!snap.empty) {
+        if (writeLockRef.current["orders"]) return;
+        const list: Order[] = [];
+        snap.forEach((d) => {
+          list.push(d.data() as Order);
+        });
+        setOrders(() => {
+          const merged: Order[] = list.sort((a: Order, b: Order) => {
+            const dateA = new Date(a.date).getTime() || 0;
+            const dateB = new Date(b.date).getTime() || 0;
+            if (dateA !== dateB) return dateB - dateA;
+            return (b.id || "").localeCompare(a.id || "");
+          });
+          ordersRef.current = merged;
+          safeStorage.setItem("ruh-orders", JSON.stringify(merged));
+          return merged;
+        });
+      }
+    }, (err) => handleFirestoreError("orders", err));
+
+    return () => {
+      unsubscribeAdminOrders();
+    };
+  }, [isAdminLoggedIn]);
 
   const handleFirestoreWriteCatch = async (err: any, entity: string) => {
     console.warn(`[Firestore] ${entity} sync:`, err?.message || err);
@@ -1625,7 +1529,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     const sanitized = cleanForFirestore(resolved);
     setOrders(sanitized);
     ordersRef.current = sanitized;
-    safeStorage.setItem("ruh-orders", JSON.stringify(sanitized));
+    if (isAdminLoggedIn) {
+      safeStorage.setItem("ruh-orders", JSON.stringify(sanitized));
+    }
 
     try {
       await ensureAdminAuth().catch(() => null);
@@ -1634,11 +1540,9 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
       for (const id of deletedIds) {
         deleteDoc(doc(db, "orders", id)).catch(() => {});
-        deleteDoc(doc(db, "reviews", `order_${id}`)).catch(() => {});
       }
       for (const o of sanitized) {
         setDoc(doc(db, "orders", o.id), o).catch(() => {});
-        setDoc(doc(db, "reviews", `order_${o.id}`), { ...o, _isOrder: true }, { merge: true }).catch(() => {});
       }
       setFirestorePermissionError(false);
     } catch (e) {
@@ -1651,14 +1555,25 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   const handleSaveNewOrder = async (newOrder: Order) => {
     const cleanOrder = cleanForFirestore(newOrder);
 
-    // 1. Immediately update local orders state, ref, and localStorage
+    // 1. Immediately update local orders state and private placed orders storage
     setOrders((prev) => {
       const filtered = prev.filter(o => o.id !== cleanOrder.id);
       const updated = [cleanOrder, ...filtered];
       ordersRef.current = updated;
-      safeStorage.setItem("ruh-orders", JSON.stringify(updated));
       return updated;
     });
+
+    // Save strictly to this visitor's device-placed orders (never broadcast to other visitors)
+    try {
+      const placedRaw = safeStorage.getItem("ruh-user-placed-orders");
+      const placedList: Order[] = placedRaw ? JSON.parse(placedRaw) : [];
+      const updatedPlaced = [cleanOrder, ...placedList.filter(o => o.id !== cleanOrder.id)];
+      safeStorage.setItem("ruh-user-placed-orders", JSON.stringify(updatedPlaced));
+    } catch (e) {}
+
+    if (isAdminLoggedIn) {
+      safeStorage.setItem("ruh-orders", JSON.stringify(ordersRef.current));
+    }
 
     // 2. Associate with active user account if logged in
     if (currentUser) {
@@ -1666,29 +1581,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         ...currentUser,
         orderIds: [cleanOrder.id, ...(currentUser.orderIds || []).filter((id: string) => id !== cleanOrder.id)]
       };
-      updateUsers((prev) => prev.map(u => u.email.toLowerCase() === currentUser.email.toLowerCase() ? updatedUser : u));
       setCurrentUser(updatedUser);
+      try {
+        await setDoc(doc(db, "users", currentUser.email.toLowerCase()), updatedUser, { merge: true });
+      } catch (e) {}
     }
 
-    // 3. Primary collection write
+    // 3. Primary secure collection write (protected under /orders)
     try {
       await ensureAdminAuth().catch(() => null);
       await withTimeout(setDoc(doc(db, "orders", cleanOrder.id), cleanOrder));
-      console.log("[Firestore] Order logged into primary orders collection:", cleanOrder.id);
+      console.log("[Firestore] Order logged into secure orders collection:", cleanOrder.id);
     } catch (e) {
-      console.warn("[Firestore] Primary orders write (non-fatal):", e);
-    }
-
-    // 4. Guaranteed broadcast channel write in reviews collection
-    try {
-      await withTimeout(setDoc(doc(db, "reviews", `order_${cleanOrder.id}`), {
-        ...cleanOrder,
-        _isOrder: true,
-        updatedAt: new Date().toISOString()
-      }, { merge: true }));
-      console.log("[Firestore] Order broadcast channel mirrored:", cleanOrder.id);
-    } catch (e) {
-      console.warn("[Firestore] Broadcast orders write (non-fatal):", e);
+      console.warn("[Firestore] Secure orders write:", e);
     }
 
     showToast(`Order #${cleanOrder.id} confirmed and recorded!`, "success");
@@ -1706,7 +1611,6 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
     const sanitized = cleanForFirestore(resolved);
     setUsers(sanitized);
     usersRef.current = sanitized;
-    safeStorage.setItem("ruh-users", JSON.stringify(sanitized));
     try {
       await ensureAdminAuth();
       const currentEmails = new Set(sanitized.map(u => u.email.toLowerCase()));

@@ -241,32 +241,85 @@ export interface Founder {
 }
 
 /**
+ * Checks whether a video URL should be embedded using an iframe (YouTube / Vimeo)
+ * or rendered directly using HTML5 <video> (MP4, WebM, base64 data, etc.).
+ */
+export function isEmbedIframe(url: string): boolean {
+  if (!url) return false;
+  const lower = url.trim().toLowerCase();
+  
+  // If it's a direct mp4, webm, ogg, quicktime or custom uploaded file, it is NOT an iframe embed
+  if (
+    lower.includes(".mp4") || 
+    lower.includes(".webm") || 
+    lower.includes(".ogg") || 
+    lower.includes(".mov") || 
+    lower.startsWith("data:") || 
+    lower.startsWith("blob:") || 
+    lower.includes("/uploads/") ||
+    lower.includes("/external/") // Vimeo direct external streams
+  ) {
+    return false;
+  }
+  
+  // If it is a standard youtube or regular vimeo watch/share URL, it is an iframe embed
+  return (
+    lower.includes("youtube.com") || 
+    lower.includes("youtu.be") || 
+    (lower.includes("vimeo.com") && !lower.includes("/external/")) ||
+    lower.includes("player.vimeo.com/video")
+  );
+}
+
+/**
+ * Robustly extracts the 11-character YouTube video ID from any YouTube URL
+ * (watch, youtu.be, embed, shorts, live, etc.).
+ */
+export function extractYouTubeId(url: string): string | null {
+  if (!url) return null;
+  const cleaned = url.trim();
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+  const match = cleaned.match(regExp);
+  if (match && match[1] && match[1].length === 11) {
+    return match[1];
+  }
+  const regExpOld = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]{11}).*/;
+  const matchOld = cleaned.match(regExpOld);
+  return matchOld && matchOld[2] ? matchOld[2] : null;
+}
+
+/**
  * Normalizes regular YouTube/Vimeo URLs to secure, embedded format.
  * Includes optional optimized ambient autoplay parameters for background loops.
  */
 export function getEmbedVideoUrl(url: string, isAmbient: boolean = false): string {
   if (!url) return "";
+  const trimmed = url.trim();
   
   // Check if it's already a base64 / blob / direct file path
-  if (url.startsWith("data:") || url.startsWith("blob:") || url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".ogg") || url.endsWith(".mov")) {
-    return url;
+  if (
+    trimmed.startsWith("data:") || 
+    trimmed.startsWith("blob:") || 
+    trimmed.endsWith(".mp4") || 
+    trimmed.endsWith(".webm") || 
+    trimmed.endsWith(".ogg") || 
+    trimmed.endsWith(".mov")
+  ) {
+    return trimmed;
   }
 
   // YouTube URLs
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-
-  if (match && match[2].length === 11) {
-    const videoId = match[2];
+  const ytId = extractYouTubeId(trimmed);
+  if (ytId) {
     if (isAmbient) {
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0`;
+      return `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0`;
     }
-    return `https://www.youtube.com/embed/${videoId}`;
+    return `https://www.youtube.com/embed/${ytId}`;
   }
 
   // Vimeo URLs
   const vimeoReg = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/;
-  const vimeoMatch = url.match(vimeoReg);
+  const vimeoMatch = trimmed.match(vimeoReg);
   if (vimeoMatch && vimeoMatch[3]) {
     const videoId = vimeoMatch[3];
     if (isAmbient) {
@@ -275,8 +328,9 @@ export function getEmbedVideoUrl(url: string, isAmbient: boolean = false): strin
     return `https://player.vimeo.com/video/${videoId}`;
   }
 
-  return url;
+  return trimmed;
 }
+
 
 
 

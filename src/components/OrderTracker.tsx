@@ -10,9 +10,13 @@ import {
   Gift,
   ArrowRight,
   ShieldCheck,
-  MapPin as PinIcon
+  MapPin as PinIcon,
+  Loader2
 } from "lucide-react";
 import { Order } from "../types";
+import { db } from "../config/firebase";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { safeStorage } from "../App";
 
 interface OrderTrackerProps {
   isOpen: boolean;
@@ -20,10 +24,21 @@ interface OrderTrackerProps {
   orders: Order[];
 }
 
+export const maskCustomerEmail = (email?: string): string => {
+  if (!email) return "—";
+  const parts = email.split("@");
+  if (parts.length !== 2) return email;
+  const name = parts[0];
+  const domain = parts[1];
+  const maskedName = name.length > 2 ? `${name[0]}***${name[name.length - 1]}` : `${name[0]}***`;
+  return `${maskedName}@${domain}`;
+};
+
 export default function OrderTracker({ isOpen, onClose, orders }: OrderTrackerProps) {
   const [trackingCode, setTrackingCode] = useState("");
   const [searchResult, setSearchResult] = useState<Order | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isQuerying, setIsQuerying] = useState(false);
 
   // Synchronize active tracking result with real-time orders updates from Firestore
   useEffect(() => {
@@ -40,18 +55,62 @@ export default function OrderTracker({ isOpen, onClose, orders }: OrderTrackerPr
 
   if (!isOpen) return null;
 
-  const handleTrackSubmit = (e: FormEvent) => {
+  const handleTrackSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
-    
-    const matched = orders.find(
-      (o) => o.trackingCode.trim().toUpperCase() === trackingCode.trim().toUpperCase() || o.id.trim().toUpperCase() === trackingCode.trim().toUpperCase()
-    );
+    const queryTerm = trackingCode.trim().toUpperCase();
+    if (!queryTerm) return;
 
-    if (matched) {
-      setSearchResult(matched);
-    } else {
+    // 1. Check in passed orders (admin or local placed orders)
+    const localMatch = orders.find(
+      (o) => o.trackingCode.trim().toUpperCase() === queryTerm || o.id.trim().toUpperCase() === queryTerm
+    );
+    if (localMatch) {
+      setSearchResult(localMatch);
+      return;
+    }
+
+    // 2. Check in user's placed orders stored locally on this device
+    try {
+      const placedRaw = safeStorage.getItem("ruh-user-placed-orders");
+      if (placedRaw) {
+        const list: Order[] = JSON.parse(placedRaw);
+        const placedMatch = list.find(
+          (o) => o.trackingCode.trim().toUpperCase() === queryTerm || o.id.trim().toUpperCase() === queryTerm
+        );
+        if (placedMatch) {
+          setSearchResult(placedMatch);
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Directly query Firestore for this specific single order without listing all orders
+    setIsQuerying(true);
+    try {
+      // First try direct document lookup by order ID
+      const directDoc = await getDoc(doc(db, "orders", queryTerm));
+      if (directDoc.exists()) {
+        setSearchResult(directDoc.data() as Order);
+        setIsQuerying(false);
+        return;
+      }
+
+      // Second try querying by trackingCode
+      const q = query(collection(db, "orders"), where("trackingCode", "==", queryTerm));
+      const qSnap = await getDocs(q);
+      if (!qSnap.empty) {
+        setSearchResult(qSnap.docs[0].data() as Order);
+        setIsQuerying(false);
+        return;
+      }
+
       setSearchResult(null);
+    } catch (err) {
+      console.warn("Tracking query error:", err);
+      setSearchResult(null);
+    } finally {
+      setIsQuerying(false);
     }
   };
 
@@ -119,10 +178,20 @@ export default function OrderTracker({ isOpen, onClose, orders }: OrderTrackerPr
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] text-xs uppercase tracking-widest font-mono rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+              disabled={isQuerying}
+              className="px-6 py-3 bg-[#2D2926] hover:bg-[#D4BC96] text-[#FAFAFA] text-xs uppercase tracking-widest font-mono rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm disabled:opacity-75"
             >
-              <Search className="w-4 h-4" />
-              <span>Query</span>
+              {isQuerying ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-[#D4BC96]" />
+                  <span>Searching...</span>
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  <span>Query</span>
+                </>
+              )}
             </button>
           </form>
 
@@ -147,7 +216,7 @@ export default function OrderTracker({ isOpen, onClose, orders }: OrderTrackerPr
                     <div>
                       <span className="text-[8px] uppercase tracking-widest text-[#D4BC96] font-bold block">Consignment Recipient</span>
                       <p className="font-semibold text-sand-800 leading-none mt-1">{searchResult.fullName}</p>
-                      <p className="text-sand-400 text-[10px] sm:inline block mt-0.5">{searchResult.email}</p>
+                      <p className="text-sand-400 text-[10px] sm:inline block mt-0.5">{maskCustomerEmail(searchResult.email)}</p>
                     </div>
 
                     <div className="text-right">
@@ -163,7 +232,7 @@ export default function OrderTracker({ isOpen, onClose, orders }: OrderTrackerPr
 
                     <div className="border-t border-sand-100 pt-3">
                       <span className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block">Delivery Destination</span>
-                      <p className="text-[10px] text-sand-600 font-light leading-snug mt-0.5">{searchResult.address}, PIN {searchResult.pincode}</p>
+                      <p className="text-[10px] text-sand-600 font-light leading-snug mt-0.5">PIN {searchResult.pincode} (Secured Destination)</p>
                     </div>
 
                     <div className="text-right border-t border-sand-100 pt-3">

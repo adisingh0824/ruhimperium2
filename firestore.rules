@@ -27,21 +27,32 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // 2. ORDERS: Visitors can CREATE orders when buying. Only Admin can view all or DELETE/MODIFY orders.
+    // 2. ORDERS: Visitors can CREATE orders at checkout.
+    // Individual order GET allowed for order tracking by customer with valid order ID.
+    // LIST (streaming/reading all orders) is STRICTLY restricted to Admin!
+    // UPDATE / DELETE strictly restricted to Admin!
     match /orders/{orderId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow get: if true;
+      allow list: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
-    // 3. REVIEWS & LIVE BROADCAST: Visitors can read and post reviews. Admin can manage all.
+    // 3. REVIEWS & PUBLIC BROADCAST: Visitors can read and post reviews.
+    // Sensitive order documents are NEVER allowed in the public reviews collection!
     match /reviews/{reviewId} {
-      allow read, create: if true;
+      allow read: if !reviewId.matches('^order_.*');
+      allow create: if !reviewId.matches('^order_.*');
       allow update, delete: if isAdmin();
     }
 
     // 4. USERS: Profiles for registration and checkout
+    // Single user profile retrieval and registration allowed.
+    // Bulk listing of all user accounts is strictly restricted to Admin!
     match /users/{userId} {
-      allow read, write: if true;
+      allow get, create, update: if true;
+      allow list, delete: if isAdmin();
     }
   }
 }
+

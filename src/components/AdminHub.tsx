@@ -32,9 +32,13 @@ import {
   CreditCard,
   Calendar,
   CheckCircle2,
-  Clock
+  Clock,
+  Youtube,
+  Film,
+  Play,
+  Link2
 } from "lucide-react";
-import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review } from "../types";
+import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder, Review, getEmbedVideoUrl, isEmbedIframe, extractYouTubeId } from "../types";
 import { storage, db, auth, withTimeout } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
@@ -316,6 +320,13 @@ export default function AdminHub({
   );
   const [prodProductImages, setProdProductImages] = useState<string[]>(["", "", "", ""]);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [heroVideoInputUrl, setHeroVideoInputUrl] = useState(heroVideoUrl || "");
+  const [heroVideoSaveStatus, setHeroVideoSaveStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    setHeroVideoInputUrl(heroVideoUrl || "");
+  }, [heroVideoUrl]);
+
   const [isUploadingNewColImg, setIsUploadingNewColImg] = useState(false);
   const [newColImageUrl, setNewColImageUrl] = useState("");
   const [uploadingColId, setUploadingColId] = useState<string | null>(null);
@@ -2666,153 +2677,319 @@ service cloud.firestore {
 
                    {/* HERO VIDEO EDITING */}
                    <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
-                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sand-100 pb-2">
-                       <div className="flex items-center gap-2 text-[#D4BC96]">
-                         <span className="text-sm">🎬</span>
+                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sand-200 pb-3">
+                       <div className="flex items-center gap-2 text-[#2D2926]">
+                         <Film className="w-4 h-4 text-[#D4BC96]" />
                          <span className="text-xs font-bold font-mono uppercase tracking-widest">Main Landing Ambient Background Video</span>
                        </div>
-                       <div className="flex items-center gap-1 bg-emerald-50 text-emerald-750 text-[8px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-200">
-                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                         <span>Real-Time Live Auto-Fetch Active</span>
+                       <div className="flex items-center gap-2">
+                         {siteSettings.heroMediaType === "video" ? (
+                           <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-[9px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full border border-emerald-300 font-bold">
+                             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                             <span>Ambient Video Mode Active</span>
+                           </span>
+                         ) : (
+                           <span className="flex items-center gap-1.5 bg-sand-100 text-sand-700 text-[9px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full border border-sand-300">
+                             <span className="w-1.5 h-1.5 bg-sand-400 rounded-full" />
+                             <span>Cover Photo Mode Active</span>
+                           </span>
+                         )}
                        </div>
                      </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-3">
-                      <div>
-                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Direct Video URL (`.mp4` / `.webm` etc.)</label>
-                        <input
-                          type="url"
-                          placeholder="Enter direct MP4 URL..."
-                          value={heroVideoUrl}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setHeroVideoUrl(val);
-                            handleUpdateSiteSetting("heroMediaType", "video");
-                          }}
-                          className="w-full bg-sand-50 border border-sand-200 rounded-lg px-4 py-2.5 text-xs text-sand-800 outline-none focus:border-[#D4BC96] transition-all"
-                        />
-                      </div>
+                     {/* Video Mode Notice & Switch */}
+                     <div className="flex flex-wrap items-center justify-between gap-3 bg-sand-100/60 p-3 rounded-xl border border-sand-200 text-xs">
+                       <p className="text-[11px] text-sand-700">
+                         Display video seamlessly on mobile, tablet, and desktop behind the hero title.
+                       </p>
+                       <div className="flex items-center gap-2">
+                         <button
+                           type="button"
+                           onClick={() => handleUpdateSiteSetting("heroMediaType", "video")}
+                           className={`px-3 py-1.5 rounded-lg text-[9.5px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                             siteSettings.heroMediaType === "video"
+                               ? "bg-[#2D2926] text-white shadow-xs font-bold"
+                               : "bg-white text-sand-700 border border-sand-300 hover:bg-sand-50"
+                           }`}
+                         >
+                           Set Video Active
+                         </button>
+                         <button
+                           type="button"
+                           onClick={() => handleUpdateSiteSetting("heroMediaType", "photo")}
+                           className={`px-3 py-1.5 rounded-lg text-[9.5px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                             siteSettings.heroMediaType === "photo"
+                               ? "bg-[#2D2926] text-white shadow-xs font-bold"
+                               : "bg-white text-sand-700 border border-sand-300 hover:bg-sand-50"
+                           }`}
+                         >
+                           Set Photo Active
+                         </button>
+                       </div>
+                     </div>
 
-                      {/* Direct File Upload Option */}
-                      <div className="pt-1.5 pb-1 border-t border-dashed border-sand-200">
-                        <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1.5">Or Direct Video File Upload <span className="normal-case text-sand-300">(max 50 MB)</span></label>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <input
-                            type="file"
-                            accept="video/*"
-                            id="hero-video-upload-direct"
-                            className="hidden"
-                            disabled={isUploadingVideo}
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              const MAX_MB = 50;
-                              if (file.size > MAX_MB * 1024 * 1024) {
-                                alert(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — files larger than ${MAX_MB} MB cannot be embedded directly.\n\nPlease upload your video to YouTube or Vimeo and paste the link using the "Video Link" button.`);
-                                e.target.value = "";
-                                return;
-                              }
-                              setIsUploadingVideo(true);
-                              try {
-                                const outcome = await uploadVideoFile(file, defaultAdminPassword);
-                                setHeroVideoUrl(outcome.url);
-                                handleUpdateSiteSetting("heroMediaType", "video");
-                                alert(outcome.message || `✅ Scent film "${file.name}" loaded and broadcasting live!`);
-                              } catch (err: any) {
-                                console.error("Hero video upload error:", err);
-                                alert(`Upload failed: ${err.message || "Unknown error."}\n\nTip: For videos larger than 50 MB, use the "Video Link" button and paste a YouTube, Vimeo, or direct .mp4 URL.`);
-                              } finally {
-                                setIsUploadingVideo(false);
-                                e.target.value = "";
-                              }
-                            }}
-                          />
-                        <label
-                          htmlFor={isUploadingVideo ? undefined : "hero-video-upload-direct"}
-                          className={`px-4 py-2.5 rounded-lg cursor-pointer transition-all inline-flex items-center gap-2 border shadow-xs text-white font-mono text-[9.5px] uppercase tracking-wider ${
-                            isUploadingVideo
-                              ? "bg-stone-400 border-stone-400 cursor-not-allowed opacity-70 animate-pulse"
-                              : "bg-[#2D2926] hover:bg-gold-600 border-black"
-                          }`}
-                        >
-                          {isUploadingVideo ? (
-                            <>
-                              <svg className="animate-spin -ml-1 mr-1 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                              </svg>
-                              <span>Uploading Scent Film...</span>
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-4.5 h-4.5 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                              </svg>
-                              <span>Choose Scent Film File</span>
-                            </>
-                          )}
-                        </label>
-                        {heroVideoUrl.startsWith("/uploads/") && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                            <span className="text-[9.5px] text-emerald-700 font-mono font-medium uppercase tracking-wider">
-                              Server Uploaded Scent Film Active
-                            </span>
-                          </div>
-                        )}
-                        {heroVideoUrl.startsWith("data:") && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                            <span className="text-[9.5px] text-emerald-700 font-mono font-medium uppercase tracking-wider">
-                              Synchronized Inline base64 Video Active
-                            </span>
-                          </div>
-                        )}
-                        {heroVideoUrl.startsWith("blob:") && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                            <span className="text-[9.5px] text-amber-700 font-mono font-medium uppercase tracking-wider">
-                              Unsaved Blob (Local Only)
-                            </span>
-                          </div>
-                        )}
-                        </div>
-                      </div>
+                     <div className="bg-white p-4 sm:p-5 rounded-xl border border-sand-200 space-y-4">
+                       {/* Method 1: YouTube or Video Link */}
+                       <div>
+                         <div className="flex items-center justify-between mb-1.5">
+                           <label className="text-[9px] uppercase tracking-widest text-sand-600 font-mono font-bold flex items-center gap-1.5">
+                             <Youtube className="w-3.5 h-3.5 text-red-600" />
+                             <span>Add YouTube Video Link or Direct Video URL</span>
+                           </label>
+                           <div className="flex items-center gap-1">
+                             <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 font-medium">YouTube</span>
+                             <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-medium">Vimeo</span>
+                             <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-sand-100 text-sand-700 border border-sand-200 font-medium">.MP4</span>
+                           </div>
+                         </div>
+                         <p className="text-[10px] text-sand-500 mb-2 leading-relaxed">
+                           Paste any YouTube URL (e.g. <span className="font-mono text-sand-700 bg-sand-100 px-1 py-0.5 rounded">https://www.youtube.com/watch?v=...</span>, <span className="font-mono text-sand-700 bg-sand-100 px-1 py-0.5 rounded">youtu.be/...</span>, or <span className="font-mono text-sand-700 bg-sand-100 px-1 py-0.5 rounded">shorts/...</span>), Vimeo link, or direct MP4 URL.
+                         </p>
 
-                      <p className="text-[10px] text-[#2D2926] font-medium leading-snug">
-                        The video plays in an elegant loop behind the hero heading in native uploaded quality. Falls back gracefully to the Selected Cover Photo if cleared or offline.
-                      </p>
-                      
-                      {/* Presets and quick selects */}
-                      <div className="pt-2.5 border-t border-sand-100">
-                        <span className="text-[9px] uppercase tracking-widest font-mono text-sand-400 block mb-2">Luxury Brand Video Presets:</span>
-                        <div className="flex flex-wrap gap-2">
-                          {[
-                            { name: "Scent Rose & Flacon", url: "https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4" },
-                            { name: "Mystic Steaming Vapor", url: "https://assets.mixkit.co/videos/preview/mixkit-vapor-from-a-hot-beverage-42289-large.mp4" },
-                            { name: "Western Ghats Misty River", url: "https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761" },
-                            { name: "Misty Mountain Peaks", url: "https://player.vimeo.com/external/434045526.sd.mp4?s=c27d349eeaf0ac6aa0cb7034cf3fe6ab36402422&profile_id=165&oauth2_token_id=57447761" }
-                          ].map((preset) => (
-                            <button
-                              key={preset.url}
-                              type="button"
-                              onClick={() => {
-                                setHeroVideoUrl(preset.url);
-                                handleUpdateSiteSetting("heroMediaType", "video");
-                              }}
-                              className={`px-3 py-1.5 rounded text-[9px] border font-mono transition-all uppercase tracking-wider cursor-pointer ${
-                                heroVideoUrl === preset.url
-                                  ? "bg-[#2D2926] text-white border-black"
-                                  : "bg-sand-50/50 text-sand-600 border-sand-200 hover:border-sand-450"
-                              }`}
-                            >
-                              {preset.name}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                         <div className="flex flex-col sm:flex-row gap-2">
+                           <div className="relative flex-1">
+                             <input
+                               type="text"
+                               placeholder="e.g. https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                               value={heroVideoInputUrl}
+                               onChange={(e) => setHeroVideoInputUrl(e.target.value)}
+                               onKeyDown={(e) => {
+                                 if (e.key === 'Enter') {
+                                   e.preventDefault();
+                                   const trimmed = heroVideoInputUrl.trim();
+                                   if (!trimmed) return;
+                                   setHeroVideoUrl(trimmed);
+                                   handleUpdateSiteSetting("heroMediaType", "video");
+                                   setHeroVideoSaveStatus("✅ Video updated & broadcasting live!");
+                                   setTimeout(() => setHeroVideoSaveStatus(null), 3500);
+                                 }
+                               }}
+                               className="w-full bg-sand-50 border border-sand-300 rounded-lg px-3.5 py-2.5 text-xs text-sand-900 font-mono outline-none focus:border-[#D4BC96] focus:bg-white transition-all shadow-inner"
+                             />
+                           </div>
+                           <button
+                             type="button"
+                             onClick={() => {
+                               const trimmed = heroVideoInputUrl.trim();
+                               if (!trimmed) {
+                                 alert("Please enter a valid YouTube or video URL before saving.");
+                                 return;
+                               }
+                               setHeroVideoUrl(trimmed);
+                               handleUpdateSiteSetting("heroMediaType", "video");
+                               setHeroVideoSaveStatus("✅ Video updated & broadcasting live!");
+                               setTimeout(() => setHeroVideoSaveStatus(null), 3500);
+                             }}
+                             className="px-5 py-2.5 bg-[#2D2926] hover:bg-gold-600 text-white rounded-lg text-[10px] font-mono uppercase tracking-wider font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                           >
+                             <Save className="w-3.5 h-3.5 text-[#D4BC96]" />
+                             <span>Save &amp; Apply Video</span>
+                           </button>
+                         </div>
+
+                         {heroVideoSaveStatus && (
+                           <div className="mt-2 text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-2 animate-fade-in">
+                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                             <span>{heroVideoSaveStatus}</span>
+                           </div>
+                         )}
+                       </div>
+
+                       {/* Method 2: Direct File Upload Option */}
+                       <div className="pt-3 border-t border-dashed border-sand-200">
+                         <label className="text-[9px] uppercase tracking-widest text-sand-600 font-mono font-bold block mb-1.5">
+                           Or Direct Video File Upload <span className="normal-case text-sand-400 font-normal">(MP4/WebM from device, max 50 MB)</span>
+                         </label>
+                         <div className="flex flex-wrap items-center gap-3">
+                           <input
+                             type="file"
+                             accept="video/*"
+                             id="hero-video-upload-direct"
+                             className="hidden"
+                             disabled={isUploadingVideo}
+                             onChange={async (e) => {
+                               const file = e.target.files?.[0];
+                               if (!file) return;
+                               const MAX_MB = 50;
+                               if (file.size > MAX_MB * 1024 * 1024) {
+                                 alert(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — files larger than ${MAX_MB} MB cannot be stored directly.\n\nPlease upload your video to YouTube or Vimeo and paste the link above.`);
+                                 e.target.value = "";
+                                 return;
+                               }
+                               setIsUploadingVideo(true);
+                               try {
+                                 const outcome = await uploadVideoFile(file, defaultAdminPassword);
+                                 setHeroVideoInputUrl(outcome.url);
+                                 setHeroVideoUrl(outcome.url);
+                                 handleUpdateSiteSetting("heroMediaType", "video");
+                                 setHeroVideoSaveStatus(`✅ Scent film "${file.name}" loaded and broadcasting live!`);
+                                 setTimeout(() => setHeroVideoSaveStatus(null), 3500);
+                               } catch (err: any) {
+                                 console.error("Hero video upload error:", err);
+                                 alert(`Upload failed: ${err.message || "Unknown error."}\n\nTip: You can upload your video to YouTube and paste the link above.`);
+                               } finally {
+                                 setIsUploadingVideo(false);
+                                 e.target.value = "";
+                               }
+                             }}
+                           />
+                           <label
+                             htmlFor={isUploadingVideo ? undefined : "hero-video-upload-direct"}
+                             className={`px-4 py-2.5 rounded-lg cursor-pointer transition-all inline-flex items-center gap-2 border shadow-xs text-white font-mono text-[9.5px] uppercase tracking-wider ${
+                               isUploadingVideo
+                                 ? "bg-stone-400 border-stone-400 cursor-not-allowed opacity-70 animate-pulse"
+                                 : "bg-[#2D2926] hover:bg-gold-600 border-black"
+                             }`}
+                           >
+                             {isUploadingVideo ? (
+                               <>
+                                 <svg className="animate-spin -ml-1 mr-1 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                 </svg>
+                                 <span>Uploading Video...</span>
+                               </>
+                             ) : (
+                               <>
+                                 <Upload className="w-3.5 h-3.5 text-[#D4BC96]" />
+                                 <span>Choose Video File from Device</span>
+                               </>
+                             )}
+                           </label>
+
+                           {heroVideoUrl && (
+                             <button
+                               type="button"
+                               onClick={() => {
+                                 if (confirm("Are you sure you want to remove the hero video and revert to the cover photo?")) {
+                                   setHeroVideoUrl("");
+                                   setHeroVideoInputUrl("");
+                                   handleUpdateSiteSetting("heroMediaType", "photo");
+                                   setHeroVideoSaveStatus("Hero video removed. Live display reverted to cover photo.");
+                                   setTimeout(() => setHeroVideoSaveStatus(null), 3500);
+                                 }
+                               }}
+                               className="px-3 py-2 text-[9px] font-mono text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg border border-rose-200 transition-colors cursor-pointer"
+                             >
+                               Remove Video
+                             </button>
+                           )}
+                         </div>
+
+                         {heroVideoUrl.startsWith("/uploads/") && (
+                           <div className="flex items-center gap-1.5 mt-2">
+                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                             <span className="text-[9.5px] text-emerald-700 font-mono font-medium uppercase tracking-wider">
+                               Server Uploaded Scent Film Active
+                             </span>
+                           </div>
+                         )}
+                         {heroVideoUrl.startsWith("data:") && (
+                           <div className="flex items-center gap-1.5 mt-2">
+                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                             <span className="text-[9.5px] text-emerald-700 font-mono font-medium uppercase tracking-wider">
+                               Synchronized Inline base64 Video Active
+                             </span>
+                           </div>
+                         )}
+                         {heroVideoUrl.startsWith("blob:") && (
+                           <div className="flex items-center gap-1.5 mt-2">
+                             <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                             <span className="text-[9.5px] text-amber-700 font-mono font-medium uppercase tracking-wider">
+                               Unsaved Blob (Local Only)
+                             </span>
+                           </div>
+                         )}
+                       </div>
+
+                       {/* Live Video Preview Box */}
+                       {heroVideoUrl && (
+                         <div className="pt-3 border-t border-sand-100">
+                           <div className="flex items-center justify-between mb-2">
+                             <div className="flex items-center gap-2">
+                               <span className="text-[9px] uppercase tracking-widest font-mono text-sand-500 font-bold">Live Hero Video Preview:</span>
+                               {isEmbedIframe(heroVideoUrl) ? (
+                                 extractYouTubeId(heroVideoUrl) ? (
+                                   <span className="text-[8px] font-mono bg-red-100 text-red-800 px-2 py-0.5 rounded-full border border-red-300 font-bold">
+                                     ▶ YouTube Video Active
+                                   </span>
+                                 ) : (
+                                   <span className="text-[8px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-300 font-bold">
+                                     Vimeo Video Active
+                                   </span>
+                                 )
+                               ) : (
+                                 <span className="text-[8px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-300 font-bold">
+                                   Direct Video (.mp4 / file) Active
+                                 </span>
+                               )}
+                             </div>
+                             <span className="text-[8.5px] font-mono text-sand-400 truncate max-w-[220px]" title={heroVideoUrl}>
+                               {heroVideoUrl}
+                             </span>
+                           </div>
+
+                           <div className="w-full h-52 sm:h-64 rounded-xl overflow-hidden border border-sand-300 bg-black relative shadow-inner">
+                             {isEmbedIframe(heroVideoUrl) ? (
+                               <iframe
+                                 key={heroVideoUrl}
+                                 src={getEmbedVideoUrl(heroVideoUrl, false)}
+                                 title="Hero Video Live Admin Preview"
+                                 className="w-full h-full border-0"
+                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                 allowFullScreen
+                               />
+                             ) : (
+                               <video
+                                 key={heroVideoUrl}
+                                 src={heroVideoUrl}
+                                 controls
+                                 loop
+                                 muted
+                                 playsInline
+                                 className="w-full h-full object-cover"
+                               />
+                             )}
+                           </div>
+                         </div>
+                       )}
+
+                       {/* Luxury Brand Video Presets */}
+                       <div className="pt-3 border-t border-sand-100">
+                         <span className="text-[9px] uppercase tracking-widest font-mono text-sand-400 block mb-2 font-bold">
+                           Quick Presets &amp; Royalty-Free Demos:
+                         </span>
+                         <div className="flex flex-wrap gap-2">
+                           {[
+                             { name: "Scent Rose & Flacon", url: "https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4" },
+                             { name: "Mystic Steaming Vapor", url: "https://assets.mixkit.co/videos/preview/mixkit-vapor-from-a-hot-beverage-42289-large.mp4" },
+                             { name: "Western Ghats Misty River", url: "https://player.vimeo.com/external/435674703.sd.mp4?s=7fdf186213cefada19cfcaf004602f37c37fa9b2&profile_id=165&oauth2_token_id=57447761" },
+                             { name: "Misty Mountain Peaks", url: "https://player.vimeo.com/external/434045526.sd.mp4?s=c27d349eeaf0ac6aa0cb7034cf3fe6ab36402422&profile_id=165&oauth2_token_id=57447761" }
+                           ].map((preset) => (
+                             <button
+                               key={preset.url}
+                               type="button"
+                               onClick={() => {
+                                 setHeroVideoInputUrl(preset.url);
+                                 setHeroVideoUrl(preset.url);
+                                 handleUpdateSiteSetting("heroMediaType", "video");
+                                 setHeroVideoSaveStatus(`✅ Preset applied: ${preset.name}`);
+                                 setTimeout(() => setHeroVideoSaveStatus(null), 3500);
+                               }}
+                               className={`px-3 py-1.5 rounded text-[9px] border font-mono transition-all uppercase tracking-wider cursor-pointer ${
+                                 heroVideoUrl === preset.url
+                                   ? "bg-[#2D2926] text-white border-black font-bold"
+                                   : "bg-sand-50/50 text-sand-600 border-sand-200 hover:border-sand-450 hover:bg-sand-100"
+                               }`}
+                             >
+                               {preset.name}
+                             </button>
+                           ))}
+                         </div>
+                       </div>
+
+                     </div>
+                   </div>
 
                   {/* FOOTER CUSTOMIZATION */}
                   <div className="bg-sand-50 rounded-2xl border border-sand-200 p-5 space-y-4">
