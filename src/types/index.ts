@@ -134,9 +134,13 @@ export interface SiteSettings {
   story03Text?: string;
   story03Image?: string;
   sandalwoodStickTitle?: string;
+  sandalwoodStickSubtitle?: string;
   sandalwoodStickText?: string;
+  sandalwoodStickWeight?: string;
   sandalwoodStickPrice?: number;
+  sandalwoodStickOriginalPrice?: number;
   sandalwoodStickImage?: string;
+  sandalwoodStickInStock?: boolean;
   checkoutPolicyTitle?: string;
   checkoutPolicyContent?: string;
   checkoutPolicyEnabled?: boolean;

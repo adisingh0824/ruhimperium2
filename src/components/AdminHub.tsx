@@ -3614,7 +3614,12 @@ service cloud.firestore {
 
                     {/* ====== 4. FEATURING SANDALWOOD STICK DEAL ====== */}
                     <div className="bg-sand-50/70 rounded-2xl border border-sand-200 p-5 space-y-4 md:col-span-2">
-                      <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">1-E. Sandalwood Stick & Rubbing Stone Deal Block</div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-bold font-mono uppercase tracking-widest text-[#D4BC96]">1-E. Sandalwood Stick &amp; Rubbing Stone Deal Block</div>
+                        <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                          Direct Buy Enabled
+                        </span>
+                      </div>
                       <div className="space-y-4 bg-white p-4 rounded-xl border border-sand-200">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
@@ -3622,7 +3627,18 @@ service cloud.firestore {
                             <input
                               type="text"
                               value={siteSettings.sandalwoodStickTitle || ""}
+                              placeholder="Sandalwood Stick + Rubbing Stone"
                               onChange={(e) => handleUpdateSiteSetting("sandalwoodStickTitle", e.target.value)}
+                              className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Subtitle / Tagline</label>
+                            <input
+                              type="text"
+                              value={siteSettings.sandalwoodStickSubtitle || ""}
+                              placeholder="Ayurveda’s Ancient Calm"
+                              onChange={(e) => handleUpdateSiteSetting("sandalwoodStickSubtitle", e.target.value)}
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
                             />
                           </div>
@@ -3630,47 +3646,95 @@ service cloud.firestore {
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Exclusive Offer Price (INR ₹)</label>
                             <input
                               type="number"
-                              value={siteSettings.sandalwoodStickPrice || ""}
-                              onChange={(e) => setSiteSettings(prev => ({ ...prev, sandalwoodStickPrice: Number(e.target.value) }))}
+                              value={siteSettings.sandalwoodStickPrice ?? 999}
+                              onChange={(e) => handleUpdateSiteSetting("sandalwoodStickPrice", Number(e.target.value))}
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
                             />
                           </div>
+                          <div>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Original / MRP Price (INR ₹)</label>
+                            <input
+                              type="number"
+                              value={siteSettings.sandalwoodStickOriginalPrice ?? 1499}
+                              onChange={(e) => handleUpdateSiteSetting("sandalwoodStickOriginalPrice", Number(e.target.value))}
+                              className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Weight Specification</label>
+                            <input
+                              type="text"
+                              value={siteSettings.sandalwoodStickWeight || ""}
+                              placeholder="APPROX(50GM)"
+                              onChange={(e) => handleUpdateSiteSetting("sandalwoodStickWeight", e.target.value)}
+                              className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none"
+                            />
+                          </div>
+                          <div className="flex items-center gap-3 pt-4">
+                            <input
+                              type="checkbox"
+                              id="admin-sandalwood-instock"
+                              checked={siteSettings.sandalwoodStickInStock !== false}
+                              onChange={(e) => handleUpdateSiteSetting("sandalwoodStickInStock", e.target.checked)}
+                              className="w-4 h-4 rounded text-emerald-600 cursor-pointer"
+                            />
+                            <label htmlFor="admin-sandalwood-instock" className="text-xs text-stone-700 font-mono cursor-pointer font-medium">
+                              In Stock &amp; Buyable by Customers
+                            </label>
+                          </div>
                           <div className="sm:col-span-2">
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Short Description</label>
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Product Description</label>
                             <textarea
-                              rows={2}
+                              rows={3}
                               value={siteSettings.sandalwoodStickText || ""}
+                              placeholder="Ayurveda's chill pill! It is a spa treatment from nature..."
                               onChange={(e) => handleUpdateSiteSetting("sandalwoodStickText", e.target.value)}
                               className="w-full bg-sand-50 border border-sand-200 p-2.5 text-xs rounded outline-none leading-relaxed"
                             />
                           </div>
-                          <div className="sm:col-span-2 bg-sand-50 p-3 rounded-lg border flex items-center justify-between gap-4">
-                            <div className="w-16 h-16 bg-white rounded border overflow-hidden shrink-0">
+                          <div className="sm:col-span-2 bg-sand-50 p-3.5 rounded-xl border border-sand-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="w-20 h-20 bg-white rounded-xl border overflow-hidden shrink-0 shadow-sm">
                               {siteSettings.sandalwoodStickImage ? (
                                 <img src={siteSettings.sandalwoodStickImage} alt="Sandalwood Stick" className="w-full h-full object-cover" />
                               ) : (
-                                <div className="text-[8px] text-center text-sand-400 font-mono">No Photo</div>
+                                <img src="/images/sandalwood_stick_rubbing_stone.png" alt="Sandalwood Stick" className="w-full h-full object-cover" />
                               )}
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 w-full space-y-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  id="sandalwood-stick-deal-photo-upload"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    handleFileChange(e, (base64) => {
+                                      handleUpdateSiteSetting("sandalwoodStickImage", base64);
+                                    });
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => document.getElementById("sandalwood-stick-deal-photo-upload")?.click()}
+                                  className="px-3.5 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                >
+                                  Upload Photo from Device
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateSiteSetting("sandalwoodStickImage", "/images/sandalwood_stick_rubbing_stone.png")}
+                                  className="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                >
+                                  Use Official Photo
+                                </button>
+                              </div>
                               <input
-                                type="file"
-                                accept="image/*"
-                                id="sandalwood-stick-deal-photo-upload"
-                                className="hidden"
-                                onChange={(e) => {
-                                  handleFileChange(e, (base64) => {
-                                    setSiteSettings(prev => ({ ...prev, sandalwoodStickImage: base64 }));
-                                  });
-                                }}
+                                type="text"
+                                placeholder="Or enter photo URL (e.g. https://...)"
+                                value={siteSettings.sandalwoodStickImage || ""}
+                                onChange={(e) => handleUpdateSiteSetting("sandalwoodStickImage", e.target.value)}
+                                className="w-full bg-white border border-sand-300 p-2 text-xs rounded outline-none font-mono"
                               />
-                              <button
-                                type="button"
-                                onClick={() => document.getElementById("sandalwood-stick-deal-photo-upload")?.click()}
-                                className="px-3.5 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer"
-                              >
-                                Swap Deal Photo
-                              </button>
                             </div>
                           </div>
                         </div>

@@ -296,6 +296,63 @@ export default function App() {
   }, [heroVideoUrl]);
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const heroContainerRef = useRef<HTMLElement>(null);
+  const [ambientIframeDims, setAmbientIframeDims] = useState<{ width: string; height: string }>({
+    width: "100%",
+    height: "100%"
+  });
+
+  // Dynamically calculate ambient iframe dimensions to guarantee 100% full cover without letterbox or black bars
+  useEffect(() => {
+    const updateDimensions = () => {
+      const el = heroContainerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const containerWidth = rect.width || window.innerWidth;
+      const containerHeight = rect.height || 440;
+      const containerAspect = containerWidth / containerHeight;
+      const videoAspect = 16 / 9; // 1.77778
+
+      // Add 8% safety margin so sub-pixel rounding or browser zoom never reveals borders
+      const safetyScale = 1.08;
+
+      if (containerAspect < videoAspect) {
+        // Container is taller than 16:9 (portrait mobile and tablet devices)
+        // Scale width based on container height so 100% of height is covered
+        const targetHeight = Math.ceil(containerHeight * safetyScale);
+        const targetWidth = Math.ceil(targetHeight * videoAspect);
+        setAmbientIframeDims({
+          width: `${targetWidth}px`,
+          height: `${targetHeight}px`
+        });
+      } else {
+        // Container is wider than 16:9 (widescreen desktop screens)
+        // Scale height based on container width so 100% of width is covered
+        const targetWidth = Math.ceil(containerWidth * safetyScale);
+        const targetHeight = Math.ceil(targetWidth / videoAspect);
+        setAmbientIframeDims({
+          width: `${targetWidth}px`,
+          height: `${targetHeight}px`
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions, { passive: true });
+    window.addEventListener("orientationchange", updateDimensions, { passive: true });
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && heroContainerRef.current) {
+      observer = new ResizeObserver(() => updateDimensions());
+      observer.observe(heroContainerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+      window.removeEventListener("orientationchange", updateDimensions);
+      if (observer) observer.disconnect();
+    };
+  }, [heroVideoUrl]);
 
   // Guarantee that whenever the heroVideoUrl or heroMode updates, the video element is unmuted, playsInline and played successfully
   useEffect(() => {
@@ -304,6 +361,12 @@ export default function App() {
     videoEl.defaultMuted = true;
     videoEl.muted = true;
     videoEl.playsInline = true;
+    videoEl.setAttribute("playsinline", "true");
+    videoEl.setAttribute("webkit-playsinline", "true");
+    videoEl.setAttribute("x5-playsinline", "true");
+    videoEl.setAttribute("x5-video-player-type", "h5-page");
+    videoEl.setAttribute("controlslist", "nodownload nofullscreen noremoteplayback");
+    videoEl.controls = false;
     try {
       videoEl.load();
       const playPromise = videoEl.play();
@@ -432,7 +495,15 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       story02Image: "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900",
       story03Title: "Our Story",
       story03Text: "At Ruh Imperium, we don't just create scents; we preserve a 200-year legacy. Born in the heart of Kannauj—India’s perfume capital—our journey is a tribute to the ancient art of hydro-distillation. We utilize copper Degs and century-old techniques to extract the soul of flowers, roots, and woods.",
-      story03Image: "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"
+      story03Image: "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900",
+      sandalwoodStickTitle: "Sandalwood Stick + Rubbing Stone",
+      sandalwoodStickSubtitle: "Ayurveda’s Ancient Calm",
+      sandalwoodStickText: "Ayurveda’s chill pill! It is a spa treatment from nature - calming your mind, cooling your skin, and centering your thoughts. Hand-crafted from original Mysore Sandalwood blocks.",
+      sandalwoodStickWeight: "APPROX(50GM)",
+      sandalwoodStickPrice: 999,
+      sandalwoodStickOriginalPrice: 1499,
+      sandalwoodStickImage: "/images/sandalwood_stick_rubbing_stone.png",
+      sandalwoodStickInStock: true
     };
   });
 
@@ -2018,7 +2089,8 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         {/* QUIQ HERO BANNER CONTAINER (RAAHI PARFUMS STYLE) */}
         <div className="p-2 sm:p-3 -mt-2 sm:-mt-3 max-w-[1550px] mx-auto">
           <section 
-            className="relative min-h-[440px] sm:min-h-[580px] lg:min-h-[80vh] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
+            ref={heroContainerRef}
+            className="relative min-h-[440px] sm:min-h-[580px] lg:min-h-[80vh] bg-stone-950 flex items-center justify-center overflow-hidden rounded-[26px] shadow-2xl" 
             id="hero-section"
           >
             {/* Admin Hero Media Control Bar (Admin only) */}
@@ -2129,27 +2201,32 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             ) : (
               /* Native Quality Ambient Video (Configured from Admin Panel - displays to all users in full uploaded resolution) */
-              <div className="absolute inset-0 z-0 overflow-hidden bg-black flex items-center justify-center pointer-events-none select-none">
-                {/* Fallback backdrop image while video stream initializes */}
-                {coverPhoto && (
-                  <img
-                    src={coverPhoto}
-                    alt="Hero Ambient Cover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-85 select-none pointer-events-none"
-                    referrerPolicy="no-referrer"
-                  />
-                )}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+                {/* Fallback backdrop image while video stream initializes - guarantees zero black void */}
+                <img
+                  src={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=2560"}
+                  alt="Hero Ambient Cover"
+                  className="absolute inset-0 w-full h-full object-cover opacity-90 select-none pointer-events-none"
+                  referrerPolicy="no-referrer"
+                />
 
                 {heroVideoUrl ? (
                   isEmbedIframe(heroVideoUrl) ? (
-                    <div className="absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center pointer-events-none select-none">
+                    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none">
                       <iframe
                         key={heroVideoUrl}
                         src={getEmbedVideoUrl(heroVideoUrl, true)}
                         title="Hero Ambient Video"
                         className="hero-ambient-iframe"
+                        style={{
+                          width: ambientIframeDims.width,
+                          height: ambientIframeDims.height,
+                          maxWidth: "none",
+                          maxHeight: "none",
+                        }}
+                        tabIndex={-1}
+                        aria-hidden="true"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
                       />
                     </div>
                   ) : (
@@ -2161,21 +2238,21 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       muted
                       loop
                       playsInline
+                      // @ts-expect-error - vendor attributes for mobile webkit/blink
+                      webkit-playsinline="true"
+                      x5-playsinline="true"
+                      x5-video-player-type="h5-page"
+                      controls={false}
+                      disablePictureInPicture
+                      disableRemotePlayback
                       preload="auto"
                       className="hero-ambient-video"
-                      poster={coverPhoto}
+                      poster={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=2560"}
                     />
                   )
-                ) : (
-                  <img 
-                    src={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=2560"} 
-                    alt="Luxury Sand Scent Banner background"
-                    className="w-full h-full object-cover opacity-90 scale-100 transition-all duration-300 select-none pointer-events-none"
-                    referrerPolicy="no-referrer"
-                  />
-                )}
+                ) : null}
                 {/* Clean, non-destructive gradient overlay: keeps the center transparent so the video displays in native color & contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/35 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none"></div>
               </div>
             )}
 
@@ -3183,10 +3260,19 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         {/* SANDALWOOD STICK + RUBBING STONE HIGHLIGHT (RAAHI PARFUMS STYLE) */}
         <SandalwoodRitual 
           siteSettings={siteSettings}
+          onAddToCart={(product, size) => {
+            handleAddToCart(product, size);
+          }}
+          onBuyNow={(product, size) => {
+            handleAddToCart(product, size);
+            setIsCartOpen(true);
+          }}
           onExplore={() => {
             if (handleSelectCategory) handleSelectCategory("Sandalwood");
             handleSectionNavigate("shop");
           }}
+          isAdminLoggedIn={isAdminLoggedIn}
+          onUpdateSiteSettings={updateSiteSettings}
         />
 
         {/* SHOP BY NOTES SECTION (THE AROMA DECK - RAAHI PARFUMS STYLE) */}
