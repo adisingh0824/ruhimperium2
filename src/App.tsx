@@ -117,18 +117,12 @@ export const DEFAULT_COLLECTIONS: Collection[] = [
 
 export const mergeWithDefaultCollections = (list: Collection[]): Collection[] => {
   if (!Array.isArray(list) || list.length === 0) return DEFAULT_COLLECTIONS;
-  const existingIds = new Set(list.map(c => c.id.toLowerCase()));
-  const missingDefaults = DEFAULT_COLLECTIONS.filter(d => 
-    !existingIds.has(d.id.toLowerCase()) && 
-    !list.some(c => c.name.toLowerCase() === d.name.toLowerCase())
-  );
-  const fixed = list.map(c => {
+  return list.map(c => {
     if (c.image && (c.image.includes("photo-1595151830531-2974eb3a13d7") || c.image.includes("1595151830531"))) {
       return { ...c, image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800" };
     }
     return c;
   });
-  return [...fixed, ...missingDefaults];
 };
 
 export const safeStorage = {
@@ -529,26 +523,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           delete parsed.customLogoUrl;
           updated = true;
         }
-        // Force update story titles and texts to exact verbatim Raahi Parfums wording
-        if (!parsed.story03Title || parsed.story03Title === "Our Sourcing Heritage" || parsed.story03Text?.includes("farmers in the flower belts")) {
-          parsed.story03Title = "Our Story";
-          parsed.story03Text = "At Ruh Imperium, we don't just create scents; we preserve a 200-year legacy. Born in the heart of Kannauj—India’s perfume capital—our journey is a tribute to the ancient art of hydro-distillation. We utilize copper Degs and century-old techniques to extract the soul of flowers, roots, and woods.";
-          parsed.story03Image = "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900";
-          updated = true;
-        }
-        if (!parsed.story01Title || parsed.aboutUsText?.includes("We honor ancient traditions.") || !parsed.story01Text?.includes("No unnecessary middlemen") || parsed.story01Image?.includes("photo-1592945403244-b3fbafd7f539")) {
-          parsed.story01Title = "The Art Of Perfume Making";
-          parsed.story01Text = "A legacy of over 200 years in the Indian perfume industry and a eureka moment is what led to the creation of Ruh Imperium. Technology was put to good use, and a new era of intense perfumery began, courtesy of a homegrown brand with a world bound take. No unnecessary middlemen. Straight from India's perfume capital 'Kannauj' to your skin.";
-          parsed.story01Image = "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900";
+        if (parsed.aboutUsHeading || parsed.aboutUsText || parsed.aboutUsImage) {
           delete parsed.aboutUsHeading;
           delete parsed.aboutUsText;
           delete parsed.aboutUsImage;
-          updated = true;
-        }
-        if (!parsed.story02Title || !parsed.story02Text?.includes("ancient deg-bhapka distillation") || parsed.story02Image?.includes("photo-1562690868-60bbe7293e94")) {
-          parsed.story02Title = "Experience True Botanical Luxury and Alcohol-Free Perfume Oils";
-          parsed.story02Text = "Rooted in tradition, Ruh Imperium transforms heritage into experience. Using the ancient deg-bhapka distillation method — slow, hand-done, and deeply intuitive. Fragrances are crafted with ethically sourced, native ingredients.";
-          parsed.story02Image = "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900";
           updated = true;
         }
         if (updated) {
@@ -1237,6 +1215,18 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       }
     }, () => {});
 
+    const unsubscribeBackupFounders = onSnapshot(doc(db, "reviews", "_app_founders"), (snap) => {
+      if (snap.exists()) {
+        if (writeLockRef.current["founders"]) return;
+        const data = snap.data();
+        if (Array.isArray(data.list) && data.list.length > 0) {
+          setFounders(data.list);
+          foundersRef.current = data.list;
+          safeStorage.setItem("ruh-founders", JSON.stringify(data.list));
+        }
+      }
+    }, () => {});
+
     return () => {
       unsubscribeSite();
       unsubscribeProducts();
@@ -1249,6 +1239,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       unsubscribeBackupAssets();
       unsubscribeBackupSite();
       unsubscribeBackupCollections();
+      unsubscribeBackupFounders();
     };
   }, []);
 

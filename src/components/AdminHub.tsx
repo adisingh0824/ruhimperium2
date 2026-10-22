@@ -3129,21 +3129,61 @@ service cloud.firestore {
 
                   {/* FOUNDERS MANAGEMENT */}
                   <div className="space-y-6">
-                    <div className="flex items-center gap-2 text-[#D4BC96] border-b border-sand-200 pb-2">
-                      <UserCheck className="w-5 h-5" />
-                      <span className="text-xs font-bold font-mono uppercase tracking-widest">Leadership Profile Registrations</span>
+                    <div className="flex flex-wrap items-center justify-between gap-3 text-[#D4BC96] border-b border-sand-200 pb-2">
+                      <div className="flex items-center gap-2">
+                        <UserCheck className="w-5 h-5" />
+                        <span className="text-xs font-bold font-mono uppercase tracking-widest">Leadership Profile Registrations</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newId = `leader_${Date.now()}`;
+                          const newLeader: Founder = {
+                            id: newId,
+                            name: "New Master Artisan / Leader",
+                            role: "MASTER DISTILLER",
+                            bio: "Dedicated master artisan preserving generational copper-still perfumery heritage at our Kannauj ateliers.",
+                            image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600",
+                            linkedin: "",
+                            instagram: "",
+                            twitter: ""
+                          };
+                          setFounders(prev => [...prev, newLeader]);
+                        }}
+                        className="px-3.5 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white text-[10px] uppercase font-mono tracking-wider rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Leadership Profile</span>
+                      </button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       
                       {founders.map((fnd) => {
-                        const fileInputRef = fnd.id === "vimal" ? founderVimalInputRef : founderAdityaInputRef;
-
                         return (
-                          <div key={fnd.id} className="bg-sand-50/70 rounded-2xl border border-sand-200 p-5 space-y-4">
-                            <span className="text-[9px] uppercase tracking-widest font-mono font-bold text-[#D4BC96] bg-gold-50 border border-gold-200/50 px-2.5 py-1 rounded">
-                              {fnd.id === "vimal" ? "FOUNDER DATA BLOCK" : "CO-FOUNDER DATA BLOCK"}
-                            </span>
+                          <div key={fnd.id} className="bg-sand-50/70 rounded-2xl border border-sand-200 p-5 space-y-4 relative">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] uppercase tracking-widest font-mono font-bold text-[#D4BC96] bg-gold-50 border border-gold-200/50 px-2.5 py-1 rounded">
+                                {fnd.role || "EXECUTIVE PROFILE"}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (founders.length <= 1) {
+                                    alert("At least one leadership profile must remain displayed.");
+                                    return;
+                                  }
+                                  if (confirm(`Are you sure you want to delete profile for "${fnd.name}"?`)) {
+                                    setFounders(prev => prev.filter(f => f.id !== fnd.id));
+                                  }
+                                }}
+                                className="px-2.5 py-1 text-red-600 hover:bg-red-50 text-[10px] font-mono uppercase tracking-wider rounded border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
+                                title="Delete Leader Profile"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                <span>Delete</span>
+                              </button>
+                            </div>
 
                             <div className="space-y-3">
                               <div>
@@ -3223,14 +3263,14 @@ service cloud.firestore {
                                     <input
                                       type="file"
                                       accept="image/*"
-                                      ref={fileInputRef}
+                                      id={`founder-file-upload-${fnd.id}`}
                                       onChange={(e) => handleFileChange(e, (base64) => handleUpdateFounderDetails(fnd.id, { image: base64 }))}
                                       className="hidden"
                                     />
 
                                     <button
                                       type="button"
-                                      onClick={() => fileInputRef.current?.click()}
+                                      onClick={() => document.getElementById(`founder-file-upload-${fnd.id}`)?.click()}
                                       className="mt-1.5 px-3 py-1.5 bg-sand-50 hover:bg-sand-150 border border-sand-300 text-[9px] uppercase font-mono tracking-wider rounded cursor-pointer text-sand-700 flex items-center gap-1"
                                     >
                                       <Upload className="w-3 h-3 text-[#D4BC96]" />
@@ -3749,7 +3789,7 @@ service cloud.firestore {
                       <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-3">
                         <span className="text-[8px] font-mono font-bold uppercase text-sand-400">Section Row 01 / Landmarking</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
+                          <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 01 Title</label>
                             <input
                               type="text"
@@ -3758,22 +3798,50 @@ service cloud.firestore {
                               className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                             />
                           </div>
-                          <div>
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Image Sourcing</label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              id="row-story-01-file-u"
-                              className="hidden"
-                              onChange={(e) => handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, story01Image: base64 })))}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => document.getElementById("row-story-01-file-u")?.click()}
-                              className="w-full py-2 bg-sand-100 hover:bg-sand-200 border text-sand-700 text-[10px] font-mono uppercase tracking-widest rounded"
-                            >
-                              Upload Row 1 Photo
-                            </button>
+                          <div className="sm:col-span-2">
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 01 Photo &amp; Image Source</label>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-sand-50/70 p-3 rounded-lg border border-sand-200">
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-sand-300 bg-sand-100 shrink-0">
+                                <img
+                                  src={siteSettings.story01Image || "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900"}
+                                  alt="Story 01 Preview"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { (e.target as HTMLImageElement).src = "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900"; }}
+                                />
+                              </div>
+                              <div className="flex-1 w-full space-y-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="row-story-01-file-u"
+                                    className="hidden"
+                                    onChange={(e) => handleFileChange(e, (base64) => handleUpdateSiteSetting("story01Image", base64))}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => document.getElementById("row-story-01-file-u")?.click()}
+                                    className="px-3 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                  >
+                                    Upload Photo from Device
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateSiteSetting("story01Image", "https://raahiparfums.com/cdn/shop/files/WhatsApp_Image_2026-05-06_at_3.24.20_PM.jpg?v=1778061290&width=900")}
+                                    className="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                  >
+                                    Reset to Official Photo
+                                  </button>
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="Or enter photo URL (e.g. https://...)"
+                                  value={siteSettings.story01Image || ""}
+                                  onChange={(e) => handleUpdateSiteSetting("story01Image", e.target.value)}
+                                  className="w-full bg-white border border-sand-300 p-2 text-xs rounded outline-none font-mono"
+                                />
+                              </div>
+                            </div>
                           </div>
                           <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 01 Content Text</label>
@@ -3791,7 +3859,7 @@ service cloud.firestore {
                       <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-3 mt-4">
                         <span className="text-[8px] font-mono font-bold uppercase text-sand-400">Section Row 02 / Landmarking</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
+                          <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 02 Title</label>
                             <input
                               type="text"
@@ -3800,22 +3868,50 @@ service cloud.firestore {
                               className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                             />
                           </div>
-                          <div>
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Image Sourcing</label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              id="row-story-02-file-u"
-                              className="hidden"
-                              onChange={(e) => handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, story02Image: base64 })))}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => document.getElementById("row-story-02-file-u")?.click()}
-                              className="w-full py-2 bg-sand-100 hover:bg-sand-200 border text-sand-700 text-[10px] font-mono uppercase tracking-widest rounded"
-                            >
-                              Upload Row 2 Photo
-                            </button>
+                          <div className="sm:col-span-2">
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 02 Photo &amp; Image Source</label>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-sand-50/70 p-3 rounded-lg border border-sand-200">
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-sand-300 bg-sand-100 shrink-0">
+                                <img
+                                  src={siteSettings.story02Image || "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900"}
+                                  alt="Story 02 Preview"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { (e.target as HTMLImageElement).src = "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900"; }}
+                                />
+                              </div>
+                              <div className="flex-1 w-full space-y-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="row-story-02-file-u"
+                                    className="hidden"
+                                    onChange={(e) => handleFileChange(e, (base64) => handleUpdateSiteSetting("story02Image", base64))}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => document.getElementById("row-story-02-file-u")?.click()}
+                                    className="px-3 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                  >
+                                    Upload Photo from Device
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateSiteSetting("story02Image", "https://raahiparfums.com/cdn/shop/files/Makhulal_Ayodhya_Prasad_Kannauj.webp?v=1778060945&width=900")}
+                                    className="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                  >
+                                    Reset to Official Photo
+                                  </button>
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="Or enter photo URL (e.g. https://...)"
+                                  value={siteSettings.story02Image || ""}
+                                  onChange={(e) => handleUpdateSiteSetting("story02Image", e.target.value)}
+                                  className="w-full bg-white border border-sand-300 p-2 text-xs rounded outline-none font-mono"
+                                />
+                              </div>
+                            </div>
                           </div>
                           <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 02 Content Text</label>
@@ -3833,7 +3929,7 @@ service cloud.firestore {
                       <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-3 mt-4">
                         <span className="text-[8px] font-mono font-bold uppercase text-sand-400">Section Row 03 / Landmarking</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
+                          <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 03 Title</label>
                             <input
                               type="text"
@@ -3842,22 +3938,50 @@ service cloud.firestore {
                               className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                             />
                           </div>
-                          <div>
-                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Image Sourcing</label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              id="row-story-03-file-u"
-                              className="hidden"
-                              onChange={(e) => handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, story03Image: base64 })))}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => document.getElementById("row-story-03-file-u")?.click()}
-                              className="w-full py-2 bg-sand-100 hover:bg-sand-200 border text-sand-700 text-[10px] font-mono uppercase tracking-widest rounded"
-                            >
-                              Upload Row 3 Photo
-                            </button>
+                          <div className="sm:col-span-2">
+                            <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 03 Photo &amp; Image Source</label>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-sand-50/70 p-3 rounded-lg border border-sand-200">
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-sand-300 bg-sand-100 shrink-0">
+                                <img
+                                  src={siteSettings.story03Image || "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"}
+                                  alt="Story 03 Preview"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { (e.target as HTMLImageElement).src = "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900"; }}
+                                />
+                              </div>
+                              <div className="flex-1 w-full space-y-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="row-story-03-file-u"
+                                    className="hidden"
+                                    onChange={(e) => handleFileChange(e, (base64) => handleUpdateSiteSetting("story03Image", base64))}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => document.getElementById("row-story-03-file-u")?.click()}
+                                    className="px-3 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                  >
+                                    Upload Photo from Device
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateSiteSetting("story03Image", "https://raahiparfums.com/cdn/shop/files/Charkha_Farm_2.webp?v=1778060936&width=900")}
+                                    className="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                  >
+                                    Reset to Official Photo
+                                  </button>
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="Or enter photo URL (e.g. https://...)"
+                                  value={siteSettings.story03Image || ""}
+                                  onChange={(e) => handleUpdateSiteSetting("story03Image", e.target.value)}
+                                  className="w-full bg-white border border-sand-300 p-2 text-xs rounded outline-none font-mono"
+                                />
+                              </div>
+                            </div>
                           </div>
                           <div className="sm:col-span-2">
                             <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Story 03 Content Text</label>
@@ -4013,14 +4137,14 @@ service cloud.firestore {
 
                         <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-3">
                           <span className="text-[10px] uppercase tracking-wider text-sand-500 font-mono font-bold">Card 3 (SCENT SUITE - IMAGE/HEADER)</span>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Badge</label>
                               <input
                                 type="text"
                                 value={siteSettings.statsCard3Badge || ""}
                                 placeholder="SCENT SUITE"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard3Badge: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard3Badge", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none font-mono"
                               />
                             </div>
@@ -4030,26 +4154,54 @@ service cloud.firestore {
                                 type="text"
                                 value={siteSettings.statsCard3Title || ""}
                                 placeholder="True Botanical Heritage"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard3Title: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard3Title", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                               />
                             </div>
-                            <div>
-                              <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Card Photo</label>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                id="bento-card-3-image-file"
-                                className="hidden"
-                                onChange={(e) => handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, statsCard3Image: base64 })))}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => document.getElementById("bento-card-3-image-file")?.click()}
-                                className="w-full py-2 bg-sand-100 hover:bg-sand-200 border text-sand-700 text-[10px] font-mono uppercase tracking-widest rounded"
-                              >
-                                Upload Card 3 Photo
-                              </button>
+                            <div className="sm:col-span-2">
+                              <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Card 3 Photo &amp; Image Source</label>
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-sand-50/70 p-3 rounded-lg border border-sand-200">
+                                <div className="w-16 h-16 rounded-lg overflow-hidden border border-sand-300 bg-sand-100 shrink-0">
+                                  <img
+                                    src={siteSettings.statsCard3Image || "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"}
+                                    alt="Card 3 Preview"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800"; }}
+                                  />
+                                </div>
+                                <div className="flex-1 w-full space-y-2">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      id="bento-card-3-image-file"
+                                      className="hidden"
+                                      onChange={(e) => handleFileChange(e, (base64) => handleUpdateSiteSetting("statsCard3Image", base64))}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => document.getElementById("bento-card-3-image-file")?.click()}
+                                      className="px-3 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                    >
+                                      Upload Photo from Device
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateSiteSetting("statsCard3Image", "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=800")}
+                                      className="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                    >
+                                      Reset to Official Photo
+                                    </button>
+                                  </div>
+                                  <input
+                                    type="text"
+                                    placeholder="Or enter photo URL (e.g. https://...)"
+                                    value={siteSettings.statsCard3Image || ""}
+                                    onChange={(e) => handleUpdateSiteSetting("statsCard3Image", e.target.value)}
+                                    className="w-full bg-white border border-sand-300 p-2 text-xs rounded outline-none font-mono"
+                                  />
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -4063,7 +4215,7 @@ service cloud.firestore {
                                 type="text"
                                 value={siteSettings.statsCard4Badge || ""}
                                 placeholder="LOGISTICS LOGS"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard4Badge: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard4Badge", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none font-mono"
                               />
                             </div>
@@ -4073,7 +4225,7 @@ service cloud.firestore {
                                 type="text"
                                 value={siteSettings.statsCard4Value || ""}
                                 placeholder="24h"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard4Value: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard4Value", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none font-mono"
                               />
                             </div>
@@ -4083,7 +4235,7 @@ service cloud.firestore {
                                 type="text"
                                 value={siteSettings.statsCard4Title || ""}
                                 placeholder="Fast Dispatch"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard4Title: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard4Title", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                               />
                             </div>
@@ -4093,7 +4245,7 @@ service cloud.firestore {
                                 type="text"
                                 value={siteSettings.statsCard4Desc || ""}
                                 placeholder="Quick shipping so your signature scent reaches you sooner."
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard4Desc: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard4Desc", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                               />
                             </div>
@@ -4102,53 +4254,81 @@ service cloud.firestore {
 
                         <div className="bg-white p-4 rounded-xl border border-sand-200 space-y-3">
                           <span className="text-[10px] uppercase tracking-wider text-sand-500 font-mono font-bold">Card 5 (ORIGIN CHRONICLES - LARGE CARD)</span>
-                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Badge</label>
                               <input
                                 type="text"
                                 value={siteSettings.statsCard5Badge || ""}
                                 placeholder="ORIGIN CHRONICLES"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard5Badge: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard5Badge", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none font-mono"
                               />
                             </div>
-                            <div>
+                            <div className="sm:col-span-2">
                               <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Headline</label>
                               <input
                                 type="text"
                                 value={siteSettings.statsCard5Title || ""}
                                 placeholder="Heritage Distillation Stoves"
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard5Title: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard5Title", e.target.value)}
                                 className="w-full bg-sand-50 border border-sand-200 p-2 text-xs rounded outline-none"
                               />
                             </div>
-                            <div>
+                            <div className="sm:col-span-3">
                               <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1 font-semibold">Description</label>
                               <input
                                 type="text"
                                 value={siteSettings.statsCard5Desc || ""}
                                 placeholder="Preserving a 204-year-old water-based clay hydrodistillation method..."
-                                onChange={(e) => setSiteSettings(prev => ({ ...prev, statsCard5Desc: e.target.value }))}
+                                onChange={(e) => handleUpdateSiteSetting("statsCard5Desc", e.target.value)}
                                 className="w-full bg-[#FCFBF9] border border-sand-200 p-2 text-xs rounded"
                               />
                             </div>
-                            <div>
-                              <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Card Photo</label>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                id="bento-card-5-image-file"
-                                className="hidden"
-                                onChange={(e) => handleFileChange(e, (base64) => setSiteSettings(prev => ({ ...prev, statsCard5Image: base64 })))}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => document.getElementById("bento-card-5-image-file")?.click()}
-                                className="w-full py-2 bg-sand-100 hover:bg-sand-200 border text-sand-700 text-[10px] font-mono uppercase tracking-widest rounded"
-                              >
-                                Upload Card 5 Photo
-                              </button>
+                            <div className="sm:col-span-3">
+                              <label className="text-[8px] uppercase tracking-widest text-sand-400 font-mono block mb-1">Card 5 Photo &amp; Image Source</label>
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-sand-50/70 p-3 rounded-lg border border-sand-200">
+                                <div className="w-16 h-16 rounded-lg overflow-hidden border border-sand-300 bg-sand-100 shrink-0">
+                                  <img
+                                    src={siteSettings.statsCard5Image || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"}
+                                    alt="Card 5 Preview"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200"; }}
+                                  />
+                                </div>
+                                <div className="flex-1 w-full space-y-2">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      id="bento-card-5-image-file"
+                                      className="hidden"
+                                      onChange={(e) => handleFileChange(e, (base64) => handleUpdateSiteSetting("statsCard5Image", base64))}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => document.getElementById("bento-card-5-image-file")?.click()}
+                                      className="px-3 py-1.5 bg-[#2D2926] hover:bg-[#D4BC96] text-white font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                    >
+                                      Upload Photo from Device
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateSiteSetting("statsCard5Image", "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=80&w=1200")}
+                                      className="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-mono text-[9px] uppercase tracking-widest rounded cursor-pointer transition-all"
+                                    >
+                                      Reset to Official Photo
+                                    </button>
+                                  </div>
+                                  <input
+                                    type="text"
+                                    placeholder="Or enter photo URL (e.g. https://...)"
+                                    value={siteSettings.statsCard5Image || ""}
+                                    onChange={(e) => handleUpdateSiteSetting("statsCard5Image", e.target.value)}
+                                    className="w-full bg-white border border-sand-300 p-2 text-xs rounded outline-none font-mono"
+                                  />
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
