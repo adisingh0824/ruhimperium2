@@ -69,25 +69,35 @@ export default function CategorySlider({ collections = [], onSelectCategory, sel
 
   // Merge dynamic admin collections with default items
   // This allows the admin to edit titles, taglines, and cover photos live from the Admin Panel
-  const dynamicItems = CATEGORY_ITEMS.map((defaultItem) => {
-    const adminCol = collections.find(
-      (c) =>
-        c.id.toLowerCase() === defaultItem.id.toLowerCase() ||
-        c.name.toLowerCase() === defaultItem.title.toLowerCase() ||
-        (defaultItem.id === "Ruh / Absolute Oil" && (c.id.includes("absolute") || c.name.toLowerCase().includes("absolute")))
-    );
-
-    if (adminCol) {
-      return {
-        id: defaultItem.id,
-        title: adminCol.name || defaultItem.title,
-        tagline: adminCol.tag || defaultItem.tagline,
-        image: adminCol.image || defaultItem.image,
-        count: adminCol.count || defaultItem.count
-      };
-    }
-    return defaultItem;
-  });
+// Merge collections with default items, but hide defaults that have been removed via admin panel
+// We only keep a default item if it exists in the current collections list (by id or name)
+const dynamicItems = CATEGORY_ITEMS.filter((defaultItem) => {
+  const exists = collections.some(
+    (c) =>
+      c.id.toLowerCase() === defaultItem.id.toLowerCase() ||
+      c.name.toLowerCase() === defaultItem.title.toLowerCase() ||
+      (defaultItem.id === "Ruh / Absolute Oil" && (c.id.includes("absolute") || c.name.toLowerCase().includes("absolute")))
+  );
+  return exists;
+}).map((defaultItem) => {
+  const adminCol = collections.find(
+    (c) =>
+      c.id.toLowerCase() === defaultItem.id.toLowerCase() ||
+      c.name.toLowerCase() === defaultItem.title.toLowerCase() ||
+      (defaultItem.id === "Ruh / Absolute Oil" && (c.id.includes("absolute") || c.name.toLowerCase().includes("absolute")))
+  );
+  if (adminCol) {
+    return {
+      id: defaultItem.id,
+      title: adminCol.name || defaultItem.title,
+      tagline: adminCol.tag || defaultItem.tagline,
+      image: adminCol.image || defaultItem.image,
+      count: adminCol.count || defaultItem.count
+    };
+  }
+  // No admin overrides, return the default item unchanged
+  return defaultItem;
+});
 
   // Also include any extra custom collections the admin stamped in the Admin Panel
   const extraCollections = collections

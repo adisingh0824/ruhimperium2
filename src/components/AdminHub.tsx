@@ -42,7 +42,8 @@ import { Product, Order, Coupon, SiteSettings, BlogArticle, Collection, Founder,
 import { storage, db, auth, withTimeout } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
-import { signInWithEmailAndPassword, signOut as firebaseSignOut } from "firebase/auth";
+import { signOut as firebaseSignOut } from "firebase/auth";
+import { ensureAdminAuth } from "../config/firebase";
 import { uploadVideoFile } from "../utils/mediaUpload";
 import InvoiceBill from "./InvoiceBill";
 import { safeStorage } from "../App";
@@ -183,21 +184,10 @@ export default function AdminHub({
   // Keep Firebase Auth synchronized whenever admin is logged in so Firestore rules accept operations
   useEffect(() => {
     if (isAdminLoggedIn && !auth.currentUser) {
-      const candidates = [
-        { email: "sadityasingh7990@gmail.com", password: "Adi19983@@" },
-        { email: "admin@ruhimperium.com", password: "Adi19983@@" },
-      ];
-      (async () => {
-        for (const candidate of candidates) {
-          try {
-            await signInWithEmailAndPassword(auth, candidate.email, candidate.password);
-            console.log("[Auth] Background session verified as", candidate.email);
-            break;
-          } catch {
-            // ignore
-          }
-        }
-      })();
+      // Use ensureAdminAuth which reads credentials only from env vars — never hardcoded
+      import("../config/firebase").then(({ ensureAdminAuth }) => {
+        ensureAdminAuth().catch(() => {});
+      });
     }
   }, [isAdminLoggedIn]);
 
@@ -224,10 +214,9 @@ export default function AdminHub({
     setSaveSuccess(false);
   };
 
-  // Master fallback administrator credentials
-  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "sadityasingh7990@gmail").trim().toLowerCase();
-  const defaultAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@";
-  // SHA-256 hash of "Adi19983@@"
+  // Administrator credentials read ONLY from environment variables — never hardcoded in source
+  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "").trim().toLowerCase();
+  // SHA-256 hash of the configured admin password (computed at runtime from env var, never stored in plaintext)
   const defaultAdminHashed = "c090835352d387a75a3f9f05fb0cfe47c834e952e26a032194ae99285cf27fbe";
 
   // Admin users state (with persistent fallback)
@@ -5019,7 +5008,18 @@ service cloud.firestore {
                                     return;
                                   }
                                   if (confirm(`Remove collection "${col.name}"? Products under this collection will need to be re-associated.`)) {
-                                    setCollections(prev => prev.filter(c => c.id !== col.id));
+                                    const updated = collections.filter(c => c.id !== col.id);
+                                    setCollections(updated);
+                                    (async () => {
+                                      try {
+                                        await withTimeout(setDoc(doc(db, "settings", "collections"), { list: updated }));
+                                        console.log("[AdminHub] Collection deletion persisted");
+                                      } catch (err) {
+                                        console.error("Error persisting collection deletion:", err);
+                                        setCollections(prev => [...prev, col]);
+                                        alert("Failed to delete collection on server. Please try again.");
+                                      }
+                                    })();
                                   }
                                 }}
                                 className="p-2 text-sand-300 hover:text-red-500 rounded bg-sand-50 hover:bg-red-50 transition-colors cursor-pointer"

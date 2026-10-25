@@ -32,16 +32,12 @@ export const analytics = getAnalytics(app);
 
 /**
  * Ensures an active Firebase Auth session matching the admin security rules.
- * Automatically authenticates as sadityasingh7990@gmail.com (or admin@ruhimperium.com)
- * so that all Firestore operations are authorized under custom Firestore Security Rules.
+ * Credentials are loaded ONLY from environment variables (never hardcoded in source).
  */
 let authInProgressPromise: Promise<any> | null = null;
 
 export const ensureAdminAuth = async () => {
-  if (auth.currentUser && (
-    auth.currentUser.email === "sadityasingh7990@gmail.com" ||
-    auth.currentUser.email === "admin@ruhimperium.com"
-  )) {
+  if (auth.currentUser) {
     return auth.currentUser;
   }
 
@@ -50,21 +46,22 @@ export const ensureAdminAuth = async () => {
   }
 
   authInProgressPromise = (async () => {
-    const candidates = [
-      { email: "sadityasingh7990@gmail.com", password: "Adi19983@@" },
-      { email: "admin@ruhimperium.com", password: "Adi19983@@" }
-    ];
+    // Credentials come exclusively from .env — never hardcoded in source code
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.trim();
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD?.trim();
 
-    for (const c of candidates) {
-      try {
-        const cred = await signInWithEmailAndPassword(auth, c.email, c.password);
-        console.log("[Auth] Successfully verified Firebase Admin token:", cred.user.email);
-        return cred.user;
-      } catch (e: any) {
-        console.warn(`[Auth] Candidate ${c.email} failed:`, e?.code || e?.message);
-      }
+    if (!adminEmail || !adminPassword) {
+      console.warn("[Auth] Admin credentials not configured in environment variables.");
+      return null;
     }
-    return null;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+      return cred.user;
+    } catch (e: any) {
+      // Silently fail — do not log credential details
+      return null;
+    }
   })().finally(() => {
     authInProgressPromise = null;
   });
