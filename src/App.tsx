@@ -95,15 +95,7 @@ export const DEFAULT_COLLECTIONS: Collection[] = [
     count: "4 Signatures",
     isBold: true
   },
-  {
-    id: "Discovery Set",
-    name: "Discovery Sets",
-    tag: "Travel Coffrets & Gift Sets",
-    icon: "🎁",
-    image: "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?auto=format&fit=crop&q=80&w=800",
-    count: "Curated Sets",
-    isBold: false
-  },
+  
   {
     id: "Ruh / Absolute Oil",
     name: "Ruh | Absolute Oils",
