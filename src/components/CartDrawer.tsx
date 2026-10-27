@@ -235,9 +235,8 @@ export default function CartDrawer({
           }
           setPlacedOrder(successOrder);
           sendAdminNotificationEmail(successOrder); // Send email notification
-          sendOrderToWhatsApp(successOrder); // Send WhatsApp notification
-          // Notify backend to forward WhatsApp message
-          fetch('http://localhost:3000/api/send-whatsapp', {
+          // Silently trigger backend to send WhatsApp invoice via Twilio
+          fetch('/api/send-whatsapp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order: successOrder }),
@@ -283,7 +282,12 @@ export default function CartDrawer({
       }
       setPlacedOrder(newOrder);
       sendAdminNotificationEmail(newOrder); // Send email notification
-          sendOrderToWhatsApp(newOrder); // Send WhatsApp notification
+      // Silently trigger backend to send WhatsApp invoice via Twilio
+      fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: newOrder }),
+      }).catch(console.error);
 
       setTimeout(() => {
         setIsSubmitting(false);

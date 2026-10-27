@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import dotenv from 'dotenv';
+import twilio from 'twilio';
 
 dotenv.config();
 
@@ -133,38 +134,67 @@ async function startServer() {
     }
   });
 
-  // API endpoint to forward order details to WhatsApp (placeholder implementation)
+  // API endpoint to forward order details to WhatsApp automatically in the background
   app.post('/api/send-whatsapp', async (req: express.Request, res: express.Response) => {
     try {
       const { order } = req.body as { order: any };
       if (!order) {
         return res.status(400).json({ error: 'Missing order data' });
       }
-      // Build WhatsApp Click‑to‑Chat URL (client‑side style)
-      const phones = '919785854770';
-      const messageLines = [];
-      messageLines.push(`*New Order Received*`);
-      if (order.id) messageLines.push(`*Order ID:* ${order.id}`);
-      if (order.customerName) messageLines.push(`*Name:* ${order.customerName}`);
-      if (order.email) messageLines.push(`*Email:* ${order.email}`);
-      if (order.phone) messageLines.push(`*Phone:* ${order.phone}`);
+
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+      const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+
+      const lines: string[] = [];
+      lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+      lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+      lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`);
+      lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+      if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+      lines.push(`👤 *CUSTOMER DETAILS*`);
+      lines.push(`*Name:* ${order.fullName || order.customerName || 'N/A'}`);
+      lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+      if (order.email) lines.push(`*Email:* ${order.email}`);
+      if (order.address) lines.push(`*Address:* ${order.address}${order.pincode ? `, PIN: ${order.pincode}` : ''}`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+      lines.push(`🛍️ *ORDER ITEMS*`);
+
       if (order.items && Array.isArray(order.items)) {
         order.items.forEach((item: any, idx: number) => {
-          const name = item.name || item.title || `Item ${idx + 1}`;
+          const name = item.product?.name || item.name || item.title || `Item ${idx + 1}`;
+          const size = item.selectedSize ? ` [${item.selectedSize}]` : '';
           const qty = item.quantity || item.qty || 1;
-          const price = item.price || item.amount || 0;
-          messageLines.push(`- ${name} x${qty}: $${price}`);
+          const price = item.product?.salePrice || item.price || item.amount || '';
+          lines.push(`${idx + 1}. ${name}${size} × ${qty} ${price ? `(₹${price})` : ''}`);
         });
       }
-      if (order.total) messageLines.push(`*Total:* $${order.total}`);
-      const text = encodeURIComponent(messageLines.join('\n'));
-      const callMeBotUrl = `https://api.callmebot.com/whatsapp.php?phone=${phones}&text=${text}`;
-      // Send GET request to CallMeBot to deliver the message
-      await fetch(callMeBotUrl, { method: 'GET' }).catch(() => {});
-      return res.json({ success: true, url: callMeBotUrl });
-    } catch (err) {
-      console.error('WhatsApp forwarding error:', err);
-      return res.status(500).json({ error: 'Failed to forward order to WhatsApp' });
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+      lines.push(`💰 *TOTAL AMOUNT:* ₹${order.total || 0}`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+
+      const messageBody = lines.join('\n');
+
+      if (accountSid && authToken) {
+        const client = twilio(accountSid, authToken);
+        const result = await client.messages.create({
+          body: messageBody,
+          from: fromNumber,
+          to: toNumber,
+        });
+        console.log(`[Twilio WhatsApp] Successfully sent invoice. SID: ${result.sid}`);
+        return res.json({ success: true, sid: result.sid });
+      } else {
+        console.warn(`[Twilio WhatsApp] Credentials not configured in .env yet. Invoice logged:`);
+        console.log(messageBody);
+        return res.json({ success: false, message: 'Twilio credentials not configured' });
+      }
+    } catch (err: any) {
+      console.error('[Twilio WhatsApp] Error sending order invoice:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send WhatsApp invoice via Twilio' });
     }
   });
 
