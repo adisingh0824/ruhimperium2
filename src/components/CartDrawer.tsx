@@ -3,6 +3,7 @@ import { X, Trash2, ShoppingBag, Percent, ArrowLeft, ShieldCheck, Ticket, Landma
 import { CartItem, Product, Order, Coupon, SiteSettings } from "../types";
 import emailjs from '@emailjs/browser';
 import InvoiceBill from "./InvoiceBill";
+import { sendOrderToWhatsApp } from "../utils/whatsapp";
 
 // Helper script loader to connect dynamically with the official indian razorpay secure checkout system
 const loadRazorpayScript = (): Promise<boolean> => {
@@ -234,6 +235,13 @@ export default function CartDrawer({
           }
           setPlacedOrder(successOrder);
           sendAdminNotificationEmail(successOrder); // Send email notification
+          sendOrderToWhatsApp(successOrder); // Send WhatsApp notification
+          // Notify backend to forward WhatsApp message
+          fetch('http://localhost:3000/api/send-whatsapp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: successOrder }),
+          }).catch(console.error);
 
           setCheckoutStep("success");
           setShowPolicyModal(false);
@@ -274,7 +282,8 @@ export default function CartDrawer({
         }
       }
       setPlacedOrder(newOrder);
-      sendAdminNotificationEmail(newOrder);
+      sendAdminNotificationEmail(newOrder); // Send email notification
+          sendOrderToWhatsApp(newOrder); // Send WhatsApp notification
 
       setTimeout(() => {
         setIsSubmitting(false);

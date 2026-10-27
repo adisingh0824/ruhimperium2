@@ -2,7 +2,9 @@ import express from "express";
 import path from "path";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
-import { createServer as createViteServer } from "vite";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Resolve standard ESModule paths
 const __filename = fileURLToPath(import.meta.url);
@@ -10,6 +12,13 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
+  // Simple CORS middleware for dev/testing
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+  });
   const PORT = 3000;
 
   // Security Headers Middleware (Defends against XSS, clickjacking, data leak, and MIME attacks)
@@ -124,7 +133,41 @@ async function startServer() {
     }
   });
 
-  // API endpoint to handle uploaded admin custom collection cover photos and products images safely
+  // API endpoint to forward order details to WhatsApp (placeholder implementation)
+  app.post('/api/send-whatsapp', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      // Build WhatsApp Click‑to‑Chat URL (client‑side style)
+      const phones = '919785854770';
+      const messageLines = [];
+      messageLines.push(`*New Order Received*`);
+      if (order.id) messageLines.push(`*Order ID:* ${order.id}`);
+      if (order.customerName) messageLines.push(`*Name:* ${order.customerName}`);
+      if (order.email) messageLines.push(`*Email:* ${order.email}`);
+      if (order.phone) messageLines.push(`*Phone:* ${order.phone}`);
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach((item: any, idx: number) => {
+          const name = item.name || item.title || `Item ${idx + 1}`;
+          const qty = item.quantity || item.qty || 1;
+          const price = item.price || item.amount || 0;
+          messageLines.push(`- ${name} x${qty}: $${price}`);
+        });
+      }
+      if (order.total) messageLines.push(`*Total:* $${order.total}`);
+      const text = encodeURIComponent(messageLines.join('\n'));
+      const callMeBotUrl = `https://api.callmebot.com/whatsapp.php?phone=${phones}&text=${text}`;
+      // Send GET request to CallMeBot to deliver the message
+      await fetch(callMeBotUrl, { method: 'GET' }).catch(() => {});
+      return res.json({ success: true, url: callMeBotUrl });
+    } catch (err) {
+      console.error('WhatsApp forwarding error:', err);
+      return res.status(500).json({ error: 'Failed to forward order to WhatsApp' });
+    }
+  });
+
   app.post("/api/upload-image", rateLimiter, adminAuth, async (req, res) => {
     try {
       const { imageData, filename } = req.body;
