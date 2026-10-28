@@ -20,6 +20,25 @@ export default function OurStoryPage({ founders = [], siteSettings, products = [
     const prevTitle = document.title;
     document.title = "Our Story & Kannauj Heritage | Ruh Imperium - Fine Parfums Scent House";
 
+    const setMeta = (attr: string, key: string, content: string) => {
+      let tag = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attr, key);
+        document.head.appendChild(tag);
+      }
+      tag.content = content;
+    };
+
+    setMeta('name', 'description', "Learn the heritage of Ruh Imperium in Kannauj, Uttar Pradesh. Centuries-old Deg-Bhapka hydro-distillation of pure attars, rare botanical oils, and luxury Eau De Parfums.");
+    setMeta('property', 'og:title', "Our Story & Kannauj Heritage | Ruh Imperium");
+    setMeta('property', 'og:description', "Centuries-old Deg-Bhapka hydro-distillation of pure attars and luxury Eau De Parfums in Kannauj.");
+    setMeta('property', 'og:url', "https://www.ruhimperium.shop/our-story");
+    setMeta('property', 'og:image', "https://www.ruhimperium.shop/og-image.png");
+    setMeta('name', 'twitter:title', "Our Story & Kannauj Heritage | Ruh Imperium");
+    setMeta('name', 'twitter:description', "Centuries-old Deg-Bhapka hydro-distillation of pure attars and luxury Eau De Parfums in Kannauj.");
+    setMeta('name', 'twitter:image', "https://www.ruhimperium.shop/og-image.png");
+
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (canonical) {
       canonical.href = "https://www.ruhimperium.shop/our-story";

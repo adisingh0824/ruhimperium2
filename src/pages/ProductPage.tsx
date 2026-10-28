@@ -118,7 +118,7 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
 
     const productDescription = product.description || `Buy authentic ${product.name} crafted in Kannauj, India by Ruh Imperium. 100% pure botanical distillation with long-lasting fragrance notes.`;
     const productUrl = `https://www.ruhimperium.shop/product/${product.id}`;
-    const productImage = product.imageUrl || 'https://www.ruhimperium.shop/og-image.jpg';
+    const productImage = product.imageUrl || product.image || 'https://www.ruhimperium.shop/og-image.png';
 
     setMetaTag('name', 'description', productDescription);
     setMetaTag('property', 'og:title', pageTitle);
@@ -126,6 +126,9 @@ export default function ProductPage({ onAddToCart, setIsCartOpen, reviews, onAdd
     setMetaTag('property', 'og:url', productUrl);
     setMetaTag('property', 'og:image', productImage);
     setMetaTag('property', 'og:type', 'product');
+    setMetaTag('name', 'twitter:title', pageTitle);
+    setMetaTag('name', 'twitter:description', productDescription);
+    setMetaTag('name', 'twitter:image', productImage);
 
     // Update canonical link
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
