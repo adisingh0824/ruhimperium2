@@ -337,34 +337,17 @@ export default function Header({
               <User className="w-5 h-5 stroke-[1.5]" />
             </button>
 
-            {/* Admin link only visible when already logged in (fix #20) */}
-            {isAdminLoggedIn && (
-              <button
-                type="button"
-                onClick={onAdminClick}
-                className="text-sand-900 hover:text-stone-600 transition-colors p-1"
-                aria-label="Admin console"
-                title="Admin"
-              >
-                <LockKeyhole className="w-4 h-4 stroke-[1.5]" />
-              </button>
-            )}
-
+            {/* Admin button */}
             <button
               type="button"
-              onClick={onOpenCart}
-              className="relative text-sand-900 hover:text-stone-600 transition-colors p-1"
-              aria-label="Shopping bag"
-              title="Cart"
+              onClick={onAdminClick}
+              className="text-sand-900 hover:text-stone-600 transition-colors p-1"
+              aria-label="Admin console"
+              title="Admin"
             >
-              <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
-              {cartTotalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartTotalItems}
-                </span>
-              )}
+              <LockKeyhole className="w-4 h-4 stroke-[1.5]" />
             </button>
-
+            {/* Logout button, visible only when admin logged in */}
             {isAdminLoggedIn && (
               <button
                 type="button"
