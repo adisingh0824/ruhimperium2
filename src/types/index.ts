@@ -96,6 +96,12 @@ export interface Coupon {
   categoryScope?: string;
 }
 
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 export interface SiteSettings {
   contactPhone: string;
   contactEmail: string;
@@ -234,7 +240,7 @@ export interface Collection {
 }
 
 export interface Founder {
-  id: "vimal" | "aditya";
+  id: string;
   name: string;
   role: string;
   bio: string;

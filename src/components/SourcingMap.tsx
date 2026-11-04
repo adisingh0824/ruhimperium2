@@ -6,10 +6,12 @@ import { MapSpot, Product } from "../types";
 interface SourcingMapProps {
   products: Product[];
   onInteractProduct?: (product: Product) => void;
+  mapSpots?: MapSpot[];
 }
 
-export default function SourcingMap({ products, onInteractProduct }: SourcingMapProps) {
-  const [selectedSpot, setSelectedSpot] = useState<MapSpot>(MAP_SPOTS[0]);
+export default function SourcingMap({ products, onInteractProduct, mapSpots }: SourcingMapProps) {
+  const activeSpots = mapSpots && mapSpots.length > 0 ? mapSpots : MAP_SPOTS;
+  const [selectedSpot, setSelectedSpot] = useState<MapSpot>(activeSpots[0] || MAP_SPOTS[0]);
 
   return (
     <section className="bg-sand-100 py-16 sm:py-24 border-b border-sand-200" id="sourcing-map-section">
@@ -96,7 +98,7 @@ export default function SourcingMap({ products, onInteractProduct }: SourcingMap
               </svg>
 
               {/* Graphical Hotspots placed dynamically over our coordinates values */}
-              {MAP_SPOTS.map((spot) => {
+              {activeSpots.map((spot) => {
                 const isSelected = selectedSpot.id === spot.id;
                 return (
                   <button
@@ -132,7 +134,7 @@ export default function SourcingMap({ products, onInteractProduct }: SourcingMap
 
             {/* Quick selector buttons */}
             <div className="w-full border-t border-sand-200 pt-6 mt-6 flex flex-wrap gap-2 justify-center">
-              {MAP_SPOTS.map((spot) => (
+              {activeSpots.map((spot) => (
                 <button
                   key={spot.id}
                   type="button"

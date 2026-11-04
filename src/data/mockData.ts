@@ -534,3 +534,36 @@ export const PRE_SEEDED_REVIEWS: Review[] = [
     verified: true
   }
 ];
+
+export const DEFAULT_FAQS: { id: string; question: string; answer: string }[] = [
+  {
+    id: "faq-1",
+    question: "How do I choose the right fragrance for me?",
+    answer: "Start by exploring scent families you enjoy — floral, woody, fresh, or spicy. Each attar evolves uniquely on your skin, so your perfect match is one that feels natural and memorable to you."
+  },
+  {
+    id: "faq-2",
+    question: "How long do attars last on the skin?",
+    answer: "Our attars are highly concentrated and alcohol-free, offering long-lasting fragrance that can stay for hours and gently evolve throughout the day."
+  },
+  {
+    id: "faq-3",
+    question: "Are your perfumes alcohol-free?",
+    answer: "Yes, all our attars are crafted using natural oils and traditional methods, completely free from alcohol — making them skin-friendly and authentic."
+  },
+  {
+    id: "faq-4",
+    question: "How should I apply attar for best results?",
+    answer: "Apply a small amount on pulse points like wrists, neck, and behind the ears. The warmth of your body helps the fragrance develop beautifully."
+  },
+  {
+    id: "faq-5",
+    question: "Are these fragrances suitable for daily use?",
+    answer: "Absolutely. Our attars are gentle on the skin and perfect for both everyday wear and special occasions."
+  },
+  {
+    id: "faq-6",
+    question: "Where are your fragrances manufactured?",
+    answer: "100% of our botanical attars and oils are hydro-distilled in ancestral copper degh-bhapka stills in Kannauj, Uttar Pradesh—the historic perfume capital of India with over two centuries of unbroken craftsmanship."
+  }
+];

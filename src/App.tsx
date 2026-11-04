@@ -29,8 +29,8 @@ import {
   Upload,
   Link2
 } from 'lucide-react';
-import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS } from './data/mockData';
-import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, getEmbedVideoUrl, isEmbedIframe, extractYouTubeId } from './types';
+import { PRODUCTS, BLOG_ARTICLES, PRE_SEEDED_REVIEWS, DEFAULT_FAQS } from './data/mockData';
+import { Product, CartItem, Review, BlogArticle, Order, Coupon, SiteSettings, UserAccount, Collection, Founder, FAQItem, getEmbedVideoUrl, isEmbedIframe, extractYouTubeId } from './types';
 import Header from "./components/Header";
 import ProductDetailsModal from "./components/ProductDetailsModal";
 import ProductPage from "./pages/ProductPage";
@@ -43,7 +43,7 @@ import UserLoungeModal from "./components/UserLoungeModal";
 import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
 import { db, withTimeout, ensureAdminAuth } from './config/firebase';
-import { doc, setDoc, onSnapshot, collection, deleteDoc, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, collection, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
 import ThreeAtmosphere from './components/ThreeAtmosphere';
 import ThreeBottleCanvas from './components/ThreeBottleCanvas';
 import { ThreeDistilleryLab } from './components/ThreeDistilleryLab';
@@ -260,6 +260,81 @@ export default function App() {
   useEffect(() => {
     safeStorage.setItem("ruh-collections", JSON.stringify(collections));
   }, [collections]);
+
+  // ---------- FAQ STATE & SYNC ----------
+  const [faqs, setFaqs] = useState<FAQItem[]>(
+    () => {
+      const cached = safeStorage.getItem("ruh-faqs");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        } catch {}
+      }
+      // fallback to default FAQs from mock data
+      return DEFAULT_FAQS;
+    }
+  );
+
+  // Persist FAQs to localStorage
+  useEffect(() => {
+    safeStorage.setItem("ruh-faqs", JSON.stringify(faqs));
+  }, [faqs]);
+
+  // Firestore live sync for FAQs
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "faqs"), async (snap) => {
+      if (!snap.empty) {
+        if (writeLockRef.current["faqs"]) return;
+        const list: FAQItem[] = [];
+        snap.forEach((d) => list.push(d.data() as FAQItem));
+        setFaqs(list);
+      } else {
+        // initialize with defaults if collection empty
+        if (initPendingRef.current["faqs"]) return;
+        initPendingRef.current["faqs"] = true;
+        try {
+          const batch = writeBatch(db);
+          for (const f of DEFAULT_FAQS) {
+            batch.set(doc(db, "faqs", f.id), f);
+          }
+          await batch.commit();
+        } catch (e) {
+          console.error("Error initializing FAQs:", e);
+          initPendingRef.current["faqs"] = false;
+        }
+      }
+    }, (err) => handleFirestoreError("faqs", err));
+
+    return () => unsubscribe();
+  }, []);
+
+  // Update function for FAQs
+  const updateFaqs = async (
+    newVal: FAQItem[] | ((prev: FAQItem[]) => FAQItem[])
+  ) => {
+    const sanitized = cleanForFirestore(
+      typeof newVal === "function" ? newVal(faqs) : newVal
+    );
+    writeLockRef.current["faqs"] = true;
+    try {
+      const batch = writeBatch(db);
+      // delete existing docs
+      const snap = await getDocs(collection(db, "faqs"));
+      snap.forEach((docSnap) => batch.delete(docSnap.ref));
+      // write new list
+      sanitized.forEach((f) => batch.set(doc(db, "faqs", f.id), f));
+      await batch.commit();
+      setFaqs(sanitized);
+    } catch (e) {
+      console.error("Error updating FAQs:", e);
+      handleFirestoreWriteCatch(e, "faqs");
+    } finally {
+      setTimeout(() => (writeLockRef.current["faqs"] = false), 500);
+    }
+  };
 
   // Dynamic Cover Hero Graphic
   const [coverPhoto, setCoverPhoto] = useState<string>(() => {
@@ -2221,7 +2296,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
                       muted
                       loop
                       playsInline
-                      // @ts-expect-error - vendor attributes for mobile webkit/blink
+                      // @ts-ignore - vendor attributes for mobile webkit/blink
                       webkit-playsinline="true"
                       x5-playsinline="true"
                       x5-video-player-type="h5-page"

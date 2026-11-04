@@ -1,39 +1,14 @@
 import { useState } from "react";
 import { Plus, Minus, HelpCircle } from "lucide-react";
+import { FAQItem } from "../types";
+import { DEFAULT_FAQS } from "../data/mockData";
 
-interface FAQItem {
-  question: string;
-  answer: string;
+interface FaqSectionProps {
+  faqs?: FAQItem[];
 }
 
-const FAQS: FAQItem[] = [
-  {
-    question: "How do I choose the right fragrance for me?",
-    answer: "Start by exploring scent families you enjoy — floral, woody, fresh, or spicy. Each attar evolves uniquely on your skin, so your perfect match is one that feels natural and memorable to you."
-  },
-  {
-    question: "How long do attars last on the skin?",
-    answer: "Our attars are highly concentrated and alcohol-free, offering long-lasting fragrance that can stay for hours and gently evolve throughout the day."
-  },
-  {
-    question: "Are your perfumes alcohol-free?",
-    answer: "Yes, all our attars are crafted using natural oils and traditional methods, completely free from alcohol — making them skin-friendly and authentic."
-  },
-  {
-    question: "How should I apply attar for best results?",
-    answer: "Apply a small amount on pulse points like wrists, neck, and behind the ears. The warmth of your body helps the fragrance develop beautifully."
-  },
-  {
-    question: "Are these fragrances suitable for daily use?",
-    answer: "Absolutely. Our attars are gentle on the skin and perfect for both everyday wear and special occasions."
-  },
-  {
-    question: "Where are your fragrances manufactured?",
-    answer: "100% of our botanical attars and oils are hydro-distilled in ancestral copper degh-bhapka stills in Kannauj, Uttar Pradesh—the historic perfume capital of India with over two centuries of unbroken craftsmanship."
-  }
-];
-
-export default function FaqSection() {
+export default function FaqSection({ faqs }: FaqSectionProps) {
+  const activeFaqs = faqs && faqs.length > 0 ? faqs : DEFAULT_FAQS;
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggle = (idx: number) => {
@@ -62,7 +37,7 @@ export default function FaqSection() {
 
         {/* Accordion List */}
         <div className="divide-y divide-stone-200/80 border-t border-b border-stone-200/80" role="list">
-          {FAQS.map((faq, idx) => {
+          {activeFaqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
 
             return (
