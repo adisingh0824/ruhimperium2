@@ -3,7 +3,8 @@ import path from "path";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import dotenv from 'dotenv';
-import twilio from 'twilio';
+import { createServer as createViteServer } from 'vite';
+
 
 dotenv.config();
 
@@ -20,6 +21,97 @@ async function startServer() {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     next();
   });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
   const PORT = 3000;
 
   // Security Headers Middleware (Defends against XSS, clickjacking, data leak, and MIME attacks)
@@ -34,12 +126,194 @@ async function startServer() {
     next();
   });
 
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
+
   // Support JSON payloads for admin media uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   const uploadDir = path.resolve(process.cwd(), "public", "uploads");
   await fs.mkdir(uploadDir, { recursive: true });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
 
   // Lightweight rate limiter to prevent API spamming & Denial of Service (DoS)
   const rateLimitWindow = 15 * 60 * 1000; // 15 mins window
@@ -63,10 +337,192 @@ async function startServer() {
 
     if (!clientData || now > clientData.resetTime) {
       requestHistory.set(ip, { count: 1, resetTime: now + rateLimitWindow });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
     } else {
       clientData.count++;
       if (clientData.count > maxRequests) {
         return res.status(429).json({ error: "Too many requests from this IP. Access throttled to prevent DoS." });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
     }
     next();
@@ -78,6 +534,97 @@ async function startServer() {
     const authHeader = req.headers["x-admin-token"];
     if (!authHeader || typeof authHeader !== "string" || authHeader !== expectedPassword) {
       return res.status(401).json({ error: "Unauthorized: Invalid administration credentials" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
     }
     next();
   };
@@ -88,6 +635,97 @@ async function startServer() {
       const { videoData, filename } = req.body;
       if (!videoData || typeof videoData !== "string") {
         return res.status(400).json({ error: "Invalid or missing videoData" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       const matches = videoData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -99,6 +737,97 @@ async function startServer() {
         const mimeType = matches[1].toLowerCase();
         if (!allowedMimes.includes(mimeType)) {
           return res.status(400).json({ error: "Unsupported media format" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
         }
         buffer = Buffer.from(matches[2], "base64");
         if (mimeType.includes("webm")) ext = "webm";
@@ -111,6 +840,97 @@ async function startServer() {
       // Enforce maximum 50MB size limit
       if (buffer.length > 50 * 1024 * 1024) {
         return res.status(413).json({ error: "File exceeds 50MB size limit" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       const safeBaseName = filename ? path.basename(filename).replace(/[^a-zA-Z0-9.\-_]/g, "_") : "";
@@ -119,6 +939,97 @@ async function startServer() {
       const filePath = path.resolve(uploadDir, cleanFilename);
       if (!filePath.startsWith(uploadDir)) {
         return res.status(403).json({ error: "Invalid file path traversal attempt" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       await fs.writeFile(filePath, buffer);
@@ -128,9 +1039,282 @@ async function startServer() {
         success: true,
         url: `/uploads/${cleanFilename}`,
       });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
     } catch (err: any) {
       console.error("Video upload handler exception:", err);
       res.status(500).json({ error: "Failed to process film file upload" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
+    }
+  });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
     }
   });
 
@@ -140,6 +1324,97 @@ async function startServer() {
       const { order } = req.body as { order: any };
       if (!order) {
         return res.status(400).json({ error: 'Missing order data' });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -171,6 +1446,97 @@ async function startServer() {
           const price = item.product?.salePrice || item.price || item.amount || '';
           lines.push(`${idx + 1}. ${name}${size} × ${qty} ${price ? `(₹${price})` : ''}`);
         });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
       lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
       lines.push(`💰 *TOTAL AMOUNT:* ₹${order.total || 0}`);
@@ -185,16 +1551,471 @@ async function startServer() {
           from: fromNumber,
           to: toNumber,
         });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
         console.log(`[Twilio WhatsApp] Successfully sent invoice. SID: ${result.sid}`);
         return res.json({ success: true, sid: result.sid });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       } else {
         console.warn(`[Twilio WhatsApp] Credentials not configured in .env yet. Invoice logged:`);
         console.log(messageBody);
         return res.json({ success: false, message: 'Twilio credentials not configured' });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
     } catch (err: any) {
       console.error('[Twilio WhatsApp] Error sending order invoice:', err?.message || err);
       return res.status(500).json({ error: 'Failed to send WhatsApp invoice via Twilio' });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
+    }
+  });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
     }
   });
 
@@ -203,6 +2024,97 @@ async function startServer() {
       const { imageData, filename } = req.body;
       if (!imageData || typeof imageData !== "string") {
         return res.status(400).json({ error: "Invalid or missing imageData" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       const matches = imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -214,6 +2126,97 @@ async function startServer() {
         const mimeType = matches[1].toLowerCase();
         if (!allowedMimes.includes(mimeType)) {
           return res.status(400).json({ error: "Unsupported image format" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
         }
         buffer = Buffer.from(matches[2], "base64");
         if (mimeType.includes("png")) ext = "png";
@@ -225,6 +2228,97 @@ async function startServer() {
       // Enforce maximum 10MB size limit for images
       if (buffer.length > 10 * 1024 * 1024) {
         return res.status(413).json({ error: "Image exceeds 10MB size limit" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       const safeBaseName = filename ? path.basename(filename).replace(/[^a-zA-Z0-9.\-_]/g, "_") : "";
@@ -233,6 +2327,97 @@ async function startServer() {
       const filePath = path.resolve(uploadDir, cleanFilename);
       if (!filePath.startsWith(uploadDir)) {
         return res.status(403).json({ error: "Invalid file path traversal attempt" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
       }
 
       await fs.writeFile(filePath, buffer);
@@ -242,9 +2427,282 @@ async function startServer() {
         success: true,
         url: `/uploads/${cleanFilename}`,
       });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
     } catch (err: any) {
       console.error("Image upload handler exception:", err);
       res.status(500).json({ error: "Failed to process image file upload" });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
+    }
+  });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
     }
   });
 
@@ -264,6 +2722,97 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: "spa",
     });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
     app.use(vite.middlewares);
   } else {
     console.log("Starting full-stack integration in PRODUCTION mode...");
@@ -273,10 +2822,192 @@ async function startServer() {
     app.get("*", (_req, res) => {
       res.sendFile(path.resolve(distPath, "index.html"));
     });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
+  });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Imperial Server executing on port ${PORT}`);
+  });
+
+  // API endpoint to forward order details via EmailJS
+  app.post('/api/send-email', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials missing in .env');
+        return res.json({ success: false, message: 'EmailJS credentials not configured' });
+      }
+      const templateParams = {
+        order_id: order.id || '',
+        customer_name: order.fullName || '',
+        customer_email: order.email || '',
+        total_amount: order.total?.toString() || '0',
+        payment_mode: order.paymentMode || '',
+        tracking_code: order.trackingCode || '',
+      };
+      const emailjs = (await import('emailjs-com')).default;
+      const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      console.log('[EmailJS] Email sent, status:', result.status);
+      return res.json({ success: true, status: result.status });
+    } catch (err: any) {
+      console.error('[EmailJS] Error sending email:', err?.message || err);
+      return res.status(500).json({ error: 'Failed to send email via EmailJS' });
+    }
+  });
+
+  // API endpoint to handle paid order notification (WhatsApp + Email)
+  app.post('/api/notify-paid', async (req: express.Request, res: express.Response) => {
+    try {
+      const { order } = req.body as { order: any };
+      if (!order) {
+        return res.status(400).json({ error: 'Missing order data' });
+      }
+      const [whResult, emailResult] = await Promise.all([
+        (async () => {
+          const accountSid = process.env.TWILIO_ACCOUNT_SID;
+          const authToken = process.env.TWILIO_AUTH_TOKEN;
+          const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+          const toNumber = process.env.ADMIN_WHATSAPP_NUMBER || 'whatsapp:+919785854770';
+          const lines: string[] = [];
+          lines.push(`🧾 *RUH IMPERIUM - NEW ORDER INVOICE*`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`*Order ID:* ${order.id || 'N/A'}`);
+          lines.push(`*Date:* ${new Date().toLocaleDateString('en-IN')}`);
+          lines.push(`*Payment Mode:* ${order.paymentMode || 'Prepaid'}`);
+          if (order.trackingCode) lines.push(`*Tracking Code:* ${order.trackingCode}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          lines.push(`👤 *CUSTOMER DETAILS*`);
+          lines.push(`*Name:* ${order.fullName || 'N/A'}`);
+          lines.push(`*Phone:* ${order.phone || 'N/A'}`);
+          if (order.email) lines.push(`*Email:* ${order.email}`);
+          lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
+          const messageBody = lines.join('\n');
+          if (accountSid && authToken) {
+            const client = twilio(accountSid, authToken);
+            const result = await client.messages.create({ body: messageBody, from: fromNumber, to: toNumber });
+            return { success: true, sid: result.sid };
+          }
+          return { success: false, message: 'Twilio not configured' };
+        })(),
+        (async () => {
+          const serviceId = process.env.VITE_EMAILJS_SERVICE_ID;
+          const templateId = process.env.VITE_EMAILJS_TEMPLATE_ID;
+          const publicKey = process.env.VITE_EMAILJS_PUBLIC_KEY;
+          if (!serviceId || !templateId || !publicKey) return { success: false, message: 'EmailJS not configured' };
+          const templateParams = {
+            order_id: order.id || '',
+            customer_name: order.fullName || '',
+            customer_email: order.email || '',
+            total_amount: order.total?.toString() || '0',
+            payment_mode: order.paymentMode || '',
+            tracking_code: order.trackingCode || '',
+          };
+          const emailjs = (await import('emailjs-com')).default;
+          const result = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+          return { success: true, status: result.status };
+        })(),
+      ]);
+      return res.json({ whResult, emailResult });
+    } catch (err: any) {
+      console.error('Notification error:', err);
+      return res.status(500).json({ error: 'Failed to process paid order notification' });
+    }
   });
 }
 

@@ -88,6 +88,8 @@ export interface Order {
   couponCode?: string;
 }
 
+export interface OrderNotificationPayload extends Order {}
+
 export interface Coupon {
   code: string;
   discountPercent?: number;
