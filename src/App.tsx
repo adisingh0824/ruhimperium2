@@ -1335,38 +1335,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           });
           ordersRef.current = merged;
           safeStorage.setItem("ruh-orders", JSON.stringify(merged));
-          // Trigger notification for newly paid orders (status "Processing")
+          // Trigger notification for newly paid orders (status "Processing" or COD)
           merged.forEach((order) => {
-  // Debug: show order id, status, paymentMode
-  console.log('🔔 Evaluating order', order.id, { status: order.status, paymentMode: order.paymentMode });
-  if ((order.status === "Processing" || /cash|cod/i.test(order.paymentMode ?? "")) && !notifiedOrdersRef.current.has(order.id)) {
-    console.log('🔔 Triggering notification for order', order.id, 'status', order.status, 'paymentMode', order.paymentMode);
-    fetch('http://localhost:3000/api/notify-paid', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('Paid/COD order notification result:', data);
-      })
-      .catch((err) => console.error('Notification error:', err));
-    notifiedOrdersRef.current.add(order.id);
-  }
-});
-            if ((order.status === "Processing" || /cash|cod/i.test(order.paymentMode)) && !notifiedOrdersRef.current.has(order.id)) {
-              // Send notification to backend
-              fetch('http://localhost:3000/api/notify-paid', {
+            if ((order.status === "Processing" || /cash|cod/i.test(order.paymentMode ?? "")) && !notifiedOrdersRef.current.has(order.id)) {
+              notifiedOrdersRef.current.add(order.id);
+              fetch('/api/notify-paid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ order }),
               })
                 .then((res) => res.json())
                 .then((data) => {
-                  console.log('Paid order notification result:', data);
+                  console.log('Paid/COD order notification result:', data);
                 })
                 .catch((err) => console.error('Notification error:', err));
-              notifiedOrdersRef.current.add(order.id);
             }
           });
           return merged;
@@ -1760,6 +1742,23 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
       console.log("[Firestore] Order logged into secure orders collection:", cleanOrder.id);
     } catch (e) {
       console.warn("[Firestore] Secure orders write:", e);
+    }
+
+    // 4. Trigger automated backend notification (WhatsApp + Email)
+    if (!notifiedOrdersRef.current.has(cleanOrder.id)) {
+      notifiedOrdersRef.current.add(cleanOrder.id);
+      fetch('/api/notify-paid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: cleanOrder }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('[Order Notification] Backend dispatch result:', data);
+        })
+        .catch((err) => {
+          console.warn('[Order Notification] Backend dispatch error:', err);
+        });
     }
 
     showToast(`Order #${cleanOrder.id} confirmed and recorded!`, "success");
