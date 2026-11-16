@@ -291,16 +291,17 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="p-1.5 text-sand-900 hover:text-[#D4BC96] transition-all duration-300 transform hover:scale-105"
+                className={`p-1.5 transition-all duration-300 transform hover:scale-105 ${searchOpen ? 'text-[#D4BC96]' : 'text-sand-900 hover:text-[#D4BC96]'}`}
                 title="Search the olfactory logs"
                 aria-label="Search fragrances"
               >
                 <Search className="w-5 h-5 stroke-[1.5]" />
               </button>
               
-              {/* Sliding Luxury Search Bar — full-width on mobile to prevent off-screen overflow */}
+              {/* Desktop Sliding Luxury Search Bar */}
               {searchOpen && (
-                <div className="absolute left-0 sm:left-auto sm:right-8 right-0 top-full sm:top-1/2 sm:-translate-y-1/2 bg-white border border-stone-200 rounded-none sm:rounded-full px-4 py-2.5 sm:py-1.5 flex items-center shadow-md sm:w-72 z-40 animate-fade-in">
+                <div className="hidden sm:flex absolute right-8 top-1/2 -translate-y-1/2 bg-white border border-stone-200 rounded-full px-4 py-1.5 items-center shadow-md w-72 z-40 animate-fade-in">
+                  <Search className="w-3.5 h-3.5 text-stone-400 mr-2 shrink-0" />
                   <input
                     type="text"
                     placeholder="Search notes, ingredients, attars..."
@@ -309,16 +310,31 @@ export default function Header({
                       if (setSearchQuery) setSearchQuery(e.target.value);
                       onNavigate("shop");
                     }}
-                    className="bg-transparent text-sm sm:text-xs text-stone-800 focus:outline-none w-full placeholder-stone-400 font-light"
-                    style={{ fontSize: '16px' }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        onNavigate("shop");
+                      }
+                    }}
+                    className="bg-transparent text-xs text-stone-800 focus:outline-none w-full placeholder-stone-400 font-light"
                     autoFocus
                   />
+                  {searchQuery && (
+                    <button 
+                      onClick={() => {
+                        if (setSearchQuery) setSearchQuery("");
+                      }}
+                      className="text-stone-400 hover:text-stone-600 mr-1.5 cursor-pointer"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
                   <button 
                     onClick={() => {
                       if (setSearchQuery) setSearchQuery("");
                       setSearchOpen(false);
                     }}
-                    className="text-stone-400 hover:text-stone-600 ml-1.5 cursor-pointer"
+                    className="text-stone-400 hover:text-stone-600 ml-1 cursor-pointer"
                     aria-label="Close search"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -361,6 +377,69 @@ export default function Header({
             )}
           </div>
         </div>
+
+        {/* MOBILE FULL-WIDTH LUXURY SEARCH EXPANSION */}
+        {searchOpen && (
+          <div className="sm:hidden w-full bg-[#FAF9F5] border-b border-sand-300 py-3 px-1 animate-fade-in relative z-50">
+            <div className="flex items-center bg-white border border-sand-300 rounded-full px-3.5 py-2 shadow-xs focus-within:border-stone-900 transition-colors">
+              <Search className="w-4 h-4 text-[#D4BC96] mr-2 shrink-0" />
+              <input
+                type="text"
+                placeholder="Search notes, ingredients, attars..."
+                value={searchQuery}
+                onChange={(e) => {
+                  if (setSearchQuery) setSearchQuery(e.target.value);
+                  onNavigate("shop");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onNavigate("shop");
+                    setSearchOpen(false);
+                  }
+                }}
+                className="bg-transparent text-sm text-stone-800 focus:outline-none w-full placeholder-stone-400 font-light"
+                style={{ fontSize: '16px' }}
+                autoFocus
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (setSearchQuery) setSearchQuery("");
+                  }}
+                  className="text-stone-400 hover:text-stone-700 p-1 mr-1.5"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchOpen(false);
+                }}
+                className="text-xs uppercase font-mono font-semibold text-stone-600 hover:text-stone-900 px-2 py-0.5"
+              >
+                Done
+              </button>
+            </div>
+            {searchQuery && (
+              <div className="mt-2 flex items-center justify-between text-[11px] text-stone-500 font-mono px-2">
+                <span>Filtering: "{searchQuery}"</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onNavigate("shop");
+                    setSearchOpen(false);
+                  }}
+                  className="text-[#9A7B4F] font-bold hover:underline"
+                >
+                  View Catalog →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         <nav className="hidden lg:flex items-center justify-between h-14 relative border-t border-sand-200">
           <ul className="flex items-center space-x-8 text-sm tracking-wider uppercase font-sans text-stone-900 font-bold">
@@ -750,6 +829,27 @@ export default function Header({
               </div>
             </div>
           )}
+
+          {/* Active Search Filter Indicator on Mobile */}
+          {searchQuery && (
+            <div className="bg-amber-50/90 border-t border-amber-200/70 px-4 py-2 flex items-center justify-between text-xs animate-fade-in">
+              <div className="flex items-center gap-2 text-stone-700 truncate">
+                <Search className="w-3.5 h-3.5 text-[#9A7B4F] shrink-0" />
+                <span className="text-[11px] font-mono truncate">
+                  Filtered by: <strong className="text-stone-900 font-semibold font-serif">"{searchQuery}"</strong>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setSearchQuery) setSearchQuery("");
+                }}
+                className="text-[10px] font-mono uppercase tracking-wider text-stone-500 hover:text-stone-900 ml-2 shrink-0 flex items-center gap-1 bg-white px-2.5 py-0.5 rounded-full border border-stone-200 shadow-xs cursor-pointer"
+              >
+                <X className="w-3 h-3" /> Clear
+              </button>
+            </div>
+          )}
         </nav>
 
       </div>
@@ -918,7 +1018,7 @@ export default function Header({
         <div className="fixed inset-0 z-[999] flex lg:hidden bg-stone-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setMobileMenuOpen(false)}>
           <div className="w-[85%] max-w-sm bg-stone-50 h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div>
-              <div className="flex items-center justify-between mb-8 border-b border-stone-200/50 pb-4">
+              <div className="flex items-center justify-between mb-6 border-b border-stone-200/50 pb-4">
                 <button
                   type="button"
                   onClick={() => {
@@ -938,6 +1038,54 @@ export default function Header({
                 >
                   <X className="w-5 h-5 stroke-[1.5]" />
                 </button>
+              </div>
+
+              {/* Mobile Drawer Search Bar */}
+              <div className="mb-6">
+                <div className="flex items-center bg-white border border-stone-300 rounded-xl px-3.5 py-2.5 shadow-xs focus-within:border-stone-900 transition-colors">
+                  <Search className="w-4 h-4 text-[#D4BC96] mr-2.5 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search notes, attars, ingredients..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      if (setSearchQuery) setSearchQuery(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        onNavigate("shop");
+                        setMobileMenuOpen(false);
+                      }
+                    }}
+                    className="bg-transparent text-sm text-stone-800 focus:outline-none w-full placeholder-stone-400 font-light"
+                    style={{ fontSize: '16px' }}
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (setSearchQuery) setSearchQuery("");
+                      }}
+                      className="text-stone-400 hover:text-stone-700 p-1"
+                      aria-label="Clear search query"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onNavigate("shop");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="mt-2 w-full text-center py-2 bg-stone-900 text-white rounded-xl text-xs font-serif font-medium tracking-wide flex items-center justify-center gap-1.5 shadow-sm cursor-pointer hover:bg-stone-800 transition-colors"
+                  >
+                    <span>View Results for "{searchQuery}"</span>
+                    <span>→</span>
+                  </button>
+                )}
               </div>
 
               {/* Mobile links exact same stack */}
