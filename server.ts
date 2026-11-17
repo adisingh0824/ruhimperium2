@@ -130,7 +130,7 @@ async function startServer() {
   // Unified Order Notification Handler (WhatsApp + Email)
   async function handleOrderNotification(req: express.Request, res: express.Response) {
     try {
-      const { order } = req.body as { order: any };
+      const order = (req.body?.order || (req.body?.id ? req.body : null)) as any;
       if (!order || !order.id) {
         return res.status(400).json({ error: "Missing or invalid order data" });
       }

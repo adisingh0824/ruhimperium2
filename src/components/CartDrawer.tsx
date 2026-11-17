@@ -1,5 +1,5 @@
 import { useState, FormEvent, useEffect } from "react";
-import { X, Trash2, ShoppingBag, Percent, ArrowLeft, ShieldCheck, Ticket, Landmark, CreditCard, ChevronRight, CheckCircle, Sparkles, Award, ScrollText, AlertTriangle, FileText } from "lucide-react";
+import { X, Trash2, ShoppingBag, Percent, ArrowLeft, ShieldCheck, Ticket, Landmark, CreditCard, ChevronRight, CheckCircle, Sparkles, Award, ScrollText, AlertTriangle, FileText, MessageCircle } from "lucide-react";
 import { CartItem, Product, Order, Coupon, SiteSettings } from "../types";
 import emailjs from '@emailjs/browser';
 import InvoiceBill from "./InvoiceBill";
@@ -802,6 +802,25 @@ export default function CartDrawer({
               <FileText className="w-4 h-4" />
               DOWNLOAD INVOICE
             </button>
+
+            <a
+              href={`https://wa.me/919785854770?text=${encodeURIComponent(
+                `*RUH IMPERIUM - NEW ORDER CONFIRMATION*\n\n` +
+                `*Order ID:* ${placedOrder?.id || "N/A"}\n` +
+                `*Tracking:* ${currentTrackingCode || "N/A"}\n` +
+                `*Customer:* ${fullName}\n` +
+                `*Phone:* ${phone}\n` +
+                `*Payment:* ${placedOrder?.paymentMode || paymentMode}\n` +
+                `*Total:* ₹${placedOrder?.total || cartTotal}\n` +
+                `*Address:* ${address}, PIN: ${pincode}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3.5 bg-[#25D366] hover:bg-[#20ba59] text-white text-xs uppercase tracking-[0.2em] font-medium rounded shadow cursor-pointer focus:outline-none flex items-center justify-center gap-2 mb-3 transition-colors text-center"
+            >
+              <MessageCircle className="w-4 h-4" />
+              RECEIVE UPDATES ON WHATSAPP
+            </a>
 
             <button
               type="button"

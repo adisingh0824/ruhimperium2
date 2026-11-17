@@ -88,7 +88,36 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { order } = req.body || {};
+  let order: any = null;
+
+  if (req.body) {
+    if (typeof req.body === "object") {
+      order = req.body.order || (req.body.id ? req.body : null);
+    } else if (typeof req.body === "string") {
+      try {
+        const parsed = JSON.parse(req.body);
+        order = parsed.order || (parsed.id ? parsed : null);
+      } catch {}
+    }
+  }
+
+  // Stream fallback for raw incoming Node.js streams
+  if (!order) {
+    try {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+      }
+      if (chunks.length > 0) {
+        const raw = Buffer.concat(chunks).toString("utf8");
+        const parsed = JSON.parse(raw);
+        order = parsed.order || (parsed.id ? parsed : null);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
   if (!order) {
     return res.status(400).json({ error: "Missing order payload" });
   }
