@@ -3,9 +3,9 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist",
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/notify-order", "destination": "/api/notify-paid" },
+    { "source": "/api/send-whatsapp", "destination": "/api/notify-paid" },
+    { "source": "/api/send-email", "destination": "/api/notify-paid" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

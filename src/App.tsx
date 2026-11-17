@@ -1313,11 +1313,16 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   // SECURE ORDERS REAL-TIME SYNCHRONIZATION: EXCLUSIVELY FOR AUTHENTICATED ADMINISTRATORS
   // Track already notified orders to avoid duplicate notifications
   const notifiedOrdersRef = useRef<Set<string>>(new Set());
+  // Flag: true after the initial snapshot loads (so we only notify NEWLY added orders)
+  const ordersInitialLoadDoneRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!isAdminLoggedIn) {
+      ordersInitialLoadDoneRef.current = false;
       return;
     }
+
+    ordersInitialLoadDoneRef.current = false;
 
     const unsubscribeAdminOrders = onSnapshot(collection(db, "orders"), (snap) => {
       if (!snap.empty) {
@@ -1335,22 +1340,34 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           });
           ordersRef.current = merged;
           safeStorage.setItem("ruh-orders", JSON.stringify(merged));
-          // Trigger notification for newly paid orders (status "Processing" or COD)
-          merged.forEach((order) => {
-            if ((order.status === "Processing" || /cash|cod/i.test(order.paymentMode ?? "")) && !notifiedOrdersRef.current.has(order.id)) {
-              notifiedOrdersRef.current.add(order.id);
-              fetch('/api/notify-paid', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ order }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log('Paid/COD order notification result:', data);
+
+          if (!ordersInitialLoadDoneRef.current) {
+            // First snapshot: seed the notified set with ALL existing orders so
+            // we don't spam WhatsApp/email with old orders on page load.
+            merged.forEach((order) => notifiedOrdersRef.current.add(order.id));
+            ordersInitialLoadDoneRef.current = true;
+          } else {
+            // Subsequent snapshots: only notify truly NEW orders not seen before
+            merged.forEach((order) => {
+              if (
+                (order.status === "Processing" || /cash|cod/i.test(order.paymentMode ?? "")) &&
+                !notifiedOrdersRef.current.has(order.id)
+              ) {
+                notifiedOrdersRef.current.add(order.id);
+                fetch('/api/notify-paid', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ order }),
                 })
-                .catch((err) => console.error('Notification error:', err));
-            }
-          });
+                  .then((res) => res.json())
+                  .then((data) => {
+                    console.log('[Order Notification] Admin snapshot trigger result:', data);
+                  })
+                  .catch((err) => console.error('[Order Notification] Admin snapshot error:', err));
+              }
+            });
+          }
+
           return merged;
         });
       }
