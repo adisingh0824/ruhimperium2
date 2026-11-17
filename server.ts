@@ -190,7 +190,7 @@ async function startServer() {
       const emailPromise = (async () => {
         const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
         const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
-        const adminEmails = process.env.ADMIN_EMAIL || "ruhimperiun9@gmail.com, saditya7990@gmail.com";
+        const adminEmails = process.env.ADMIN_EMAIL || "ruhimperiun9@gmail.com, sadityasingh7990@gmail.com";
 
         if (gmailUser && gmailPass) {
           try {
@@ -289,7 +289,7 @@ async function startServer() {
                 tracking_code: order.trackingCode || "",
                 shipping_address: `${order.address || ""}, PIN: ${order.pincode || ""}`,
                 admin_email_1: "ruhimperiun9@gmail.com",
-                admin_email_2: "saditya7990@gmail.com",
+                admin_email_2: "sadityasingh7990@gmail.com",
               },
             };
             if (emailjsPrivateKey) {

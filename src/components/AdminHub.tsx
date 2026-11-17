@@ -219,7 +219,7 @@ export default function AdminHub({
   };
 
   // Administrator credentials read ONLY from environment variables — never hardcoded in source
-  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "sadityasingh7990@gmail").trim().toLowerCase();
+  const defaultAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "sadityasingh7990@gmail.com").trim().toLowerCase();
   const defaultAdminPassword = (import.meta.env.VITE_ADMIN_PASSWORD || "Adi19983@@").trim();
   // SHA-256 hash of the configured admin password (computed at runtime from env var, never stored in plaintext)
   const defaultAdminHashed = "c090835352d387a75a3f9f05fb0cfe47c834e952e26a032194ae99285cf27fbe";
@@ -886,7 +886,7 @@ export default function AdminHub({
                     type="text"
                     required
                     autoComplete="username"
-                    placeholder="sadityasingh7990@gmail"
+                    placeholder="sadityasingh7990@gmail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-white border border-sand-200 rounded px-3 py-2.5 text-xs focus:ring-1 focus:ring-[#D4BC96] outline-none font-mono"
