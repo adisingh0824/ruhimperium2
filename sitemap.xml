@@ -1,116 +1,204 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <!-- Primary Landing Page -->
   <url>
     <loc>https://www.ruhimperium.shop/</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.ruhimperium.shop/og-image.png</image:loc>
+      <image:title>Ruh Imperium | Authentic Indian Attars &amp; Pure Kannauj Perfumes</image:title>
+    </image:image>
   </url>
 
-  <!-- Brand Story & Heritage Page -->
+  <!-- Brand Story & Kannauj Heritage Page -->
   <url>
     <loc>https://www.ruhimperium.shop/our-story</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</image:loc>
+      <image:title>Kannauj 204-Year-Old Traditional Copper Woodfire Distillation</image:title>
+    </image:image>
   </url>
 
-  <!-- Product Pages -->
+  <!-- Product: Safar EDP -->
   <url>
     <loc>https://www.ruhimperium.shop/product/sandy-hills</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&amp;fit=crop&amp;q=80&amp;w=800</image:loc>
+      <image:title>Safar EDP - Sensual Coastal Breeze &amp; Golden Desert Sand - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Zara EDP -->
   <url>
     <loc>https://www.ruhimperium.shop/product/island-bloom</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Zara EDP - Dancing Tiare Petals &amp; Luminous Beachside Musk - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Aarzoo Attar -->
   <url>
     <loc>https://www.ruhimperium.shop/product/mogra-madness</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Aarzoo Attar - Wild Arabian Jasmine &amp; Velvet Musk Trail - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Musafir EDP -->
   <url>
     <loc>https://www.ruhimperium.shop/product/sidr-wood</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&amp;fit=crop&amp;q=80&amp;w=800</image:loc>
+      <image:title>Musafir EDP - Golden Sidr Honey, Saffron &amp; Majestic Cedarwood - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Mitti Attar -->
   <url>
     <loc>https://www.ruhimperium.shop/product/mitti-attar</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&amp;fit=crop&amp;q=80&amp;w=800</image:loc>
+      <image:title>Mitti Attar - The Olfactory Essence of Baked Terra-Cotta - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: The Ruh Odyssey Discovery Set -->
   <url>
     <loc>https://www.ruhimperium.shop/product/ruh-discovery-set</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>The Ruh Odyssey Discovery Set - Explore flagship slow-perfumery masterpieces - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Sandalwood Attar -->
   <url>
     <loc>https://www.ruhimperium.shop/product/sandalwood-attar</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&amp;fit=crop&amp;q=80&amp;w=800</image:loc>
+      <image:title>Sandalwood Attar - Pure Santalum Album Heritage Oil - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Mogra Attar -->
   <url>
     <loc>https://www.ruhimperium.shop/product/mogra-attar</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</image:loc>
+      <image:title>Mogra Attar - Royal White Jasmine Petals in Sandalwood oil - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Nargis Attar -->
   <url>
     <loc>https://www.ruhimperium.shop/product/nargis-attar</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1528740564264-7a988d39f6cc?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Nargis Attar - Wild Narcissus Scent of Himalayan Slopes - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Dahn Al Oud Attar -->
   <url>
     <loc>https://www.ruhimperium.shop/product/dahn-al-oud-attar</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1512207724213-747424901c37?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Dahn Al Oud Attar - Prestigious Wild Aquilaria Resin Oil - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Saffron Attar (Kesar) -->
   <url>
     <loc>https://www.ruhimperium.shop/product/saffron-attar</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Saffron Attar (Kesar) - Kashmiri Golden Saffron in Sandalwood Oil Base - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Raat ki Rani -->
   <url>
     <loc>https://www.ruhimperium.shop/product/raat-ki-rani</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1588405748373-122b2321bc31?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Raat ki Rani - Night-Blooming Cestrum Diurnvm &amp; Amber - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Champa Muse -->
   <url>
     <loc>https://www.ruhimperium.shop/product/champa-muse</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Champa Muse - Golden Champa Flower &amp; Sunkissed Vanilla EDP - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Dahn al Oud EDP -->
   <url>
     <loc>https://www.ruhimperium.shop/product/dahn-al-oud-edp</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Dahn al Oud EDP - Resinous Assamese Agarwood &amp; Tuscan Leather - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Forest Rush -->
   <url>
     <loc>https://www.ruhimperium.shop/product/forest-rush</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1585218356057-dc0e8d3558bb?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Forest Rush - Earthy Vetiver &amp; Rainwashed Woods EDP - Ruh Imperium</image:title>
+    </image:image>
   </url>
+  <!-- Product: Gulab EDP -->
   <url>
     <loc>https://www.ruhimperium.shop/product/gulab-edp</loc>
     <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&amp;fit=crop&amp;q=80&amp;w=600</image:loc>
+      <image:title>Gulab EDP - Hydro-Distilled Damask Roses &amp; Soft Musks - Ruh Imperium</image:title>
+    </image:image>
   </url>
 </urlset>
