@@ -1,12 +1,31 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-T2K3MM36');</script>
+    <!-- Google Tag Manager (Optimized: Deferred to free main thread for sub-2.5s LCP) -->
+    <script>
+      (function() {
+        var gtmLoaded = false;
+        function initGTM() {
+          if (gtmLoaded) return;
+          gtmLoaded = true;
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-T2K3MM36');
+        }
+        if (typeof window !== 'undefined') {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(function() { setTimeout(initGTM, 1000); });
+          } else {
+            window.addEventListener('load', function() { setTimeout(initGTM, 1000); });
+          }
+          ['click', 'touchstart', 'scroll'].forEach(function(e) {
+            window.addEventListener(e, initGTM, { once: true, passive: true });
+          });
+        }
+      })();
+    </script>
     <!-- End Google Tag Manager -->
 
     <meta charset="UTF-8" />
@@ -332,9 +351,16 @@
     <link rel="dns-prefetch" href="https://api.twilio.com" />
     <link rel="dns-prefetch" href="https://api.emailjs.com" />
 
-    <!-- LCP Preload: Hero cover image (reduces Largest Contentful Paint) -->
-    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=75&w=1280" fetchpriority="high" />
-    <script type="module" crossorigin src="/assets/index-CtL7424s.js"></script>
+    <!-- Critical LCP Image Preload: Preloads the exact responsive local image for instant mobile rendering -->
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/images/hero_cover_mobile.jpg"
+      imagesrcset="/images/hero_cover_mobile.jpg 768w, /images/hero_cover_tablet.jpg 1200w, /images/hero_cover_optimized.jpg 1408w"
+      imagesizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1408px"
+      fetchpriority="high"
+    />
+    <script type="module" crossorigin src="/assets/index-t7x67hBx.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-router-vtpHoy7b.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-motion-CfavdxgV.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-lucide-CK-MIjwB.js">
