@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+/* Google Fonts are preconnected and loaded asynchronously in index.html to eliminate render-blocking CSS chains */
 @import "tailwindcss";
 
 @theme {

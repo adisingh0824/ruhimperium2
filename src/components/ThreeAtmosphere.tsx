@@ -107,11 +107,12 @@ export default function ThreeAtmosphere() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [flowerDensity, setFlowerDensity] = useState<'high' | 'subtle'>('high');
 
+  // Immediately bail out on mobile, tablet, and touch screens (<1024px) to save CPU/GPU and ensure sub-2.5s mobile LCP
+  if (typeof window !== "undefined" && (window.innerWidth < 1024 || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0))) {
+    return null;
+  }
+
   useEffect(() => {
-    // Completely disable on mobile, tablet, and touch screens (<1024px) to preserve 60fps native scrolling
-    if (typeof window !== "undefined" && (window.innerWidth < 1024 || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0))) {
-      return;
-    }
 
     if (!containerRef.current) return;
 

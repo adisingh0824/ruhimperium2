@@ -13,6 +13,21 @@ export default defineConfig(() => {
     },
     build: {
       chunkSizeWarningLimit: 1500,
+      rollupOptions: {
+        output: {
+          // Split heavy third-party libraries into separate chunks so the
+          // initial JS payload is smaller and loads faster (improves LCP).
+          manualChunks(id) {
+            if (id.includes('node_modules/three')) return 'vendor-three';
+            if (id.includes('node_modules/framer-motion') || id.includes('node_modules/motion')) return 'vendor-motion';
+            if (id.includes('node_modules/firebase')) return 'vendor-firebase';
+            if (id.includes('node_modules/lucide-react')) return 'vendor-lucide';
+            if (id.includes('node_modules/react-router')) return 'vendor-router';
+            if (id.includes('node_modules/@clerk')) return 'vendor-clerk';
+            if (id.includes('node_modules/twilio') || id.includes('node_modules/nodemailer')) return 'vendor-notify';
+          },
+        },
+      },
     },
     server: {
       host: true,

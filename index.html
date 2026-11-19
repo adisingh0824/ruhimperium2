@@ -12,6 +12,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Google Fonts Optimization: Preconnect & Load async for sub-2.5s LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" />
 
     <!-- Search Engine Verification -->
     <meta name="google-site-verification" content="-11Q32WrleQ9xImKEUJdiqOW5grkKahrDQpShRAxR4U" />
@@ -321,13 +325,64 @@
     }
     </script>
     <link rel="help" type="text/markdown" href="/llms.txt" title="LLM & AI Knowledge Grounding Context" />
+    <!-- Critical Resource Hints: Preconnect for LCP improvement -->
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://api.twilio.com" />
+    <link rel="dns-prefetch" href="https://api.emailjs.com" />
+
+    <!-- LCP Preload: Hero cover image (reduces Largest Contentful Paint) -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=75&w=1280" fetchpriority="high" />
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2K3MM36"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div id="root"></div>
+    <!-- Static SEO Fallback: Visible to search engine crawlers that don't execute JavaScript.
+         This ensures Google indexes the H1, product links, and key content even on the first crawl. -->
+    <noscript>
+      <div id="seo-static-content" style="font-family:Georgia,serif;max-width:1200px;margin:0 auto;padding:24px;">
+        <h1 style="font-size:2rem;color:#1a1715;">Ruh Imperium &mdash; Authentic Indian Attars &amp; Pure Kannauj Perfumes</h1>
+        <p style="font-size:1rem;color:#555;max-width:700px;line-height:1.7;">
+          Discover India&rsquo;s native slow-perfumery. 100% pure alcohol-free attars, rare botanical oils,
+          and artisanal Eau De Parfums hydro-distilled in traditional Kannauj copper stills.
+          Ethically crafted in Kannauj, Uttar Pradesh &mdash; India&rsquo;s perfume capital.
+        </p>
+        <h2 style="font-size:1.3rem;color:#1a1715;margin-top:1.5rem;">Our Signature Fragrances</h2>
+        <ul style="list-style:none;padding:0;display:grid;gap:12px;">
+          <li><a href="/product/mitti-attar" style="color:#9A7B4F;font-weight:bold;">Mitti Attar</a> &mdash; The Scent of First Rain &bull; Pure petrichor distilled into sandalwood. <strong>From &#x20B9;1,850</strong></li>
+          <li><a href="/product/sandy-hills" style="color:#9A7B4F;font-weight:bold;">Sandy Hills Attar</a> &mdash; Golden desert warmth, amber &amp; sandalwood. <strong>From &#x20B9;1,350</strong></li>
+          <li><a href="/product/island-bloom" style="color:#9A7B4F;font-weight:bold;">Island Bloom Attar</a> &mdash; Tropical florals &amp; sea-salt mist. <strong>From &#x20B9;1,450</strong></li>
+          <li><a href="/product/mogra-madness" style="color:#9A7B4F;font-weight:bold;">Aarzoo Attar</a> &mdash; Kannauj Mogra &amp; Arabian Jasmine. <strong>From &#x20B9;1,623</strong></li>
+          <li><a href="/product/sandalwood-attar" style="color:#9A7B4F;font-weight:bold;">Shahi Sandalwood Attar</a> &mdash; Sacred Mysore Santalum album. <strong>From &#x20B9;1,999</strong></li>
+          <li><a href="/product/gulab-edp" style="color:#9A7B4F;font-weight:bold;">Gulab EDP</a> &mdash; Kannauj Damask Rose Eau de Parfum. <strong>From &#x20B9;1,799</strong></li>
+          <li><a href="/product/saffron-attar" style="color:#9A7B4F;font-weight:bold;">Saffron Attar</a> &mdash; Rare Kashmiri saffron in pure oil. <strong>From &#x20B9;2,199</strong></li>
+          <li><a href="/product/ruh-discovery-set" style="color:#9A7B4F;font-weight:bold;">Ruh Discovery Set</a> &mdash; Sample all 6 signature attars. <strong>From &#x20B9;999</strong></li>
+        </ul>
+        <p style="margin-top:1.5rem;color:#555;font-size:0.9rem;">
+          &copy; 2024 Ruh Imperium &bull; Kannauj, Uttar Pradesh, India &bull;
+          <a href="mailto:support@ruhimperium.com" style="color:#9A7B4F;">support@ruhimperium.com</a> &bull;
+          <a href="/our-story" style="color:#9A7B4F;">Our Heritage Story</a>
+        </p>
+      </div>
+    </noscript>
+    <div id="root">
+      <!-- Pre-rendered Shell: Crawlers and Speed Testers see this immediately on initial HTML download -->
+      <header style="padding:16px 20px;display:flex;align-items:center;justify-content:center;background:#141210;border-bottom:1px solid rgba(212,188,150,0.25);">
+        <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;letter-spacing:0.25em;color:#D4BC96;text-transform:uppercase;font-weight:600;">RUH IMPERIUM</span>
+      </header>
+      <main style="max-width:1200px;margin:0 auto;padding:48px 20px;text-align:center;">
+        <span style="font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:#9A7B4F;font-family:monospace;font-weight:600;display:block;margin-bottom:12px;">Traditional Copper Distilled Fragrances</span>
+        <h1 style="font-size:2.5rem;font-family:'Cormorant Garamond',Georgia,serif;color:#1a1715;line-height:1.2;margin:0 0 16px;font-weight:300;">Ruh Imperium &mdash; Authentic Indian Attars &amp; Pure Kannauj Perfumes</h1>
+        <p style="font-size:15px;color:#555;max-width:640px;margin:0 auto 24px;line-height:1.6;font-family:'Poppins',sans-serif;">Explore 100% alcohol-free pure oils and elegant luxury Eau De Parfums hydro-distilled in 204-year-old copper stills of Kannauj, Uttar Pradesh.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+          <a href="/#shop-section" style="display:inline-block;padding:12px 28px;background:#1a1715;color:#FAF9F5;text-decoration:none;border-radius:999px;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;font-weight:600;">Explore Collections</a>
+          <a href="/our-story" style="display:inline-block;padding:12px 28px;border:1px solid #1a1715;color:#1a1715;text-decoration:none;border-radius:999px;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;font-weight:500;">Our Heritage</a>
+        </div>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
