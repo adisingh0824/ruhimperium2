@@ -6,6 +6,22 @@
 User-agent: *
 Allow: /
 
+# Google Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
 # Explicitly welcome AI Assistants, LLM Search Bots & Grounding Crawlers
 User-agent: GPTBot
 Allow: /

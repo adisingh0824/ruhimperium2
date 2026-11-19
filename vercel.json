@@ -6,6 +6,6 @@
     { "source": "/api/notify-order", "destination": "/api/notify-paid" },
     { "source": "/api/send-whatsapp", "destination": "/api/notify-paid" },
     { "source": "/api/send-email", "destination": "/api/notify-paid" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/index.html" }
   ]
 }
