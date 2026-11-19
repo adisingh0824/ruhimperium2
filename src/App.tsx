@@ -337,10 +337,13 @@ export default function App() {
     }
   };
 
-  // Dynamic Cover Hero Graphic
+  // Dynamic Cover Hero Graphic (Optimized for instant mobile LCP)
   const [coverPhoto, setCoverPhoto] = useState<string>(() => {
     const cached = safeStorage.getItem("ruh-cover-photo");
-    return cached || "/images/traditional_degh_distillation_pots_1781437229236.jpg";
+    if (cached && !cached.includes("traditional_degh_distillation_pots_1781437229236.jpg")) {
+      return cached;
+    }
+    return "/images/hero_cover_optimized.jpg";
   });
 
   useEffect(() => {
@@ -786,6 +789,11 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
 
   // Keep live media modes synchronized when admin updates site settings in Firestore
   useEffect(() => {
+    // Mobile always stays on optimized photo banner for sub-2.5s LCP
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setHeroMode('photo');
+      return;
+    }
     if (siteSettings?.heroMediaType) {
       setHeroMode(siteSettings.heroMediaType);
     } else {
@@ -794,6 +802,10 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
   }, [siteSettings?.heroMediaType]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setDistilleryTab('photo');
+      return;
+    }
     if (siteSettings?.distilleryMediaType) {
       setDistilleryTab(siteSettings.distilleryMediaType);
     }
@@ -1226,7 +1238,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
         if (initPendingRef.current["assets"]) return;
         initPendingRef.current["assets"] = true;
         try {
-          const cachedCover = safeStorage.getItem("ruh-cover-photo") || "/images/traditional_degh_distillation_pots_1781437229236.jpg";
+          const cachedCover = safeStorage.getItem("ruh-cover-photo") || "/images/hero_cover_optimized.jpg";
           const cachedVideo = safeStorage.getItem("ruh-hero-video-url") || "https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-with-a-rose-on-a-surface-41584-large.mp4";
           await withTimeout(setDoc(doc(db, "settings", "assets"), { coverPhoto: cachedCover, heroVideoUrl: cachedVideo }));
         } catch (err) {
@@ -1253,7 +1265,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           coverPhotoRef.current = data.coverPhoto;
           safeStorage.setItem("ruh-cover-photo", data.coverPhoto);
         }
-        if (data.heroMediaType) {
+        if (data.heroMediaType && !(typeof window !== 'undefined' && window.innerWidth < 768)) {
           setHeroMode(data.heroMediaType);
         }
       }
@@ -1268,7 +1280,7 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
           safeStorage.setItem("ruh-site-settings", JSON.stringify(merged));
           return merged;
         });
-        if (data.heroMediaType) {
+        if (data.heroMediaType && !(typeof window !== 'undefined' && window.innerWidth < 768)) {
           setHeroMode(data.heroMediaType);
         }
       }
@@ -2303,16 +2315,20 @@ We dispatch all premium monogrammed chests through tier-1 cargo partners (Blueda
               </div>
             )}
 
-            {heroMode === 'photo' ? (
-              /* High-Resolution Static Cover Photo Banner */
+            {heroMode === 'photo' || (typeof window !== 'undefined' && window.innerWidth < 768) ? (
+              /* High-Resolution Static Cover Photo Banner - Instant sub-2.5s LCP */
               <div className="absolute inset-0 z-0">
                 <img 
-                  src={coverPhoto || "https://images.unsplash.com/photo-1615655496458-62137024e6ab?auto=format&fit=crop&q=75&w=1920"} 
-                  alt="Luxury Sand Scent Banner background" 
+                  src={coverPhoto && !coverPhoto.includes("traditional_degh_distillation_pots_1781437229236.jpg") ? coverPhoto : "/images/hero_cover_optimized.jpg"}
+                  srcSet={coverPhoto && !coverPhoto.includes("traditional_degh_distillation_pots_1781437229236.jpg") && coverPhoto.startsWith("http") ? undefined : "/images/hero_cover_mobile.jpg 768w, /images/hero_cover_tablet.jpg 1200w, /images/hero_cover_optimized.jpg 1408w"}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1408px"
+                  alt="Ruh Imperium Heritage Indian Attars &amp; Pure Kannauj Perfumes" 
                   className="w-full h-full object-cover opacity-90 scale-100 transition-all duration-300 select-none pointer-events-none"
                   referrerPolicy="no-referrer"
                   fetchPriority="high"
                   decoding="sync"
+                  width="1408"
+                  height="768"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75 pointer-events-none"></div>
               </div>
